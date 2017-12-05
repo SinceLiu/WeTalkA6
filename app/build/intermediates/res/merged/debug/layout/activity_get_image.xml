@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/square_screen_width"
+    android:layout_height="@dimen/square_screen_width"
+    android:background="@color/main_color">
+	<android.support.v7.widget.RecyclerView
+        android:id="@+id/choose_image_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/choose_friend_tip"/>
+	<TextView
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/synchronizing"
+        android:textColor="#cccccc"
+        android:textSize="24px"
+        android:gravity="center"
+        android:background="@color/main_color"/>
+</RelativeLayout>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/square_screen_width"
+    android:layout_height="@dimen/square_screen_width"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@color/main_color">
+    <com.readboy.view.EmptyRecyclerView
+        android:id="@+id/square_friend_recycler_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:listSelector="?android:attr/selectableItemBackground"/>
+    <TextView
+        android:id="@+id/no_contact"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/no_contact"
+        android:textColor="#cccccc"
+        android:textSize="24px"
+        android:gravity="center"
+        android:visibility="gone"/>
+    <TextView
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/synchronizing"
+        android:textColor="@android:color/white"
+        android:textSize="24px"
+        android:gravity="center"
+        android:background="@color/main_color"/>
+</RelativeLayout>

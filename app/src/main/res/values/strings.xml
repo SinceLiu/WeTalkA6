@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">微聊</string>
+    <string name="speak">按住说话</string>
+    <string name="get_image_fail">获取照片数据出错</string>
+    <string name="play_voice_error">语音文件不存在</string>
+    <string name="homeGroup">家庭圈</string>
+    <string name="voice_error_msg">录音时间太短</string>
+    <string name="out_off_limit">录音最大时长为10秒</string>
+    <string name="synchronizing">正在加载</string>
+    <string name="disk_error">创建本地目录失败</string>
+    <string name="cancel_record">取消录音</string>
+    <string name="no_data">没有消息</string>
+    <string name="square_mode">方屏模式</string>
+    <string name="circle_mode">圆屏模式</string>
+    <string name="wrong_data">获取用户失败</string>
+    <string name="share_to">分享给</string>
+    <string name="share_error">分享图片失败</string>
+    <string name="no_contact">没有联系人</string>
+    <string name="contact_fail">获取联系人信息出错</string>
+    <string name="me">我</string>
+    <string name="missing_required_permission">缺少关键权限</string>
+    <string name="internet_down">网络连接异常</string>
+    <string name="file_not_found">无法找到文件</string>
+    <string name="send_voice_fail">发送语音出错</string>
+    <string name="send_image_fail">发送图片出错</string>
+</resources>

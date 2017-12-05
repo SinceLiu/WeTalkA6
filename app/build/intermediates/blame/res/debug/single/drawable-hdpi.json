@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\ic_launcher.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-hdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-hdpi\\wetalk_icon.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-hdpi\\wetalk_icon.png"
+    }
+]

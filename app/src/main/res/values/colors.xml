@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="unread_color">#ff6d1d</color>
+    <color name="home_color">#11ddaa</color>
+    <color name="yellow">#fac613</color>
+    <color name="purple">#982ec9</color>
+    <color name="deep_purple">#8100bc</color>
+    <color name="blue">#008cff</color>
+    <color name="deep_blue">#0186f2</color>
+    <color name="green">#00cc47</color>
+    <color name="orange">#ff960d</color>
+    <color name="deep_orange">#ed8600</color>
+    <color name="time_color">#5c605f</color>
+    <color name="gray">#898989</color>
+    <color name="index_color">#96b7dff1</color>
+    <color name="index_dark_bg">#20a3ef</color>
+    <color name="username_color">#ffffff</color>
+    <color name="background_transparent">#6a000000</color>
+    <color name="half_transparent">#2d000000</color>
+    <color name="text_color">#434343</color>
+    <color name="wl_blue">#2878ff</color>
+    <color name="wl_gray">#c1c1c1</color>
+    <color name="main_color">#101114</color>
+    <color name="main_color_light">#41cbe1</color>
+    <color name="name_color">#0284ea</color>
+    <color name="emoji_bg_color">#232426</color>
+</resources>

@@ -1,0 +1,74 @@
+[
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\answer_bg_selector.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\answer_bg_selector.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\rect_white.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\rect_white.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\retry_btn_selector.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\retry_btn_selector.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\send_emoji_btn_sel.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\send_emoji_btn_sel.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\divider.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\divider.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\send_voice_btn_sel.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\send_voice_btn_sel.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\phone_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\phone_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\send_image_btn_sel.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\send_image_btn_sel.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\friend_pager_item_circle_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\friend_pager_item_circle_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\index_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\index_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\send_voice_bg_selector.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\send_voice_bg_selector.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\title_bar_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\title_bar_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\emoji_item_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\emoji_item_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\index_dark_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\index_dark_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\phone_bg_blue.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\phone_bg_blue.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\wl_circle.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\wl_circle.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\unread_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\unread_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\action_bar_bg.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\action_bar_bg.xml"
+    }
+]

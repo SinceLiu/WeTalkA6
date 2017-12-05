@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.readboy.wetalk"
+    android:versionCode="171014001"
+    android:versionName="1.1.8" >
+
+    <uses-sdk
+        android:minSdkVersion="20"
+        android:targetSdkVersion="21" />
+
+    <uses-feature android:name="android.hardware.type.watch" />
+    
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_SETTINGS"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> 
+	<uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+	
+	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+	<uses-permission android:name="android.permission.READ_LOGS" />
+    
+    <application
+        android:name=".WeTalkApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/wetalk_icon"
+        android:label="@string/app_name"
+        android:theme="@style/SwipeToDismissTheme"
+        android:usesCleartextTraffic="true">
+        <meta-data android:name="com.readboy.utils.GlideConfiguration" android:value="GlideModule" />
+        <provider
+            android:authorities="com.readboy.wetalk.provider.Conversation"
+            android:name="com.readboy.provider.ConversationProvider"
+            android:exported="true"/>
+        <receiver
+            android:name="com.readboy.receiver.MessageReceiver">
+            <intent-filter>
+                <action android:name="readboy.action.NOTIFY_MESSAGE"/>
+            </intent-filter>
+            <intent-filter >
+                <action android:name="com.readboy.action.SENDPICTURE"/>
+            </intent-filter>
+        </receiver>
+        <activity 
+            android:name=".FirstStartActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.readboy.WATCH.FLAG" />
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity 
+            android:name=".FriendActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"
+            android:exported="true"/>
+        <activity 
+            android:name=".DisplayImageActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:exported="true"/>
+        <activity 
+            android:name=".GetImageActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"
+            android:exported="true"/>
+        <activity 
+            android:name=".EmojiActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
+        <activity 
+            android:name=".ConversationActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
+        <activity android:name=".ChooseFriendActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"></activity>
+        <service android:name=".UpdateContactPhotoService"></service>
+    </application>
+
+</manifest>
