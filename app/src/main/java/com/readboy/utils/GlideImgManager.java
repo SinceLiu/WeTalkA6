@@ -17,8 +17,6 @@ public class GlideImgManager {
 	* load normal  for  circle or round img
 	*
 	* @param url
-	* @param erroImg
-	* @param emptyImg
 	* @param iv
 	* @param tag
 	*/
@@ -72,8 +70,6 @@ public class GlideImgManager {
 	* load normal  for  circle or round img
 	*
 	* @param url
-	* @param erroImg
-	* @param emptyImg
 	* @param iv
 	* @param tag
 	*/

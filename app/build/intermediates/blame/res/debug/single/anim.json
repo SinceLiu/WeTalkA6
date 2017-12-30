@@ -16,23 +16,11 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\anim\\hide.xml"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\anim\\play.xml",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\anim\\play.xml"
-    },
-    {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\anim\\record_ing.xml",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\anim\\record_ing.xml"
-    },
-    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\anim\\state.xml",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\anim\\state.xml"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\anim\\show.xml",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\anim\\show.xml"
-    },
-    {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\anim\\play_wht.xml",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\anim\\play_wht.xml"
     }
 ]

@@ -12,6 +12,7 @@ import com.readboy.bean.Constant;
 
 public class MPrefs {
 
+    //TODO: 不应该为静态变量
     private static MPrefs mPrefs;
     private SharedPreferences mSp;
     
@@ -28,7 +29,8 @@ public class MPrefs {
     public static final String USER = "user";
 
     public static final String IS_FLOAT_VIEW = "float";
-    
+
+    //不应该为静态成员变量
     public static Context mContext;
     
     private MPrefs(Context context){
@@ -91,7 +93,6 @@ public class MPrefs {
     
     /**
      * 判断是否处于好友界面,通知栏样式更改
-     * @param state
      */
     public void setNotificationType(boolean floating){
     	mSp.edit().putBoolean(IS_FLOAT_VIEW, floating).apply();

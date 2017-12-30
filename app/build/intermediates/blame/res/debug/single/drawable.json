@@ -20,12 +20,20 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\divider.xml"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\play_wht.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\play_wht.xml"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\send_voice_btn_sel.xml",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\send_voice_btn_sel.xml"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\phone_bg.xml",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\phone_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\record_ing.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\record_ing.xml"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\send_image_btn_sel.xml",
@@ -54,6 +62,10 @@
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\index_dark_bg.xml",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\index_dark_bg.xml"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\play.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable\\play.xml"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable\\phone_bg_blue.xml",

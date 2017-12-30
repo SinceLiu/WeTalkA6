@@ -11,11 +11,13 @@ public class Conversations {
 
     static final String AUTHORITY = "com.readboy.wetalk.provider.Conversation";
 
-    private Conversations(){}
+    private Conversations() {
+    }
 
-    public static final class Conversation implements BaseColumns{
+    public static final class Conversation implements BaseColumns {
 
-        private Conversation(){}
+        private Conversation() {
+        }
 
         //访问Uri
         public static final Uri CONVERSATION_URI = Uri.parse("content://" + AUTHORITY + "/conversation");

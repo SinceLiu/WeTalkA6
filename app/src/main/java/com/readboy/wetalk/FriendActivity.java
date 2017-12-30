@@ -29,7 +29,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 
-public class FriendActivity extends RequestPermissionActivityBase {
+public class FriendActivity extends BaseRequestPermissionActivity {
 	
 	private MPrefs mPrefs;
 	private List<Friend> mFriends;
@@ -296,7 +296,8 @@ public class FriendActivity extends RequestPermissionActivityBase {
 	            }
 	        }
 			holder.item.setFriendName(friend.name);
-			holder.item.setFriendAvatar(FriendActivity.this, friend.name,friend.relation,friend.photoUri);//Constant.getAvatarPath(FriendActivity.this) + friend.uuid);
+			holder.item.setFriendAvatar(FriendActivity.this, friend.name,friend.relation,friend.photoUri);
+			//Constant.getAvatarPath(FriendActivity.this) + friend.uuid);
 			holder.item.getAvatarView().setOnTouchListener(new OnTouchListener() {
 				
 				@Override

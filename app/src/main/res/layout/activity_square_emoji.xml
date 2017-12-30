@@ -4,12 +4,13 @@
     android:layout_height="@dimen/square_screen_width"
     android:layout_gravity="center"
     android:background="@color/main_color">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/square_emoji_recycle_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null"
-        android:scrollbars="none"
+        android:listSelector="@android:color/transparent"
         android:overScrollMode="never"
-        android:listSelector="@android:color/transparent"/>
+        android:scrollbars="none" />
 </RelativeLayout>

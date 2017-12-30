@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 23
     buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.readboy.wetalk"
-        minSdkVersion 20
-        targetSdkVersion 21
+        minSdkVersion 21
+        targetSdkVersion 25
     }
 
     buildTypes {

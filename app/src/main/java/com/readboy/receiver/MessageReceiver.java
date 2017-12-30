@@ -2,7 +2,9 @@ package com.readboy.receiver;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,59 +38,64 @@ import android.text.TextUtils;
  * 获取消息
  */
 
-public class MessageReceiver extends BroadcastReceiver{
+public class MessageReceiver extends BroadcastReceiver {
 
-	public static final String READBOY_ACTION_NOTIFY_MESSAGE = "readboy.action.NOTIFY_MESSAGE";
-	public static final String READBOY_ACTION_SEND_CAPTURE = "com.readboy.action.SENDPICTURE";
-	
+    public static final String READBOY_ACTION_NOTIFY_MESSAGE = "readboy.action.NOTIFY_MESSAGE";
+    public static final String READBOY_ACTION_SEND_CAPTURE = "com.readboy.action.SENDPICTURE";
+
     private static final int DOWNLOAD_MSG = 0x13;
+
+    /**
+     * TODO 修改mContext, 不是静态，防止无法释放, 内存泄露。
+     */
+//    private Context mContext;
     private static Context mContext;
-    
+
     private static boolean isGettingMessage = false;
     private static boolean isNotify = false;
-    
+
     private static NetWorkUtils mNetWorkUtils;
 
-    private static Handler mHandler = new Handler(Looper.getMainLooper()){
+    private static Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
-        public void handleMessage(Message msg){
-            if(msg.what == DOWNLOAD_MSG){
-                mNetWorkUtils.downLoadVoiceFile(mContext,(Conversation) msg.obj);
-            }else if(msg.what == NetWorkUtils.UPLOAD_SUCCEED){
-            	LogInfo.i("hwj","upload capture succeed");
-            }else if(msg.what == NetWorkUtils.UPLOAD_FAIL){
-            	LogInfo.i("hwj","upload capture fail");
+        public void handleMessage(Message msg) {
+            if (msg.what == DOWNLOAD_MSG) {
+                mNetWorkUtils.downLoadVoiceFile(mContext, (Conversation) msg.obj);
+            } else if (msg.what == NetWorkUtils.UPLOAD_SUCCEED) {
+                LogInfo.i("hwj", "upload capture succeed");
+            } else if (msg.what == NetWorkUtils.UPLOAD_FAIL) {
+                LogInfo.i("hwj", "upload capture fail");
             }
         }
     };
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-    	String action = intent.getAction();
-    	if(TextUtils.isEmpty(action)){
-    		return;
-    	}
-    	switch (action) {
-		case READBOY_ACTION_NOTIFY_MESSAGE://收到消息
-			isNotify = true;
-			LogInfo.i("hwj","isGettingMessage : " + isGettingMessage);
-			if(!isGettingMessage) {
-				LogInfo.i("hwj","------------------- getAllMessage start");
-	    		getAllMessage(context);
-	    		LogInfo.i("hwj","------------------- getAllMessage finish");
-	        }
-			break;
-		case READBOY_ACTION_SEND_CAPTURE://发送监拍指令
-			String path = intent.getStringExtra("picture_path");
-			ArrayList<String> ids = intent.getStringArrayListExtra("capture_uuid");
-			if(TextUtils.isEmpty(path) || ids == null){
-				return;
-			}
-			NetWorkUtils.getInstance(context).uploadCaptureFile(ids, path, mHandler);
-			break;
-		default:
-			break;
-		}
+        String action = intent.getAction();
+        if (TextUtils.isEmpty(action)) {
+            return;
+        }
+        switch (action) {
+            case READBOY_ACTION_NOTIFY_MESSAGE://收到消息
+                isNotify = true;
+                LogInfo.i("hwj", "isGettingMessage : " + isGettingMessage);
+                if (!isGettingMessage) {
+                    LogInfo.i("hwj", "------------------- getAllMessage start");
+                    getAllMessage(context);
+                    LogInfo.i("hwj", "------------------- getAllMessage finish");
+                }
+                break;
+            case READBOY_ACTION_SEND_CAPTURE://发送监拍指令
+                String path = intent.getStringExtra("picture_path");
+                ArrayList<String> ids = intent.getStringArrayListExtra("capture_uuid");
+                if (TextUtils.isEmpty(path) || ids == null) {
+                    return;
+                }
+                NetWorkUtils.getInstance(context).uploadCaptureFile(ids, path, mHandler);
+                break;
+            default:
+                break;
+        }
     }
 
     public static void getAllMessage(final Context context) {
@@ -98,21 +105,21 @@ public class MessageReceiver extends BroadcastReceiver{
         isGettingMessage = true;
         isNotify = false;
         mNetWorkUtils.getAllMessage(mPrefs.getMessageTag(), new PushResultListener() {
-			
-			@Override
-			public void pushSucceed(String type, String s1, int code, String s,
-					String response) {
-				LogInfo.i("hwj","receive message respon:" + response);
-				try {
+
+            @Override
+            public void pushSucceed(String type, String s1, int code, String s,
+                                    String response) {
+                LogInfo.i("hwj", "receive message respon:" + response);
+                try {
                     JSONObject jsonObject = new JSONObject(response);
                     mPrefs.setMessageTag(jsonObject.optString(NetWorkUtils.TIME));
                     JSONArray array = jsonObject.getJSONArray(NetWorkUtils.DATA);
                     int count = array.length();
                     if (count >= 10) {
-						isNotify = true;
-					}
+                        isNotify = true;
+                    }
                     boolean hasFile = false;
-                    for (int i = 0 ; i < count ; i++){
+                    for (int i = 0; i < count; i++) {
                         JSONObject data = array.optJSONObject(i);
                         String msgHeader = data.optString(NetWorkUtils.HEADER);
                         String[] messageInfo = msgHeader.split("\\|");
@@ -126,17 +133,17 @@ public class MessageReceiver extends BroadcastReceiver{
                         conversation.time = String.valueOf(System.currentTimeMillis());
                         conversation.isUnread = Constant.TRUE;
                         conversation.conversationId = String.valueOf(NetWorkUtils.md5(
-                        		String.valueOf(System.currentTimeMillis())));
+                                String.valueOf(System.currentTimeMillis())));
                         //是否是家庭圈的消息,根据发件人的群Id判断
                         conversation.isHomeGroup = conversation.sendId.startsWith("G") ? Constant.TRUE : Constant.FALSE;
-                        if(conversation.isHomeGroup == Constant.TRUE){
-                        	conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
-                        }else{
-                        	//判断发件人是否存在通讯录中
-                            if(TextUtils.isEmpty(WTContactUtils.getNameById(context,conversation.realSendId))){
+                        if (conversation.isHomeGroup == Constant.TRUE) {
+                            conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
+                        } else {
+                            //判断发件人是否存在通讯录中
+                            if (TextUtils.isEmpty(WTContactUtils.getNameById(context, conversation.realSendId))) {
                                 break;
-                            }else{
-                            	conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
+                            } else {
+                                conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
                             }
                         }
                         //消息类型,支持text、image、audio、video、link
@@ -144,7 +151,7 @@ public class MessageReceiver extends BroadcastReceiver{
                             case NetWorkUtils.TEXT:
                                 String content = data.optString(NetWorkUtils.MESSAGE);
                                 //表情
-                                if(EmojiUtils.getEmojiId(content) != -1) {
+                                if (EmojiUtils.getEmojiId(content) != -1) {
                                     conversation.emojiCode = content;
                                     conversation.emojiId = EmojiUtils.getEmojiId(content);
                                     conversation.type = Constant.REC_EMOJI;
@@ -164,103 +171,108 @@ public class MessageReceiver extends BroadcastReceiver{
                                 conversation.isPlaying = Constant.FALSE;
                                 conversation.type = Constant.REC_VOICE;
                                 hasFile = true;
-                                mHandler.obtainMessage(DOWNLOAD_MSG,conversation).sendToTarget();
+                                mHandler.obtainMessage(DOWNLOAD_MSG, conversation).sendToTarget();
                                 break;
                             case NetWorkUtils.IMAGE:
-                            	conversation.imageUrl = data.optJSONObject(NetWorkUtils.A).optString(NetWorkUtils.SRC);
-                            	conversation.thumbImageUrl = data.optString(NetWorkUtils.MESSAGE);
-                            	conversation.type = Constant.REC_IMAGE;
-                            	addToDatabase(context, conversation);
-                            	break;
-                            case NetWorkUtils.VIDEO:break;
-                            case NetWorkUtils.LINK:break;
-                            default:break;
+                                conversation.imageUrl = data.optJSONObject(NetWorkUtils.A).optString(NetWorkUtils.SRC);
+                                conversation.thumbImageUrl = data.optString(NetWorkUtils.MESSAGE);
+                                conversation.type = Constant.REC_IMAGE;
+                                addToDatabase(context, conversation);
+                                break;
+                            case NetWorkUtils.VIDEO:
+                                break;
+                            case NetWorkUtils.LINK:
+                                break;
+                            default:
+                                break;
                         }
                     }
-                    if(count != 0 && !hasFile){
-                    	sendNotification(context);
+                    if (count != 0 && !hasFile) {
+                        sendNotification(context);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-				isGettingMessage = false;
-				/**
-				 * 两种情况会再次获取
-				 */
-				mHandler.post(new Runnable() {
-					
-					@Override
-					public void run() {
-						if(isNotify){
-							LogInfo.i("hwj"," --- getAllMessage again");
-							getAllMessage(context);
-						}						
-					}
-				});
-			}
-			
-			@Override
-			public void pushFail(String s, String s1, int i, String s2) {
-				isGettingMessage = false;
-			}
-		});
-    }
-    
-    private static void addToDatabase(Context context,Conversation conversation){
-    	//插入数据库
-        Uri uri = context.getContentResolver().insert(Conversations.Conversation.CONVERSATION_URI,
-                ConversationProvider.getContentValue(conversation,true));
-        if(uri != null) {
-        	WTContactUtils.updateUnreadCount(context, conversation.sendId,1);
-        }
-    }
-    
-    private static void sendNotification(Context context){
-    	//在聊天界面的用户不是发送用户,就更新未读信息数
-    	String classState = Settings.Global.getString(context.getContentResolver(), "class_disabled");
-    	LogInfo.i("hwj","classState = " + classState);
-    	if(!TextUtils.isEmpty(classState)){
-    		LogInfo.i("hwj","isNowEnable = " + isTimeEnable(classState));
-    		//未开启上课禁用
-			if(!isTimeEnable(classState)) {
-			    NotificationUtils.notification(context);
-			}
-    	}else{
-    		NotificationUtils.notification(context);
-    	}
+                isGettingMessage = false;
+                /**
+                 * 两种情况会再次获取
+                 */
+                mHandler.post(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (isNotify) {
+                            LogInfo.i("hwj", " --- getAllMessage again");
+                            getAllMessage(context);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void pushFail(String s, String s1, int i, String s2) {
+                isGettingMessage = false;
+            }
+        });
     }
 
-    private static boolean isTimeEnable(String data){
-    	long time = System.currentTimeMillis();
-    	SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm");
+    private static void addToDatabase(Context context, Conversation conversation) {
+        //插入数据库
+        Uri uri = context.getContentResolver().insert(Conversations.Conversation.CONVERSATION_URI,
+                ConversationProvider.getContentValue(conversation, true));
+        if (uri != null) {
+            WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
+        }
+    }
+
+    private static void sendNotification(Context context) {
+        //在聊天界面的用户不是发送用户,就更新未读信息数
+        String classState = Settings.Global.getString(context.getContentResolver(), "class_disabled");
+        LogInfo.i("hwj", "classState = " + classState);
+        if (!TextUtils.isEmpty(classState)) {
+            LogInfo.i("hwj", "isNowEnable = " + isTimeEnable(context, classState));
+            //未开启上课禁用
+            if (!isTimeEnable(context, classState)) {
+                NotificationUtils.notification(context);
+            }
+        } else {
+            NotificationUtils.notification(context);
+        }
+    }
+
+    private static boolean isTimeEnable(Context context, String data) {
+        long time = System.currentTimeMillis();
+        SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm", Locale.CHINESE);
         boolean isEnable = false;
         boolean isWeekEnable = false;
         boolean isTimeEnable = false;
         boolean isSingleTime = false;
         try {
             Date date = new Date(time);
-            long startSetTime = Settings.Global.getLong(mContext.getContentResolver(),"class_disable_time",0);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(time);
+            long startSetTime = Settings.Global.getLong(context.getContentResolver(), "class_disable_time", 0);
             Date startSetData = new Date(startSetTime);
-            boolean isSameDay = isSameDay(date,startSetData);
+            boolean isSameDay = isSameDay(date, startSetData);
             int week = (date.getDay() + 6) % 7;
             week = 1 << (6 - week);
             JSONObject jsonObject = new JSONObject(data);
-            isEnable = jsonObject.optBoolean("enabled",false);
-            String repeatStr = jsonObject.optString("repeat","0000000");
-            int repeatWeek = Integer.parseInt(repeatStr,2);
+            isEnable = jsonObject.optBoolean("enabled", false);
+            String repeatStr = jsonObject.optString("repeat", "0000000");
+            int repeatWeek = Integer.parseInt(repeatStr, 2);
             isSingleTime = isSameDay && (repeatWeek == 0);
             isWeekEnable = (week & repeatWeek) != 0;
             JSONArray jsonArray = jsonObject.optJSONArray("time");
             int length = jsonArray.length();
-            for(int i = 0; i < length; i++){
+            for (int i = 0; i < length; i++) {
                 JSONObject jsonSun = jsonArray.getJSONObject(i);
-                String startTime = jsonSun.optString("start","00:00");
-                String endTime = jsonSun.optString("end","00:00");
+                String startTime = jsonSun.optString("start", "00:00");
+                String endTime = jsonSun.optString("end", "00:00");
                 String nowTime = mDateFormat.format(date);
                 Date date1 = mDateFormat.parse(startTime.trim());
                 Date date2 = mDateFormat.parse(endTime.trim());
                 Date dateNow = mDateFormat.parse(nowTime.trim());
-                if(dateNow.getTime() >= date1.getTime() && dateNow.getTime() < date2.getTime()){
+                if (dateNow.getTime() >= date1.getTime() && dateNow.getTime() < date2.getTime()) {
                     isTimeEnable = true;
                     break;
                 }
@@ -269,12 +281,12 @@ public class MessageReceiver extends BroadcastReceiver{
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return isEnable && (isWeekEnable || isSingleTime) && isTimeEnable;
     }
-    
+
     private static boolean isSameDay(Date day1, Date day2) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String ds1 = sdf.format(day1);

@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
-import com.readboy.utils.LogInfo;
 import com.readboy.wetalk.R;
 
 public class FriendGridItem extends RelativeLayout{

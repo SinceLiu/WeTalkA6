@@ -9,9 +9,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
-//import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -25,7 +25,8 @@ import com.readboy.utils.GlideCircleTransform;
 import com.readboy.utils.WTContactUtils;
 import com.readboy.view.CircleImageView;
 
-public class ChooseFriendActivity extends RequestPermissionActivityBase{
+public class ChooseFriendActivity extends BaseRequestPermissionActivity {
+	private static final String TAG = "ChooseFriendActivity";
 
 	private RecyclerView mFriendList;
 	private View mLoading;
@@ -121,6 +122,8 @@ public class ChooseFriendActivity extends RequestPermissionActivityBase{
 					if(intent == null || TextUtils.isEmpty(intent.getStringExtra("share_image"))){
 						showMsg(getString(R.string.share_error));
 						finish();
+						Log.e(TAG, "onClick: intent = null.");
+						return;
 					}
 					Intent sendImageIntent = new Intent(ChooseFriendActivity.this,ConversationActivity.class);
 					sendImageIntent.putExtra(Constant.FROM,Constant.SHOW_CHAT);
@@ -137,8 +140,7 @@ public class ChooseFriendActivity extends RequestPermissionActivityBase{
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int position) {
-			ViewHolder holder = new ViewHolder(getLayoutInflater().inflate(R.layout.choose_friend_item, parent,false));
-			return holder;
+			return new ViewHolder(getLayoutInflater().inflate(R.layout.choose_friend_item, parent,false));
 		}
 		
 		class ViewHolder extends android.support.v7.widget.RecyclerView.ViewHolder{

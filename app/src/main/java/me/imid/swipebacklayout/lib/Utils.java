@@ -74,6 +74,7 @@ public class Utils {
                 null
             });
         } catch (Throwable t) {
+            t.printStackTrace();
         }
     }
 

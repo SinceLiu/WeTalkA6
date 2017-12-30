@@ -14,31 +14,36 @@ import android.view.View;
 import android.widget.Toast;
 
 /**
- * Created by hwwjian on 2017/3/21.
+ * Created by hwj on 2017/3/21.
+ *
+ * @author hwj
  */
 
-public abstract class RequestPermissionActivityBase extends Activity{
+public abstract class BaseRequestPermissionActivity extends Activity {
 
     private static final int REQUEST_CODE = 0x213;
 
+    /**
+     * 初始化数据
+     */
     protected abstract void initContent();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(Build.VERSION.SDK_INT >= 23){
+        if (Build.VERSION.SDK_INT >= 23) {
             String[] permissions = REQUEST_PERMISSIONS;
-            if(permissions != null){
+            if (permissions != null) {
                 boolean hasPermission = true;
-                for (String permission : permissions){
-                    if(ContextCompat.checkSelfPermission(this,permission) != PackageManager.PERMISSION_GRANTED){
+                for (String permission : permissions) {
+                    if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                         hasPermission = false;
                         break;
                     }
                 }
-                if(!hasPermission){
-                    ActivityCompat.requestPermissions(this,permissions,REQUEST_CODE);
-                }else{
+                if (!hasPermission) {
+                    ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
+                } else {
                     initContent();
                 }
             }
@@ -47,21 +52,21 @@ public abstract class RequestPermissionActivityBase extends Activity{
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == REQUEST_CODE){
+        if (requestCode == REQUEST_CODE) {
             boolean hasPermission = true;
-            for (int i : grantResults){
-                if(i != PackageManager.PERMISSION_GRANTED){
+            for (int i : grantResults) {
+                if (i != PackageManager.PERMISSION_GRANTED) {
                     hasPermission = false;
                     break;
                 }
             }
-            if(hasPermission){
+            if (hasPermission) {
                 initContent();
-            }else{
+            } else {
                 Toast.makeText(this, getString(R.string.missing_required_permission), Toast.LENGTH_SHORT).show();
                 finish();
             }
-        } else{
+        } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -71,20 +76,21 @@ public abstract class RequestPermissionActivityBase extends Activity{
     private int anim_out = R.anim.slide_out_right;
 
     private static final String[] REQUEST_PERMISSIONS = new String[]{Manifest.permission.RECORD_AUDIO,
-    	Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    	Manifest.permission.READ_PHONE_STATE,Manifest.permission.READ_CONTACTS,
-    	Manifest.permission.WRITE_CONTACTS,Manifest.permission.READ_LOGS,
-    	Manifest.permission.ACCESS_WIFI_STATE};
-	
-	protected abstract void initView();
+            Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_LOGS,
+            Manifest.permission.ACCESS_WIFI_STATE};
+
+    protected abstract void initView();
+
     protected abstract void initData();
 
-    protected View getView(int id){
+    protected View getView(int id) {
         return findViewById(id);
     }
 
-    protected void showMsg(String msg){
-    	Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    protected void showMsg(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override

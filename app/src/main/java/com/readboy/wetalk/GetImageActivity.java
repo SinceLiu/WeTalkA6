@@ -28,7 +28,6 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
 import com.readboy.utils.IOs;
-import com.readboy.utils.LogInfo;
 import com.readboy.utils.NetWorkUtils;
 
 public class GetImageActivity extends BaseActivity{
@@ -164,7 +163,10 @@ public class GetImageActivity extends BaseActivity{
     }
     
 	private class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder>{
-		
+
+        private final String TYPE_CAMERA = "camera";
+        private final String TYPE_PICTURE = "picture";
+
 		static final int CAMERA = 0;
 		static final int PICTURE = 1;
 		
@@ -182,7 +184,7 @@ public class GetImageActivity extends BaseActivity{
 
 		@Override
 		public int getItemViewType(int position) {
-			if(mImagePaths.get(position).equals("camera")){
+			if(TYPE_CAMERA.equals(mImagePaths.get(position))){
 				return CAMERA;
 			}else{
 				return PICTURE;
@@ -294,8 +296,7 @@ public class GetImageActivity extends BaseActivity{
 
 		@Override
 		public ViewHolder onCreateViewHolder(ViewGroup parent, int position) {
-			ViewHolder holder = new ViewHolder(getLayoutInflater().inflate(R.layout.item_image, parent,false));
-			return holder;
+			return new ViewHolder(getLayoutInflater().inflate(R.layout.item_image, parent,false));
 		}
 	}
 	
@@ -327,7 +328,6 @@ public class GetImageActivity extends BaseActivity{
 	
 	/**
 	 * 按时间排序
-	 * @param a
 	 */
 	public void bubbleSort(File[] files) {   
 	    int n = files.length;   

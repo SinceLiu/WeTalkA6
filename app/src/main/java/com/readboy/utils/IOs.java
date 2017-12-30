@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -158,9 +157,11 @@ public class IOs {
 
     @TargetApi(19)
     public static String getImageAbsolutePath(Context context, Uri imageUri) {
-        if (context == null || imageUri == null)
+        if (context == null || imageUri == null) {
             return null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT && DocumentsContract.isDocumentUri(context, imageUri)) {
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT
+                && DocumentsContract.isDocumentUri(context, imageUri)) {
             if (isExternalStorageDocument(imageUri)) {
                 String docId = DocumentsContract.getDocumentId(imageUri);
                 String[] split = docId.split(":");
@@ -191,8 +192,9 @@ public class IOs {
         } // MediaStore (and general)
         else if ("content".equalsIgnoreCase(imageUri.getScheme())) {
             // Return the remote address
-            if (isGooglePhotosUri(imageUri))
+            if (isGooglePhotosUri(imageUri)) {
                 return imageUri.getLastPathSegment();
+            }
             return getDataColumn(context, imageUri, null, null);
         }
         // File
@@ -213,8 +215,9 @@ public class IOs {
                 return cursor.getString(index);
             }
         } finally {
-            if (cursor != null)
+            if (cursor != null) {
                 cursor.close();
+            }
         }
         return null;
     }

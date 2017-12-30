@@ -104,12 +104,12 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji4.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\shadow_left.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\shadow_left.png"
-    },
-    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\image_mask_left.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\image_mask_left.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\shadow_left.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\shadow_left.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\avatar_mask.png",
@@ -432,12 +432,12 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_4.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_7.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_7.png"
-    },
-    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji10.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji10.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_7.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_7.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji16.png",

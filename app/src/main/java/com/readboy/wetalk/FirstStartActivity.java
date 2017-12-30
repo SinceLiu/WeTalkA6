@@ -15,7 +15,7 @@ import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.WTContactUtils;
 
-public class FirstStartActivity extends RequestPermissionActivityBase{
+public class FirstStartActivity extends BaseRequestPermissionActivity {
 
 	private NetWorkUtils mNetWorkUtils;
 	

@@ -27,12 +27,12 @@ public class MyTimeUtils {
 	public static final String START =" 00:00:00";
 	public static final String END =" 23:59:59";
 	public static final String DEFAULT_SYMBOL =".";
-	public static final SimpleDateFormat sdf = new SimpleDateFormat(DEFAULT_DATE);
+	public static final SimpleDateFormat SDF = new SimpleDateFormat(DEFAULT_DATE);
 	public static final SimpleDateFormat sdf1 = new SimpleDateFormat(DEFAULT_DATE1);
 
 	/**
 	 * 根据时间戳得到对应年月日 时分，格式：yyyy-MM-dd HH:mm
-	 * @param time 时间戳
+	 * @param timestamp 时间戳
 	 * @return
 	 */
 	public static String getTime(long timestamp) {
@@ -42,7 +42,6 @@ public class MyTimeUtils {
 	
 	/**
 	 * 根据时间戳得到对应月和日，格式：MM-dd
-	 * @param time
 	 * @return
 	 */
 	public static String getMonthAndDay(long timestamp) {
@@ -52,7 +51,6 @@ public class MyTimeUtils {
 	
 	/**
 	 * 根据时间戳得到对应年月日，格式：yyyy-MM-dd
-	 * @param time
 	 * @return
 	 */
 	public static String getYearMonthAndDay(long timestamp) {
@@ -62,7 +60,6 @@ public class MyTimeUtils {
 
 	/**
 	 * 根据时间戳得到对应小时和分钟，格式：HH:mm
-	 * @param time
 	 * @return
 	 */
 	public static String getHourAndMin(long timestamp) {
@@ -72,7 +69,6 @@ public class MyTimeUtils {
 	
 	/**
 	 * 根据时间戳得到对应月和日，格式：MM-dd HH:mm
-	 * @param time
 	 * @return
 	 */
 	public static String getDateAndTime(long timestamp) {
@@ -82,7 +78,6 @@ public class MyTimeUtils {
 
 	/**
 	 * 时间戳转换成聊天界面列表的显示时间
-	 * @param timesamp	时间戳
 	 * @return
 	 */
 	public static String getChatTime(long timestamp) {
@@ -113,7 +108,6 @@ public class MyTimeUtils {
 	
 	/**
 	 * 时间戳转换成列表的显示时间
-	 * @param timesamp	时间戳，单位：秒
 	 * @return
 	 */
 	public static String getListTime(long timestamp){
@@ -151,7 +145,6 @@ public class MyTimeUtils {
 	
 	/**
 	 * 把秒转换成其他单位的值，让用户给然后看出时间，比如：180秒转成3分钟
-	 * @param timesamp	秒的值，单位：秒
 	 * @return	180返回 3分钟
 	 */
 	public static String secondToOtherUnit(Context context, int secondValue){
@@ -296,8 +289,7 @@ public class MyTimeUtils {
 	 */
 	public static String timestampToDateString(Long timestamp, String formatString) {
 		SimpleDateFormat formatter = new SimpleDateFormat(formatString);
-		String strtodate = formatter.format(new Date(timestamp * 1000));
-		return strtodate;
+		return formatter.format(new Date(timestamp * 1000));
 	}
 
 	/**
@@ -310,8 +302,7 @@ public class MyTimeUtils {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		String dateString = formatter.format(currentTime);
 		ParsePosition pos = new ParsePosition(8);
-		Date currentTime_2 = formatter.parse(dateString, pos);
-		return currentTime_2; 
+		return formatter.parse(dateString, pos);
 	}
 
 	/**
@@ -324,8 +315,7 @@ public class MyTimeUtils {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		String dateString = formatter.format(currentTime);
 		ParsePosition pos = new ParsePosition(8);
-		Date currentTime_2 = formatter.parse(dateString, pos);
-		return currentTime_2;
+		return formatter.parse(dateString, pos);
 	}
 
 	/**
@@ -336,8 +326,7 @@ public class MyTimeUtils {
 	public static String getNowTimeString() {
 		Date currentTime = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-		String dateString = formatter.format(currentTime);
-		return dateString;
+		return formatter.format(currentTime);
 	}
 
 	/**
@@ -348,8 +337,7 @@ public class MyTimeUtils {
 	public static String getStringDate() {
 		Date currentTime = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String dateString = formatter.format(currentTime);
-		return dateString;
+		return formatter.format(currentTime);
 	}
 
 	/**
@@ -360,8 +348,7 @@ public class MyTimeUtils {
 	public static String getStringDateShort() {
 		Date currentTime = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		String dateString = formatter.format(currentTime);
-		return dateString;
+		return formatter.format(currentTime);
 	}
 
 	/**
@@ -372,21 +359,18 @@ public class MyTimeUtils {
 	public static String getTimeShort() {
 		SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 		Date currentTime = new Date();
-		String dateString = formatter.format(currentTime);
-		return dateString;
+		return formatter.format(currentTime);
 	}
 
 	/**
 	 * 将长时间格式字符串转换为时间 yyyy-MM-dd HH:mm:ss
 	 * 
 	 * @param strDate
-	 * @return
 	 */
 	public static Date strToDateLong(String strDate) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		ParsePosition pos = new ParsePosition(0);
-		Date strtodate = formatter.parse(strDate, pos);
-		return strtodate;
+		return formatter.parse(strDate, pos);
 	}
 
 	/**
@@ -397,21 +381,18 @@ public class MyTimeUtils {
 	 */
 	public static String dateToStrLong(java.util.Date dateDate) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String dateString = formatter.format(dateDate);
-		return dateString;
+		return formatter.format(dateDate);
 	}
 
 	/**
 	 * 将短时间格式时间转换为字符串 yyyy-MM-dd
 	 * 
 	 * @param dateDate
-	 * @param k
 	 * @return
 	 */
 	public static String dateToStr(java.util.Date dateDate) {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		String dateString = formatter.format(dateDate);
-		return dateString;
+		return formatter.format(dateDate);
 	}
 
 	/**
@@ -424,9 +405,9 @@ public class MyTimeUtils {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		ParsePosition pos = new ParsePosition(0);
 		try {
-			Date strtodate = formatter.parse(strDate, pos);
-			return strtodate;
+			return formatter.parse(strDate, pos);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return null;
 	}
@@ -437,8 +418,7 @@ public class MyTimeUtils {
 	 * @return
 	 */
 	public static Date getNow() {
-		Date currentTime = new Date();
-		return currentTime;
+		return new Date();
 	}
 
 	/**
@@ -448,8 +428,7 @@ public class MyTimeUtils {
 	 * @return
 	 */
 	public static Date getDateFromLong(long time) {
-		Date date_3_hm_date = new Date(time);
-		return date_3_hm_date;
+		return new Date(time);
 	}
 	
 	/**
@@ -461,8 +440,7 @@ public class MyTimeUtils {
 	public static Date getLastDate(long day) {
 		Date date = new Date();
 		long date_3_hm = date.getTime() - 3600000 * 34 * day;
-		Date date_3_hm_date = new Date(date_3_hm);
-		return date_3_hm_date;
+		return new Date(date_3_hm);
 	}
 
 	/**
@@ -473,8 +451,7 @@ public class MyTimeUtils {
 	public static String getStringToday() {
 		Date currentTime = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd HHmmss");
-		String dateString = formatter.format(currentTime);
-		return dateString;
+		return formatter.format(currentTime);
 	}
 
 	/**
@@ -527,8 +504,7 @@ public class MyTimeUtils {
 	public static String getUserDate(String sformat) {
 		Date currentTime = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat(sformat);
-		String dateString = formatter.format(currentTime);
-		return dateString;
+		return formatter.format(currentTime);
 	}
 
 	/**
@@ -564,10 +540,7 @@ public class MyTimeUtils {
 		else {
 			double y = Double.parseDouble(kk[0]) + Double.parseDouble(kk[1]) / 60;
 			double u = Double.parseDouble(jj[0]) + Double.parseDouble(jj[1]) / 60;
-			if ((y - u) > 0)
-				return true;
-			else
-				return false;
+			return (y - u) > 0;
 		}
 	}
 
@@ -599,6 +572,7 @@ public class MyTimeUtils {
 			date1.setTime(Time * 1000);
 			mydate1 = format.format(date1);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return mydate1;
 	}
@@ -726,15 +700,14 @@ public class MyTimeUtils {
 		GregorianCalendar gc = (GregorianCalendar) Calendar.getInstance();
 		gc.setTime(d);
 		int year = gc.get(Calendar.YEAR);
-		if ((year % 400) == 0)
-			return true;
-		else if ((year % 4) == 0) {
-			if ((year % 100) == 0)
-				return false;
-			else
-				return true;
-		} else
-			return false;
+//		if ((year % 400) == 0) {
+//			return true;
+//		} else if ((year % 4) == 0) {
+//			return (year % 100) != 0;
+//		} else {
+//			return false;
+//		}
+		return (year % 400) == 0 || (year % 4) == 0 && (year % 100) != 0;
 	}
 
 	/**
@@ -790,13 +763,15 @@ public class MyTimeUtils {
 		cal2.setTime(date2);
 		int subYear = cal1.get(Calendar.YEAR) - cal2.get(Calendar.YEAR);
 		if (0 == subYear) {
-			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR)) {
 				return true;
-		} else if (1 == subYear && 11 == cal2.get(Calendar.MONTH)) {
+			}
+		} else if (1 == subYear && Calendar.DECEMBER == cal2.get(Calendar.MONTH)) {
 			// 如果12月的最后一周横跨来年第一周的话则最后一周即算做来年的第一周
-			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR)) {
 				return true;
-		} else if (-1 == subYear && 11 == cal1.get(Calendar.MONTH)) {
+			}
+		} else if (-1 == subYear && Calendar.DECEMBER == cal1.get(Calendar.MONTH)) {
 			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
 				return true;
 		}
@@ -829,19 +804,19 @@ public class MyTimeUtils {
 		Date dd = strToDate(sdate);
 		Calendar c = Calendar.getInstance();
 		c.setTime(dd);
-		if (num.equals("1")) // 返回星期一所在的日期
+		if ("1".equals(num)) // 返回星期一所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-		else if (num.equals("2")) // 返回星期二所在的日期
+		else if ("2".equals(num)) // 返回星期二所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-		else if (num.equals("3")) // 返回星期三所在的日期
+		else if ("3".equals(num)) // 返回星期三所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-		else if (num.equals("4")) // 返回星期四所在的日期
+		else if ("4".equals(num)) // 返回星期四所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-		else if (num.equals("5")) // 返回星期五所在的日期
+		else if ("5".equals(num)) // 返回星期五所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-		else if (num.equals("6")) // 返回星期六所在的日期
+		else if ("6".equals(num)) // 返回星期六所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-		else if (num.equals("0")) // 返回星期日所在的日期
+		else if ("0".equals(num)) // 返回星期日所在的日期
 			c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 		return new SimpleDateFormat("yyyy-MM-dd").format(c.getTime());
 	}
@@ -855,8 +830,7 @@ public class MyTimeUtils {
 		Date date = getNow();
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		int w = c.get(Calendar.DAY_OF_WEEK);
-		return w;
+		return c.get(Calendar.DAY_OF_WEEK);
 	}
 
 	/**
@@ -904,9 +878,9 @@ public class MyTimeUtils {
 	 * @return
 	 */
 	public static long getDays(String date1, String date2) {
-		if (date1 == null || date1.equals(""))
+		if (date1 == null || "".equals(date1))
 			return 0;
-		if (date2 == null || date2.equals(""))
+		if (date2 == null || "".equals(date2))
 			return 0;
 		// 转换为标准时间
 		SimpleDateFormat myFormatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -917,8 +891,7 @@ public class MyTimeUtils {
 			mydate = myFormatter.parse(date2);
 		} catch (Exception e) {
 		}
-		long day = (date.getTime() - mydate.getTime()) / (24 * 60 * 60 * 1000);
-		return day;
+		return (date.getTime() - mydate.getTime()) / (24 * 60 * 60 * 1000);
 	}
 
 	/**
@@ -1006,8 +979,7 @@ public class MyTimeUtils {
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		int u = c.get(Calendar.DAY_OF_WEEK);
-		String newday = getNextDay(sdate, (1 - u) + "");
-		return newday;
+		return getNextDay(sdate, (1 - u) + "");
 	}
 
 	/**
@@ -1041,13 +1013,11 @@ public class MyTimeUtils {
 	}
 
 	/**
-	 * 
-	 * @param args
+	 *
 	 */
 	public static boolean RightDate(String date) {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		;
 		if (date == null)
 			return false;
 		if (date.length() > 10) {

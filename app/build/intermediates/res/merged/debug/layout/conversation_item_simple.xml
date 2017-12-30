@@ -42,7 +42,7 @@
 	                android:id="@+id/conversation_item_rec_voice_play_anim"
 	                android:layout_width="21px"
 	                android:layout_height="30px"
-	                android:background="@anim/play"
+	                android:background="@drawable/play"
 	                android:layout_gravity="center_vertical|right"
 	                android:layout_marginRight="15px"
 	                android:visibility="gone"/>
@@ -93,7 +93,7 @@
 	                android:id="@+id/conversation_item_send_voice_play_anim"
 	                android:layout_width="21px"
 	                android:layout_height="30px"
-	                android:background="@anim/play_wht"
+	                android:background="@drawable/play_wht"
 	                android:layout_gravity="center_vertical"
 	                android:visibility="gone"
 	                android:layout_marginLeft="15px"/>

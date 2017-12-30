@@ -361,6 +361,7 @@ public class ViewDragHelper {
      * Interpolator defining the animation curve for mScroller
      */
     private static final Interpolator sInterpolator = new Interpolator() {
+        @Override
         public float getInterpolation(float t) {
             t -= 1.0f;
             return t * t * t * t * t + 1.0f;
@@ -368,6 +369,7 @@ public class ViewDragHelper {
     };
 
     private final Runnable mSetIdleRunnable = new Runnable() {
+        @Override
         public void run() {
             setDragState(STATE_IDLE);
         }
@@ -931,7 +933,7 @@ public class ViewDragHelper {
     }
 
     private void saveLastMotion(MotionEvent ev) {
-        final int pointerCount = MotionEventCompat.getPointerCount(ev);
+        final int pointerCount = ev.getPointerCount();
         for (int i = 0; i < pointerCount; i++) {
             final int pointerId = MotionEventCompat.getPointerId(ev, i);
             final float x = MotionEventCompat.getX(ev, i);
@@ -1534,11 +1536,7 @@ public class ViewDragHelper {
      * otherwise
      */
     public boolean isViewUnder(View view, int x, int y) {
-        if (view == null) {
-            return false;
-        }
-        return x >= view.getLeft() && x < view.getRight() && y >= view.getTop()
-                && y < view.getBottom();
+        return view != null && x >= view.getLeft() && x < view.getRight() && y >= view.getTop() && y < view.getBottom();
     }
 
     /**

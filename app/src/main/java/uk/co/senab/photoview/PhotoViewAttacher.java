@@ -385,8 +385,9 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
             if (mScrollEdge == EDGE_BOTH
                     || (mScrollEdge == EDGE_LEFT && dx >= 1f)
                     || (mScrollEdge == EDGE_RIGHT && dx <= -1f)) {
-                if (null != parent)
+                if (null != parent) {
                     parent.requestDisallowInterceptTouchEvent(false);
+                }
             }
         } else {
             if (null != parent) {
@@ -803,6 +804,7 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         return null;
     }
 
+    @Override
     public Bitmap getVisibleRectangleBitmap() {
         ImageView imageView = getImageView();
         return imageView == null ? null : imageView.getDrawingCache();

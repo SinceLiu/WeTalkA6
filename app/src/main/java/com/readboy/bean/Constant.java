@@ -1,14 +1,16 @@
 package com.readboy.bean;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
+
+import java.io.File;
 
 /**
  * Created by 1-PC on 2016/9/21.
  * 常量
+ * @author hwj
  */
-public class Constant extends Application{
+public final class Constant{
 
 	//能否切换测试服务器,正式apk不允许切换
 	public static final boolean CAN_CHANGE_TO_TEST_SERVER = true;
@@ -82,11 +84,15 @@ public class Constant extends Application{
     
     /**
      * 路径相关
-     * @param context
-     * @return
      */
     private static String getExternalFileDirectory(Context context){
-    	return context.getExternalFilesDir(null).getPath();
+        File file = context.getExternalFilesDir(null);
+        if (file != null){
+            return file.getPath();
+        }else {
+            return Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + "/Android/data/com.readboy.wetalk/files";
+        }
     }
     
     public static String getVoicePath(Context context){
