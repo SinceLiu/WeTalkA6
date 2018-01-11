@@ -159,8 +159,9 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
         imageView.setOnTouchListener(this);
 
         ViewTreeObserver observer = imageView.getViewTreeObserver();
-        if (null != observer)
+        if (null != observer) {
             observer.addOnGlobalLayoutListener(this);
+        }
 
         // Make sure we using MATRIX Scale Type
         setImageViewScaleTypeMatrix(imageView);
@@ -258,15 +259,18 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
     @Override
     public boolean setDisplayMatrix(Matrix finalMatrix) {
-        if (finalMatrix == null)
+        if (finalMatrix == null) {
             throw new IllegalArgumentException("Matrix cannot be null");
+        }
 
         ImageView imageView = getImageView();
-        if (null == imageView)
+        if (null == imageView) {
             return false;
+        }
 
-        if (null == imageView.getDrawable())
+        if (null == imageView.getDrawable()) {
             return false;
+        }
 
         mSuppMatrix.set(finalMatrix);
         setImageViewMatrix(getDrawMatrix());
@@ -812,8 +816,9 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
 
     @Override
     public void setZoomTransitionDuration(int milliseconds) {
-        if (milliseconds < 0)
+        if (milliseconds < 0) {
             milliseconds = DEFAULT_ZOOM_DURATION;
+        }
         this.ZOOM_DURATION = milliseconds;
     }
 
@@ -928,14 +933,16 @@ public class PhotoViewAttacher implements IPhotoView, View.OnTouchListener,
     }
 
     private int getImageViewWidth(ImageView imageView) {
-        if (null == imageView)
+        if (null == imageView) {
             return 0;
+        }
         return imageView.getWidth() - imageView.getPaddingLeft() - imageView.getPaddingRight();
     }
 
     private int getImageViewHeight(ImageView imageView) {
-        if (null == imageView)
+        if (null == imageView) {
             return 0;
+        }
         return imageView.getHeight() - imageView.getPaddingTop() - imageView.getPaddingBottom();
     }
 

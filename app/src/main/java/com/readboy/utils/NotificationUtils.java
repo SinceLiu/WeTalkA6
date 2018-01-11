@@ -21,6 +21,9 @@ import com.readboy.wetalk.R;
  */
 
 public class NotificationUtils {
+    private static final String TAG = "NotificationUtils";
+
+    private static final int MAX_MESSAGE_COUNT = 100;
 
     public static final int NOTIFY_ID = "wetlak".hashCode();
 
@@ -48,7 +51,7 @@ public class NotificationUtils {
         builder.setContentTitle("微聊");
         builder.setExtras(bundle);
         int count = WTContactUtils.getAllContactsUnreadCount(context);
-        if (count >= 100) {
+        if (count >= MAX_MESSAGE_COUNT) {
             builder.setContentText("收到99+条新消息");
         } else if (count > 0) {
             builder.setContentText("收到" + WTContactUtils.getAllContactsUnreadCount(context) + "条新消息");
@@ -71,7 +74,7 @@ public class NotificationUtils {
         builder.setContentTitle("微聊");
         builder.setExtras(bundle);
         int count = WTContactUtils.getAllContactsUnreadCount(context);
-        if (count >= 100) {
+        if (count >= MAX_MESSAGE_COUNT) {
             builder.setContentText("收到99+条新消息");
         } else if (count > 0) {
             builder.setContentText("收到" + WTContactUtils.getAllContactsUnreadCount(context) + "条新消息");

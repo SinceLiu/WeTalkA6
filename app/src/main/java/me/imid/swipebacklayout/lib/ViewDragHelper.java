@@ -742,10 +742,12 @@ public class ViewDragHelper {
      */
     private int clampMag(int value, int absMin, int absMax) {
         final int absValue = Math.abs(value);
-        if (absValue < absMin)
+        if (absValue < absMin) {
             return 0;
-        if (absValue > absMax)
+        }
+        if (absValue > absMax) {
             return value > 0 ? absMax : -absMax;
+        }
         return value;
     }
 
@@ -761,10 +763,12 @@ public class ViewDragHelper {
      */
     private float clampMag(float value, float absMin, float absMax) {
         final float absValue = Math.abs(value);
-        if (absValue < absMin)
+        if (absValue < absMin) {
             return 0;
-        if (absValue > absMax)
+        }
+        if (absValue > absMax) {
             return value > 0 ? absMax : -absMax;
+        }
         return value;
     }
 
@@ -1564,14 +1568,18 @@ public class ViewDragHelper {
     private int getEdgeTouched(int x, int y) {
         int result = 0;
 
-        if (x < mParentView.getLeft() + mEdgeSize)
+        if (x < mParentView.getLeft() + mEdgeSize) {
             result = EDGE_LEFT;
-        if (y < mParentView.getTop() + mEdgeSize)
+        }
+        if (y < mParentView.getTop() + mEdgeSize) {
             result = EDGE_TOP;
-        if (x > mParentView.getRight() - mEdgeSize)
+        }
+        if (x > mParentView.getRight() - mEdgeSize) {
             result = EDGE_RIGHT;
-        if (y > mParentView.getBottom() - mEdgeSize)
+        }
+        if (y > mParentView.getBottom() - mEdgeSize) {
             result = EDGE_BOTTOM;
+        }
 
         return result;
     }

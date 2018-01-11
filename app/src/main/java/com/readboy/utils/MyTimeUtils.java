@@ -28,7 +28,7 @@ public class MyTimeUtils {
 	public static final String END =" 23:59:59";
 	public static final String DEFAULT_SYMBOL =".";
 	public static final SimpleDateFormat SDF = new SimpleDateFormat(DEFAULT_DATE);
-	public static final SimpleDateFormat sdf1 = new SimpleDateFormat(DEFAULT_DATE1);
+	public static final SimpleDateFormat SDF_1 = new SimpleDateFormat(DEFAULT_DATE1);
 
 	/**
 	 * 根据时间戳得到对应年月日 时分，格式：yyyy-MM-dd HH:mm
@@ -515,15 +515,16 @@ public class MyTimeUtils {
 		String[] jj = null;
 		kk = endTime.split(":");
 		jj = startTime.split(":");
-		if (Integer.parseInt(kk[0]) < Integer.parseInt(jj[0]))
-			return "0";
-		else {
+		if (Integer.parseInt(kk[0]) < Integer.parseInt(jj[0])) {
+            return "0";
+        } else {
 			double y = Double.parseDouble(kk[0]) + Double.parseDouble(kk[1]) / 60;
 			double u = Double.parseDouble(jj[0]) + Double.parseDouble(jj[1]) / 60;
-			if ((y - u) > 0)
-				return y - u + "";
-			else
-				return "0";
+			if ((y - u) > 0) {
+                return y - u + "";
+            } else {
+                return "0";
+            }
 		}
 	}
 
@@ -535,9 +536,9 @@ public class MyTimeUtils {
 		String[] jj = null;
 		kk = endTime.split(":");
 		jj = startTime.split(":");
-		if (Integer.parseInt(kk[0]) < Integer.parseInt(jj[0]))
-			return false;
-		else {
+		if (Integer.parseInt(kk[0]) < Integer.parseInt(jj[0])) {
+            return false;
+        } else {
 			double y = Double.parseDouble(kk[0]) + Double.parseDouble(kk[1]) / 60;
 			double u = Double.parseDouble(jj[0]) + Double.parseDouble(jj[1]) / 60;
 			return (y - u) > 0;
@@ -568,8 +569,8 @@ public class MyTimeUtils {
 		String mydate1 = "";
 		try {
 			Date date1 = format.parse(sj1);
-			long Time = (date1.getTime() / 1000) + Integer.parseInt(jj) * 60;
-			date1.setTime(Time * 1000);
+			long time = (date1.getTime() / 1000) + Integer.parseInt(jj) * 60;
+			date1.setTime(time * 1000);
 			mydate1 = format.format(date1);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -772,8 +773,9 @@ public class MyTimeUtils {
 				return true;
 			}
 		} else if (-1 == subYear && Calendar.DECEMBER == cal1.get(Calendar.MONTH)) {
-			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR))
+			if (cal1.get(Calendar.WEEK_OF_YEAR) == cal2.get(Calendar.WEEK_OF_YEAR)) {
 				return true;
+			}
 		}
 		return false;
 	}
@@ -786,8 +788,9 @@ public class MyTimeUtils {
 	public static String getSeqWeek() {
 		Calendar c = Calendar.getInstance(Locale.CHINA);
 		String week = Integer.toString(c.get(Calendar.WEEK_OF_YEAR));
-		if (week.length() == 1)
-			week = "0" + week;
+		if (week.length() == 1) {
+            week = "0" + week;
+        }
 		String year = Integer.toString(c.get(Calendar.YEAR));
 		return year + week;
 	}
@@ -805,19 +808,27 @@ public class MyTimeUtils {
 		Calendar c = Calendar.getInstance();
 		c.setTime(dd);
 		if ("1".equals(num)) // 返回星期一所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-		else if ("2".equals(num)) // 返回星期二所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-		else if ("3".equals(num)) // 返回星期三所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-		else if ("4".equals(num)) // 返回星期四所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-		else if ("5".equals(num)) // 返回星期五所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-		else if ("6".equals(num)) // 返回星期六所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-		else if ("0".equals(num)) // 返回星期日所在的日期
-			c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        } else if ("2".equals(num)) // 返回星期二所在的日期
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+        } else if ("3".equals(num)) // 返回星期三所在的日期
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+        } else if ("4".equals(num)) // 返回星期四所在的日期
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+        } else if ("5".equals(num)) // 返回星期五所在的日期
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+        } else if ("6".equals(num)) // 返回星期六所在的日期
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        } else if ("0".equals(num)) // 返回星期日所在的日期
+        {
+            c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        }
 		return new SimpleDateFormat("yyyy-MM-dd").format(c.getTime());
 	}
 
@@ -878,10 +889,12 @@ public class MyTimeUtils {
 	 * @return
 	 */
 	public static long getDays(String date1, String date2) {
-		if (date1 == null || "".equals(date1))
-			return 0;
-		if (date2 == null || "".equals(date2))
-			return 0;
+		if (date1 == null || "".equals(date1)) {
+            return 0;
+        }
+		if (date2 == null || "".equals(date2)) {
+            return 0;
+        }
 		// 转换为标准时间
 		SimpleDateFormat myFormatter = new SimpleDateFormat("yyyy-MM-dd");
 		java.util.Date date = null;
@@ -904,17 +917,18 @@ public class MyTimeUtils {
 		int hour = 0;
 		int minute = 0;
 		int second = 0;
-		if (time <= 0)
-			return "00:00";
-		else {
+		if (time <= 0) {
+            return "00:00";
+        } else {
 			minute = time / 60;
 			if (minute < 60) {
 				second = time % 60;
 				timeStr = unitFormat(minute) + ":" + unitFormat(second);
 			} else {
 				hour = minute / 60;
-				if (hour > 99)
-					return "99:59:59";
+				if (hour > 99) {
+                    return "99:59:59";
+                }
 				minute = minute % 60;
 				second = time - hour * 3600 - minute * 60;
 				timeStr = unitFormat(hour) + ":" + unitFormat(minute) + ":" + unitFormat(second);
@@ -925,10 +939,11 @@ public class MyTimeUtils {
 
 	public static String unitFormat(int i) {
 		String retStr = null;
-		if (i >= 0 && i < 10)
-			retStr = "0" + Integer.toString(i);
-		else
-			retStr = "" + i;
+		if (i >= 0 && i < 10) {
+            retStr = "0" + Integer.toString(i);
+        } else {
+            retStr = "" + i;
+        }
 		return retStr;
 	}
 
@@ -942,9 +957,9 @@ public class MyTimeUtils {
 		int hour = 0;
 		int minute = 0;
 		int second = 0;
-		if (time <= 0)
-			return "00'00''";
-		else if(time < 60){
+		if (time <= 0) {
+            return "00'00''";
+        } else if(time < 60){
 			return time + "''";
 		} else {
 			minute = time / 60;
@@ -953,8 +968,9 @@ public class MyTimeUtils {
 				timeStr = minute + "'" + unitFormat(second) + "''";
 			} else {
 				hour = minute / 60;
-				if (hour > 99)
-					return "99h59'59''";
+				if (hour > 99) {
+                    return "99h59'59''";
+                }
 				minute = minute % 60;
 				second = time - hour * 3600 - minute * 60;
 				timeStr = hour + "h" + unitFormat(minute) + "'" + unitFormat(second) + "''";
@@ -1003,8 +1019,9 @@ public class MyTimeUtils {
 	public static String getRandom(int i) {
 		Random jjj = new Random();
 		// int suiJiShu = jjj.nextInt(9);
-		if (i == 0)
-			return "";
+		if (i == 0) {
+            return "";
+        }
 		String jj = "";
 		for (int k = 0; k < i; k++) {
 			jj = jj + jjj.nextInt(9);
@@ -1015,11 +1032,12 @@ public class MyTimeUtils {
 	/**
 	 *
 	 */
-	public static boolean RightDate(String date) {
+	public static boolean rightDate(String date) {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		if (date == null)
-			return false;
+		if (date == null) {
+            return false;
+        }
 		if (date.length() > 10) {
 			sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		} else {

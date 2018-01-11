@@ -21,9 +21,9 @@ public class LoadLoacalPhotoCursorTask extends AsyncTask<Object, Object, Object>
     //定义回调接口，获取解析到的数据
     private OnLoadPhotoCursor onLoadPhotoCursor;
     //存放图片URI
-    private ArrayList<Uri> uriArray = new ArrayList<Uri>();
+    private ArrayList<Uri> uriArray = new ArrayList<>();
     //存放图片ID
-    private ArrayList<Long> origIdArray = new ArrayList<Long>();
+    private ArrayList<Long> origIdArray = new ArrayList<>();
 
     public LoadLoacalPhotoCursorTask(Context mContext) {
         mContentResolver = mContext.getContentResolver();
@@ -61,8 +61,8 @@ public class LoadLoacalPhotoCursorTask extends AsyncTask<Object, Object, Object>
         }
         c.close();//关闭数据库
         if (mExitTasksEarly) {
-            uriArray = new ArrayList<Uri>();
-            origIdArray = new ArrayList<Long>();
+            uriArray = new ArrayList<>();
+            origIdArray = new ArrayList<>();
         }
         return null;
     }
@@ -90,6 +90,6 @@ public class LoadLoacalPhotoCursorTask extends AsyncTask<Object, Object, Object>
     }
 
     public interface OnLoadPhotoCursor {
-        public void onLoadPhotoSursorResult(ArrayList<Uri> uriArray, ArrayList<Long> origIdArray);
+        void onLoadPhotoSursorResult(ArrayList<Uri> uriArray, ArrayList<Long> origIdArray);
     }
 }

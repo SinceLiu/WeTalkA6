@@ -158,6 +158,7 @@ public class NetWorkUtils {
     }
 
     public void uploadCaptureFile(final ArrayList<String> ids, String path, final Handler handler) {
+        Log.e(TAG, "uploadCaptureFile() called with: path = " + path + ", Thread = " + Thread.currentThread().getName());
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -385,6 +386,7 @@ public class NetWorkUtils {
      * @param conversation 语音文件的url
      */
     public void downLoadVoiceFile(final Context context, final Conversation conversation) {
+        Log.e(TAG, "downLoadVoiceFile: thread = " + Thread.currentThread().getName());
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -437,8 +439,10 @@ public class NetWorkUtils {
 
     public AsyncHttpClient getClient() {
         if (Looper.myLooper() == null) {
+            Log.e(TAG, "getClient: SyncHttpClient.");
             return new SyncHttpClient();
         } else {
+            Log.e(TAG, "getClient: AsyncHttpClient.");
             return new AsyncHttpClient();
         }
     }
@@ -471,18 +475,17 @@ public class NetWorkUtils {
         return name;
     }
 
-    public void saveMessageTag(Context context) {
+    public void saveMessageTag(final Context context) {
         if (mManager == null) {
             return;
         }
-        final MPrefs mPrefs = MPrefs.getInstance(context);
-        if (TextUtils.isEmpty(mPrefs.getMessageTag())) {
+        if (TextUtils.isEmpty(MPrefs.getMessageTag(context))) {
             try {
-                mManager.getAllMessage(mPrefs.getMessageTag(), new IReadboyWearListener.Stub() {
+                mManager.getAllMessage(MPrefs.getMessageTag(context), new IReadboyWearListener.Stub() {
                     @Override
                     public void pushSuc(String type, String s1, int code, String s, String response) throws RemoteException {
                         try {
-                            mPrefs.setMessageTag(new JSONObject(response).getString(NetWorkUtils.TIME));
+                            MPrefs.setMessageTag(context, new JSONObject(response).getString(NetWorkUtils.TIME));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

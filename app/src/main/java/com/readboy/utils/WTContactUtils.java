@@ -24,7 +24,7 @@ public class WTContactUtils {
     public static String getLocalAvatarPath(Context context) {
         //获取当前手表的头像
         return Environment.getExternalStorageDirectory() + "/personal/"
-                + MPrefs.getInstance(context).getDeviceId() + ".png";
+                + MPrefs.getDeviceId(context) + ".png";
     }
 
     /**
@@ -93,7 +93,6 @@ public class WTContactUtils {
      * @return
      */
     public static List<Friend> getFriendFromContact(Context context) {
-        MPrefs mPrefs = MPrefs.getInstance(context);
         List<Friend> list = new ArrayList<Friend>();
         int oldrid = -1;
         int contactId = -1;
@@ -112,6 +111,9 @@ public class WTContactUtils {
                 contact = new Friend();
                 contact.contactId = contactId;
                 oldrid = contactId;
+            }
+            if (contact == null){
+                continue;
             }
             switch (cursor.getString(cursor.getColumnIndex(Data.MIMETYPE))) {
                 case StructuredName.CONTENT_ITEM_TYPE:

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -28,7 +29,7 @@ public class ConversationProvider extends ContentProvider {
 
     public static final String IS_RECEIVE_MESSAGE = "receive";
 
-    private static UriMatcher mMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private final static UriMatcher mMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         //为UriMatcher注册Uri
@@ -55,7 +56,7 @@ public class ConversationProvider extends ContentProvider {
      */
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String where, String[] whereArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String where, String[] whereArgs, String sortOrder) {
         if (mMatcher.match(uri) == CONVERSATION) {
             Cursor cursor = null;
             if (sortOrder != null) {

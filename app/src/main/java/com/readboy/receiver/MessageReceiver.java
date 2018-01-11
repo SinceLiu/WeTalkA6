@@ -34,7 +34,8 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 /**
- * Created by hwwjian on 2016/12/14.
+ * @author hwwjian
+ * @date 2016/12/14
  * 获取消息
  */
 
@@ -49,18 +50,16 @@ public class MessageReceiver extends BroadcastReceiver {
      * TODO 修改mContext, 不是静态，防止无法释放, 内存泄露。
      */
 //    private Context mContext;
-    private static Context mContext;
+//    private static Context mContext;
 
     private static boolean isGettingMessage = false;
     private static boolean isNotify = false;
-
-    private static NetWorkUtils mNetWorkUtils;
 
     private static Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == DOWNLOAD_MSG) {
-                mNetWorkUtils.downLoadVoiceFile(mContext, (Conversation) msg.obj);
+//                mNetWorkUtils.downLoadVoiceFile(mContext, (Conversation) msg.obj);
             } else if (msg.what == NetWorkUtils.UPLOAD_SUCCEED) {
                 LogInfo.i("hwj", "upload capture succeed");
             } else if (msg.what == NetWorkUtils.UPLOAD_FAIL) {
@@ -99,12 +98,11 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     public static void getAllMessage(final Context context) {
-        final MPrefs mPrefs = MPrefs.getInstance(context);
-        mContext = context;
-        mNetWorkUtils = NetWorkUtils.getInstance(context);
+//        mContext = context;
+        final NetWorkUtils mNetWorkUtils = NetWorkUtils.getInstance(context);
         isGettingMessage = true;
         isNotify = false;
-        mNetWorkUtils.getAllMessage(mPrefs.getMessageTag(), new PushResultListener() {
+        mNetWorkUtils.getAllMessage(MPrefs.getMessageTag(context), new PushResultListener() {
 
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
@@ -112,7 +110,7 @@ public class MessageReceiver extends BroadcastReceiver {
                 LogInfo.i("hwj", "receive message respon:" + response);
                 try {
                     JSONObject jsonObject = new JSONObject(response);
-                    mPrefs.setMessageTag(jsonObject.optString(NetWorkUtils.TIME));
+                    MPrefs.setMessageTag(context, jsonObject.optString(NetWorkUtils.TIME));
                     JSONArray array = jsonObject.getJSONArray(NetWorkUtils.DATA);
                     int count = array.length();
                     if (count >= 10) {
@@ -125,7 +123,7 @@ public class MessageReceiver extends BroadcastReceiver {
                         String[] messageInfo = msgHeader.split("\\|");
                         final Conversation conversation = new Conversation();
                         //收件人的Id
-                        conversation.recId = mPrefs.getDeviceId();
+                        conversation.recId = MPrefs.getDeviceId(context);
                         //真正的发件人Id
                         conversation.realSendId = messageInfo[0];
                         //发件人的Id,分为家庭圈发送和单聊发送两种
@@ -171,7 +169,13 @@ public class MessageReceiver extends BroadcastReceiver {
                                 conversation.isPlaying = Constant.FALSE;
                                 conversation.type = Constant.REC_VOICE;
                                 hasFile = true;
-                                mHandler.obtainMessage(DOWNLOAD_MSG, conversation).sendToTarget();
+//                                mHandler.obtainMessage(DOWNLOAD_MSG, conversation).sendToTarget();
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mNetWorkUtils.downLoadVoiceFile(context, conversation);
+                                    }
+                                });
                                 break;
                             case NetWorkUtils.IMAGE:
                                 conversation.imageUrl = data.optJSONObject(NetWorkUtils.A).optString(NetWorkUtils.SRC);
@@ -288,13 +292,9 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     private static boolean isSameDay(Date day1, Date day2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINESE);
         String ds1 = sdf.format(day1);
         String ds2 = sdf.format(day2);
-        if (ds1.equals(ds2)) {
-            return true;
-        } else {
-            return false;
-        }
+        return ds1.equals(ds2);
     }
 }

@@ -1,6 +1,7 @@
 package com.readboy.wetalk;
 
 import uk.co.senab.photoview.PhotoView;
+
 import android.os.Bundle;
 
 import com.readboy.utils.GlideImgManager;

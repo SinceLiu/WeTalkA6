@@ -38,26 +38,19 @@ import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
 
 /**
+ * @author hwj
  */
 public class ConversationListAdapterSimple extends BaseAdapter {
     private static final String TAG = "ConversationListAdapter";
 
-
-    protected Context mContext;
-
-    protected LayoutInflater mInflater;
-
-    protected List<Conversation> mConversations;
-
-    protected boolean mIsToastShow = false;
-
-    protected Handler mSendMessageHandler;
-
-    protected ContentResolver mResolver;
-
-    protected NetWorkUtils mNetWorkUtils;
-
-    protected MediaPlayer mMediaPlayer;
+    private Context mContext;
+    private LayoutInflater mInflater;
+    private List<Conversation> mConversations;
+    private boolean mIsToastShow = false;
+    private Handler mSendMessageHandler;
+    private ContentResolver mResolver;
+    private NetWorkUtils mNetWorkUtils;
+    private MediaPlayer mMediaPlayer;
 
     public ConversationListAdapterSimple(Context context, List<Conversation> data) {
         mConversations = data;
@@ -154,9 +147,9 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     voiceItemHolder = new VoiceItemHolder();
                     voiceItemHolder.play = view.findViewById(R.id.conversation_item_send_voice_play);
                     voiceItemHolder.time = (TextView) view.findViewById(R.id.conversation_item_send_voice_time);
-                    voiceItemHolder.play_anim = (ImageView) view.findViewById(R.id.conversation_item_send_voice_play_anim);
+                    voiceItemHolder.playAnim = (ImageView) view.findViewById(R.id.conversation_item_send_voice_play_anim);
                     voiceItemHolder.item = view.findViewById(R.id.conversation_item_send_voice_item);
-                    voiceItemHolder.play_img = view.findViewById(R.id.conversation_item_send_voice_play_imgv);
+                    voiceItemHolder.playImg = view.findViewById(R.id.conversation_item_send_voice_play_imgv);
                     voiceItemHolder.retry = (ImageView) view.findViewById(R.id.conversation_item_send_voice_resend_btn);
                     voiceItemHolder.progress = (ImageView) view.findViewById(R.id.conversation_item_send_voice_progress);
                     voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
@@ -168,10 +161,10 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     voiceItemHolder.play = view.findViewById(R.id.conversation_item_rec_voice_play);
                     voiceItemHolder.time = (TextView) view.findViewById(R.id.conversation_item_rec_voice_time);
                     voiceItemHolder.unread = view.findViewById(R.id.conversation_item_rec_voice_unread);
-                    voiceItemHolder.play_anim = (ImageView) view.findViewById(R.id.conversation_item_rec_voice_play_anim);
+                    voiceItemHolder.playAnim = (ImageView) view.findViewById(R.id.conversation_item_rec_voice_play_anim);
                     voiceItemHolder.item = view.findViewById(R.id.conversation_item_rec_voice_item);
                     voiceItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_voice_user_name);
-                    voiceItemHolder.play_img = view.findViewById(R.id.conversation_item_rec_voice_play_imgv);
+                    voiceItemHolder.playImg = view.findViewById(R.id.conversation_item_rec_voice_play_imgv);
                     voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
                     view.setTag(voiceItemHolder);
                     break;
@@ -245,12 +238,12 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 playVoice(conversation, conversation.voiceLocalPath, voiceItemHolder, true);
                 showUploadFileProgressOrResend(conversation, voiceItemHolder);
                 if (conversation.isPlaying == Constant.TRUE) {
-                    voiceItemHolder.play_anim.setVisibility(View.VISIBLE);
-                    ((AnimationDrawable) voiceItemHolder.play_anim.getBackground()).start();
-                    voiceItemHolder.play_img.setVisibility(View.GONE);
+                    voiceItemHolder.playAnim.setVisibility(View.VISIBLE);
+                    ((AnimationDrawable) voiceItemHolder.playAnim.getBackground()).start();
+                    voiceItemHolder.playImg.setVisibility(View.GONE);
                 } else {
-                    voiceItemHolder.play_img.setVisibility(View.VISIBLE);
-                    voiceItemHolder.play_anim.setVisibility(View.GONE);
+                    voiceItemHolder.playImg.setVisibility(View.VISIBLE);
+                    voiceItemHolder.playAnim.setVisibility(View.GONE);
                 }
                 showReceiveOrSendTime(conversation, position, voiceItemHolder);
                 break;
@@ -270,12 +263,12 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 }
                 playVoice(conversation, conversation.voiceLocalPath, voiceItemHolder, false);
                 if (conversation.isPlaying == Constant.TRUE) {
-                    voiceItemHolder.play_anim.setVisibility(View.VISIBLE);
-                    ((AnimationDrawable) voiceItemHolder.play_anim.getBackground()).start();
-                    voiceItemHolder.play_img.setVisibility(View.GONE);
+                    voiceItemHolder.playAnim.setVisibility(View.VISIBLE);
+                    ((AnimationDrawable) voiceItemHolder.playAnim.getBackground()).start();
+                    voiceItemHolder.playImg.setVisibility(View.GONE);
                 } else {
-                    voiceItemHolder.play_img.setVisibility(View.VISIBLE);
-                    voiceItemHolder.play_anim.setVisibility(View.GONE);
+                    voiceItemHolder.playImg.setVisibility(View.VISIBLE);
+                    voiceItemHolder.playAnim.setVisibility(View.GONE);
                 }
                 showReceiveOrSendTime(conversation, position, voiceItemHolder);
                 break;
@@ -603,11 +596,11 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         //播放项
         View play;
         //播放的动画
-        ImageView play_anim;
+        ImageView playAnim;
         //未读小红点
         View unread;
         //语音动画项
-        View play_img;
+        View playImg;
     }
 
     /**

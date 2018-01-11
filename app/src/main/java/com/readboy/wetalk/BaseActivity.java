@@ -6,14 +6,14 @@ import android.view.View;
 import android.widget.Toast;
 
 /**
- * Created by 1-PC on 2016/9/21.
+ * Created by oubin on 2016/9/21.
  */
 public abstract class BaseActivity extends Activity {
 
     public static final String TAG = "WeTalk";
 
-    private int anim_in = R.anim.slide_in_right;
-    private int anim_out = R.anim.slide_out_right;
+    private int animIn = R.anim.slide_in_right;
+    private int animOut = R.anim.slide_out_right;
 
     protected abstract void initView();
 
@@ -30,18 +30,18 @@ public abstract class BaseActivity extends Activity {
     @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
-//        overridePendingTransition(anim_in, anim_out);
+//        overridePendingTransition(animIn, animOut);
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
         super.startActivityForResult(intent, requestCode);
-//        overridePendingTransition(anim_in, anim_out);
+//        overridePendingTransition(animIn, animOut);
     }
 
     @Override
     public void finish() {
         super.finish();
-//        overridePendingTransition(anim_in, anim_out);
+//        overridePendingTransition(animIn, animOut);
     }
 }

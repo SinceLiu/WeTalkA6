@@ -63,7 +63,7 @@ public class EmojiActivity extends BaseActivity {
 
             ImageView emoji;
 
-            public ViewHolder(View itemView) {
+            ViewHolder(View itemView) {
                 super(itemView);
                 emoji = (ImageView) itemView.findViewById(R.id.emoji_content);
             }

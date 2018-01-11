@@ -10,8 +10,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.Arrays;
 
 /**
  * Created by hwj on 2017/3/21.
@@ -20,21 +23,30 @@ import android.widget.Toast;
  */
 
 public abstract class BaseRequestPermissionActivity extends Activity {
+    private static final String TAG = "hwj_RequestPermissionAc";
+
 
     private static final int REQUEST_CODE = 0x213;
 
     /**
-     * 初始化数据
+     * 检查好有权限了，才初始化数据
      */
     protected abstract void initContent();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] permissions = REQUEST_PERMISSIONS;
             if (permissions != null) {
                 boolean hasPermission = true;
+                for (String permission : permissions) {
+                    if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
+                    {
+                        Log.e(TAG, "onCreate: has not permission : " + permission);
+                    }
+                }
+
                 for (String permission : permissions) {
                     if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                         hasPermission = false;
@@ -52,6 +64,9 @@ public abstract class BaseRequestPermissionActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Log.e(TAG, "onRequestPermissionsResult() called with: requestCode = " + requestCode
+                + ", permissions = " + Arrays.toString(permissions)
+                + ", grantResults = " + Arrays.toString(grantResults) + "");
         if (requestCode == REQUEST_CODE) {
             boolean hasPermission = true;
             for (int i : grantResults) {
@@ -61,6 +76,7 @@ public abstract class BaseRequestPermissionActivity extends Activity {
                 }
             }
             if (hasPermission) {
+                Log.e(TAG, "onRequestPermissionsResult: initContent()");
                 initContent();
             } else {
                 Toast.makeText(this, getString(R.string.missing_required_permission), Toast.LENGTH_SHORT).show();
@@ -71,9 +87,9 @@ public abstract class BaseRequestPermissionActivity extends Activity {
         }
     }
 
-    private int anim_in = R.anim.slide_in_right;
+    private int animIn = R.anim.slide_in_right;
     private int state = R.anim.state;
-    private int anim_out = R.anim.slide_out_right;
+    private int animOut = R.anim.slide_out_right;
 
     private static final String[] REQUEST_PERMISSIONS = new String[]{Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -96,18 +112,18 @@ public abstract class BaseRequestPermissionActivity extends Activity {
     @Override
     public void startActivity(Intent intent) {
         super.startActivity(intent);
-//        overridePendingTransition(anim_in,anim_out);
+//        overridePendingTransition(animIn,animOut);
     }
 
     @Override
     public void startActivityForResult(Intent intent, int requestCode) {
         super.startActivityForResult(intent, requestCode);
-//        overridePendingTransition(anim_in,anim_out);
+//        overridePendingTransition(animIn,animOut);
     }
 
     @Override
     public void finish() {
         super.finish();
-//        overridePendingTransition(anim_in,anim_out);
+//        overridePendingTransition(animIn,animOut);
     }
 }

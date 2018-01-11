@@ -21,6 +21,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.readboy.bean.Constant;
 
@@ -29,11 +30,15 @@ import com.readboy.bean.Constant;
  */
 
 public class IOs {
+
+    private static final String TAG = "IOs";
+
     /**
      * 保存bitmap到本地
+     *
      * @param bitmap 要保存的bitmap
-     * @param name 文件名
-     * @param path 文件的存储路径
+     * @param name   文件名
+     * @param path   文件的存储路径
      * @return 返回文件的目录
      */
     public static String savePicInLocal(Bitmap bitmap, String name, String path, Handler mHandler, int quality) {
@@ -48,7 +53,7 @@ public class IOs {
             if (!dir.exists()) {
                 dir.mkdirs();// 创建照片的存储目录
             }
-            File file = new File(dir,name);// 给新照的照片文件命名
+            File file = new File(dir, name);// 给新照的照片文件命名
             // 将字节数组写入到刚创建的图片文件中
             fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
@@ -82,10 +87,10 @@ public class IOs {
         Message message = new Message();
         message.what = Constant.IMAGE_DONE;
         message.obj = path + name;
-        if(mHandler != null) {
+        if (mHandler != null) {
             mHandler.sendMessage(message);
         }
-        if(bitmap != null && !bitmap.isRecycled()){
+        if (bitmap != null && !bitmap.isRecycled()) {
             bitmap.recycle();
             bitmap = null;
             System.gc();
@@ -95,13 +100,14 @@ public class IOs {
 
     /**
      * 保存bitmap到本地
+     *
      * @param bitmap 要保存的bitmap
-     * @param name 文件名
-     * @param path 文件的存储路径
+     * @param name   文件名
+     * @param path   文件的存储路径
      * @return 返回文件的目录
      */
     public static String savePicInLocal(Bitmap bitmap, String name, String path) {
-        if(bitmap == null){
+        if (bitmap == null) {
             return "";
         }
         FileOutputStream fos = null;
@@ -115,7 +121,7 @@ public class IOs {
             if (!dir.exists()) {
                 dir.mkdirs();// 创建照片的存储目录
             }
-            File file = new File(dir,name);// 给新照的照片文件命名
+            File file = new File(dir, name);// 给新照的照片文件命名
             // 将字节数组写入到刚创建的图片文件中
             fos = new FileOutputStream(file);
             bos = new BufferedOutputStream(fos);
@@ -146,7 +152,7 @@ public class IOs {
                 }
             }
         }
-        if(!bitmap.isRecycled()){
+        if (!bitmap.isRecycled()) {
             bitmap.recycle();
             bitmap = null;
             System.gc();
@@ -186,7 +192,7 @@ public class IOs {
                     contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                 }
                 String selection = MediaStore.Images.Media._ID + "=?";
-                String[] selectionArgs = new String[] { split[1] };
+                String[] selectionArgs = new String[]{split[1]};
                 return getDataColumn(context, contentUri, selection, selectionArgs);
             }
         } // MediaStore (and general)
@@ -207,7 +213,7 @@ public class IOs {
     private static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
         Cursor cursor = null;
         String column = MediaStore.Images.Media.DATA;
-        String[] projection = { column };
+        String[] projection = {column};
         try {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
             if (cursor != null && cursor.moveToFirst()) {
@@ -253,57 +259,64 @@ public class IOs {
     private static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
-    
-    // 要保存的文件名 
-    private static String fileName = Environment.getExternalStorageDirectory() + "/get_message_time.txt"; 
 
-    /** 
-     *保存消息时间标记到文件 
+    /**
+     * 要保存的文件名
      */
-    public static void saveTimeTag(Context context,String content) { 
-		try {
-			File file = new File(fileName);
-			if(!file.exists()){
-				file.createNewFile();
-			}
-			FileOutputStream outputStream = new FileOutputStream(file);
-			outputStream.write(content.getBytes()); 
-			outputStream.flush(); 
-			outputStream.close(); 
-			LogInfo.i("hwj","save time tag succeed");
-		} catch (FileNotFoundException e) { 
-		    e.printStackTrace(); 
-		} catch (IOException e) { 
-		    e.printStackTrace(); 
-		} 
+    private static String fileName = Environment.getExternalStorageDirectory() + "/get_message_time.txt";
+
+    /**
+     * 保存消息时间标记到文件
+     */
+    public static void saveTimeTag(Context context, String content) {
+        try {
+            File file = new File(fileName);
+            if (!file.exists()) {
+                if (!file.createNewFile()) {
+                    Log.e(TAG, "saveTimeTag: cannot create new file, filename = " + fileName);
+                    return;
+                }
+            }
+            FileOutputStream outputStream = new FileOutputStream(file);
+            outputStream.write(content.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            LogInfo.i("hwj", "save time tag succeed");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    /** 
+    /**
      * 从文件从获取时间标记
      */
-    public static String readTimeTag(Context context) { 
-    	try { 
-    		File file = new File(fileName);
-    		FileInputStream inputStream = new FileInputStream(file);
-    		byte[] bytes = new byte[1024]; 
-    		ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream(); 
-    		while (inputStream.read(bytes) != -1) { 
-    			arrayOutputStream.write(bytes, 0, bytes.length); 
-    		} 
-    		inputStream.close(); 
-    		arrayOutputStream.close(); 
-    		String content = new String(arrayOutputStream.toByteArray()); 
-    		String regEx="[^0-9]";   
-    		Pattern p = Pattern.compile(regEx);   
-    		Matcher m = p.matcher(content); 
-    		content = m.replaceAll("").trim();
-    		LogInfo.i("hwj","time tag : " + content);
-    		return content;
-    	} catch (FileNotFoundException e) { 
-    		e.printStackTrace(); 
-    	} catch (IOException e) { 
-    		e.printStackTrace(); 
-    	}
-    	return ""; 
+    public static String readTimeTag(Context context) {
+        try {
+            File file = new File(fileName);
+            if (!file.exists()) {
+                Log.e(TAG, "readTimeTag: file is not exit");
+                return "";
+            }
+            FileInputStream inputStream = new FileInputStream(file);
+            byte[] bytes = new byte[1024];
+            ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+            while (inputStream.read(bytes) != -1) {
+                arrayOutputStream.write(bytes, 0, bytes.length);
+            }
+            inputStream.close();
+            arrayOutputStream.close();
+            String content = new String(arrayOutputStream.toByteArray());
+            String regEx = "[^0-9]";
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(content);
+            content = m.replaceAll("").trim();
+            LogInfo.i("hwj", "time tag : " + content);
+            return content;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

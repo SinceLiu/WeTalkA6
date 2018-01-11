@@ -1,6 +1,7 @@
 package com.readboy.wetalk;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Dialog;
@@ -15,9 +16,11 @@ import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,67 +46,40 @@ import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.utils.WTContactUtils;
+import com.tencent.bugly.crashreport.BuglyLog;
 
 public class ConversationActivity extends BaseActivity implements OnClickListener,
         OnScrollListener, OnLongClickListener, OnTouchListener {
+    private static final int MAX_COUNT = 100;
 
     private ListView mConversationList;
-
     private Button mSendVoiceBtn;
-
     private View mSendEmojiBtn;
-
     private View mSendImageBtn;
-
-    private View mNoDataTip;
-
     private TextView mConversationName;
-
-    private View mFooterView;
     private View mHeaderView;
-
     private List<Conversation> mConversations;
-
     private ConversationListAdapterSimple mAdapter;
-
     private Friend mCurrentFriend = null;
-
     private ContentResolver mResolver;
-
-    private MPrefs mPrefs;
-
     private NetWorkUtils mNetWorkUtils;
-
     private View mSendBtnLayout;
-
     private boolean isOnPause = false;
-
     private ImageView mRecordStateImg;
 
     /**
      * 录音相关
      */
     private static final int MIN_RECORD_TIME = 1;
-
     private static final int MAX_RECORD_TIME = 10;
-
     private final int STOP_TIMER = 0x982;
-
     private int mRecordTime;
-
     private int limitTime = MAX_RECORD_TIME;
-
     private Dialog mRecordDialog;
-
     private RecordStrategy mRecorder;
-
     private Thread mTimerThread;
-
     private boolean isRecording = false;
-
     private String mCurrentImagePath = "";
-
-    private final int MAX_COUNT = 100;
 
     private float density;
 
@@ -118,13 +94,10 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                 return;
             }
             int length = conversations.size();
-            if (mPrefs == null) {
-                mPrefs = MPrefs.getInstance(ConversationActivity.this);
-            }
             for (int i = length - 1; i >= 0; i--) {
                 //按时间降序,获取最新的一条消息
                 Conversation conversation = conversations.get(i);
-                if (!conversation.sendId.equals(mPrefs.getDeviceId())) {
+                if (!conversation.sendId.equals(MPrefs.getDeviceId(ConversationActivity.this))) {
                     //添加到显示的消息列表集合
                     mConversations.add(conversation);
                     LogInfo.i("hwj", "onChange ---------- add conversation notifyDataSetChanged");
@@ -136,8 +109,9 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         }
     };
 
-    private GetConversationTask mConversationTask;
-
+    /**
+     * 异步获取通讯录
+     */
     private class GetConversationTask extends AsyncTask<Void, Void, List<Conversation>> {
 
         @Override
@@ -147,7 +121,15 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
 
         @Override
         protected void onPostExecute(List<Conversation> result) {
+            Log.e(TAG, "onPostExecute: mConversations = " + mConversations);
+            List<Conversation> temp = new ArrayList<>();
+            if (mConversations != null && mConversations.size() > 0) {
+                temp.addAll(mConversations);
+            }
             mConversations = result;
+            if (temp.size() > 0) {
+                mConversations.addAll(temp);
+            }
             limitConversationSize();
             mAdapter = new ConversationListAdapterSimple(ConversationActivity.this, mConversations);
             mAdapter.setSendMessageHandler(mSendMessageResultHandler);
@@ -173,24 +155,23 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     protected void initView() {
         mConversationList = (ListView) getView(R.id.conversation_list);
         mHeaderView = getLayoutInflater().inflate(R.layout.conversation_header, mConversationList, false);
-        mFooterView = getLayoutInflater().inflate(R.layout.conversation_footer, mConversationList, false);
+        View mFooterView = getLayoutInflater().inflate(R.layout.conversation_footer, mConversationList, false);
         mConversationList.addHeaderView(mHeaderView);
         mConversationList.addFooterView(mFooterView);
         mSendEmojiBtn = getView(R.id.send_emoji_btn);
         mSendVoiceBtn = (Button) getView(R.id.send_voice_btn);
         mSendImageBtn = getView(R.id.send_image_btn);
         mSendBtnLayout = getView(R.id.conversation_send_msg_tab);
-        mNoDataTip = getView(R.id.no_msg_tip);
+        View mNoDataTip = getView(R.id.no_msg_tip);
         mConversationList.setEmptyView(mNoDataTip);
         mConversationName = (TextView) getView(R.id.conversation_name_tip);
         initData();
-        mConversationTask = new GetConversationTask();
+        GetConversationTask mConversationTask = new GetConversationTask();
         mConversationTask.execute();
     }
 
     @Override
     protected void initData() {
-        mPrefs = MPrefs.getInstance(this);
         mResolver = getContentResolver();
         //初始化录音对象
         mRecorder = new AudioRecorder(this);
@@ -273,7 +254,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     protected void onResume() {
         LogInfo.i("ConversationActivity --- onResume");
         super.onResume();
-        mPrefs.setNotificationType(false);
+        MPrefs.setNotificationType(this, false);
     }
 
     /**
@@ -329,7 +310,8 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
 
     protected void getImageFromAlbum() {
         Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");//相片类型  
+        //相片类型
+        intent.setType("image/*");
         startActivityForResult(intent, Constant.REQUEST_IMAGE);
     }
 
@@ -377,9 +359,9 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             return;
         }
         //相机分享图片,直接发送
-        String share_path = fromIntent.getStringExtra(Constant.SHARE_IMAGE_PATH);
-        if (!TextUtils.isEmpty(share_path)) {
-            mCurrentImagePath = share_path;
+        String sharePath = fromIntent.getStringExtra(Constant.SHARE_IMAGE_PATH);
+        if (!TextUtils.isEmpty(sharePath)) {
+            mCurrentImagePath = sharePath;
             showImageConversation();
         }
     }
@@ -414,6 +396,11 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             mResolver.insert(Conversations.Conversation.CONVERSATION_URI,
                     ConversationProvider.getContentValue(conversation, false));
             //添加消息数据
+            if (mConversations == null) {
+                mConversations = new ArrayList<>();
+
+                BuglyLog.e(TAG, "mConversation = null.");
+            }
             mConversations.add(conversation);
             LogInfo.i("hwj", "saveConversationToLocal ---------- add conversation notifyDataSetChanged");
             //刷新显示
@@ -429,7 +416,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     public static final int SEND_MESSAGE_SUCCESS = 0x11;
     public static final int SEND_MESSAGE_FAIL = 0x12;
 
-    private Handler mSendMessageResultHandler = new Handler() {
+    private final Handler mSendMessageResultHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message message) {
             if (message.what == SEND_MESSAGE_SUCCESS) {
@@ -443,8 +430,8 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     /**
      * 根据发送结果更新界面显示
      *
-     * @param message 结果消息
-     * @param shouldResend   是否需要显示重发标识
+     * @param message      结果消息
+     * @param shouldResend 是否需要显示重发标识
      */
     private void handleSendMessageResult(Message message, boolean shouldResend) {
         Conversation conversation = (Conversation) message.obj;
@@ -498,8 +485,8 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         mRecordStateImg = (ImageView) mRecordDialog.findViewById(R.id.record_state);
         TextView name = (TextView) mRecordDialog.findViewById(R.id.record_name);
         name.setText(mCurrentFriend.name);
-        ImageView record_anim = (ImageView) mRecordDialog.findViewById(R.id.record_voice);
-        AnimationDrawable drawable = (AnimationDrawable) record_anim.getBackground();
+        ImageView recordAnim = (ImageView) mRecordDialog.findViewById(R.id.record_voice);
+        AnimationDrawable drawable = (AnimationDrawable) recordAnim.getBackground();
         drawable.start();
         mRecordDialog.show();
     }
@@ -578,6 +565,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             //删除该语音文件
             if (oldFile.exists()) {
                 oldFile.delete();
+                oldFile.deleteOnExit();
             }
         } else {
             //显示发送语音项
@@ -585,7 +573,9 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         }
     }
 
-    //文件上传Handler
+    /**
+     *  文件上传Handler
+     */
     private Handler mUploadFileHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -667,13 +657,13 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     private Conversation getSendBaseConversation(int type) {
         Conversation conversation = new Conversation();
         conversation.conversationId = NetWorkUtils.md5(String.valueOf(System.currentTimeMillis()));
-        conversation.senderName = mPrefs.getNickName();
+        conversation.senderName = MPrefs.getNickName(this);
         //发件人的Id
-        conversation.sendId = mPrefs.getDeviceId();
+        conversation.sendId = MPrefs.getDeviceId(this);
         //收件人的Id
         conversation.recId = mCurrentFriend.uuid;
-        LogInfo.i("hwj", "recId = " + conversation.recId + "  homeGroupId = " + mPrefs.getHomeGroupId());
-        if (conversation.recId.equals(mPrefs.getHomeGroupId())) {
+        LogInfo.i("hwj", "recId = " + conversation.recId + "  homeGroupId = " + MPrefs.getHomeGroupId(this));
+        if (conversation.recId.equals(MPrefs.getHomeGroupId(this))) {
             conversation.isHomeGroup = Constant.TRUE;
         }
         //消息类型

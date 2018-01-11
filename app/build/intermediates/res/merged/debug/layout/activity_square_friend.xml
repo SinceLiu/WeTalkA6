@@ -3,32 +3,35 @@
     android:layout_width="@dimen/square_screen_width"
     android:layout_height="@dimen/square_screen_width"
     android:layout_gravity="center"
-    android:gravity="center"
-    android:background="@color/main_color">
+    android:background="@color/main_color"
+    android:gravity="center">
+
     <com.readboy.view.EmptyRecyclerView
         android:id="@+id/square_friend_recycler_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@null"
-        android:scrollbars="none"
+        android:listSelector="?android:attr/selectableItemBackground"
         android:overScrollMode="never"
-        android:listSelector="?android:attr/selectableItemBackground"/>
+        android:scrollbars="none" />
+
     <TextView
         android:id="@+id/no_contact"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
         android:text="@string/no_contact"
         android:textColor="#cccccc"
         android:textSize="24px"
-        android:gravity="center"
-        android:visibility="gone"/>
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/main_color"
+        android:gravity="center"
         android:text="@string/synchronizing"
         android:textColor="@android:color/white"
-        android:textSize="24px"
-        android:gravity="center"
-        android:background="@color/main_color"/>
+        android:textSize="24px" />
 </RelativeLayout>

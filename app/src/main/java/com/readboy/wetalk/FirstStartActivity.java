@@ -3,9 +3,12 @@ package com.readboy.wetalk;
 import java.io.File;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.readboy.bean.Constant;
@@ -16,18 +19,23 @@ import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.WTContactUtils;
 
 public class FirstStartActivity extends BaseRequestPermissionActivity {
+	private static final String TAG = "FirstStartActivity";
+
 
 	private NetWorkUtils mNetWorkUtils;
-	
-	private MPrefs mPrefs;
 	
 	private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
 	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		LogInfo.i("hwj","FirstStartActivity ---------- onCreate");
 		super.onCreate(savedInstanceState);
+		LogInfo.i("hwj","FirstStartActivity ---------- onCreate");
+//		startUpdateContactService();
+
+	}
+
+	private void startUpdateContactService() {
 		try {
 			long last = Settings.System.getLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR,0);
 			if((System.currentTimeMillis() - last) > 60 * 60 * 1000 && !WeTalkApplication.IS_TEST_MODE){
@@ -39,14 +47,29 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
 			e.printStackTrace();
 		}
 	}
-	
+
+	private Intent getAppDetailSettingIntent() {
+		Log.e(TAG, "getAppDetailSettingIntent: ");
+		Intent localIntent = new Intent();
+		localIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		if (Build.VERSION.SDK_INT >= 9) {
+			localIntent.setAction("android.settings.APPLICATION_DETAILS_SETTINGS");
+			localIntent.setData(Uri.fromParts("package", getPackageName(), null));
+		} else if (Build.VERSION.SDK_INT <= 8) {
+			localIntent.setAction(Intent.ACTION_VIEW);
+			localIntent.setClassName("com.android.settings", "com.android.settings.InstalledAppDetails");
+			localIntent.putExtra("com.android.settings.ApplicationPkgName", getPackageName());
+		}
+		return localIntent;
+	}
+
 	private void initDeviceInfo(){
-    	if(TextUtils.isEmpty(mPrefs.getDeviceId()) ||
-    			TextUtils.isEmpty(mPrefs.getNickName()) ||
-    			TextUtils.isEmpty(mPrefs.getMessageTag())){
+    	if(TextUtils.isEmpty(MPrefs.getDeviceId(this)) ||
+    			TextUtils.isEmpty(MPrefs.getNickName(this)) ||
+    			TextUtils.isEmpty(MPrefs.getMessageTag(this))){
     		//获取手表设备信息
-            mPrefs.setDeviceId(mNetWorkUtils.getDevicedUuid());
-            mPrefs.setNickName(mNetWorkUtils.getNickName());
+            MPrefs.setDeviceId(this, mNetWorkUtils.getDevicedUuid());
+            MPrefs.setNickName(this, mNetWorkUtils.getNickName());
             mNetWorkUtils.saveMessageTag(this);
     	}
     }
@@ -76,8 +99,10 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
 
 	@Override
 	protected void initContent() {
-		mPrefs = MPrefs.getInstance(this);
-		mPrefs.setNotificationType(false);
+
+		startUpdateContactService();
+
+		MPrefs.setNotificationType(this, false);
 		mNetWorkUtils = NetWorkUtils.getInstance(this);
         MessageReceiver.getAllMessage(this);
         initDeviceInfo();

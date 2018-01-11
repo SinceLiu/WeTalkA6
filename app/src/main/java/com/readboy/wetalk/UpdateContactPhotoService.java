@@ -29,6 +29,7 @@ import com.android.volley.toolbox.Volley;
 import com.readboy.bean.Friend;
 
 public class UpdateContactPhotoService extends IntentService {
+    private static final String TAG = "hwj_UpdateContact";
 
     private static final String ICON_URL = "http://img.readboy.com/avatar/";
     private static final int IMAGE_WIDTH = 126;
@@ -62,7 +63,7 @@ public class UpdateContactPhotoService extends IntentService {
         @Override
         public void onErrorResponse(VolleyError error) {
             // TODO Auto-generated method stub
-            Log.i("adsd", "VolleyError = " + error.toString());
+            Log.i("", "VolleyError = " + error.toString());
         }
     };
 
@@ -86,6 +87,9 @@ public class UpdateContactPhotoService extends IntentService {
                     contact.contactId = rawId;
                     list.add(contact);
                 }
+                if (contact == null){
+                    continue;
+                }
                 String mimetype = c.getString(c.getColumnIndex(Data.MIMETYPE));
                 switch (mimetype) {
                     case StructuredPostal.CONTENT_ITEM_TYPE:
@@ -93,15 +97,15 @@ public class UpdateContactPhotoService extends IntentService {
                         break;
                     case Photo.CONTENT_ITEM_TYPE:
                         contact.photoUri = c.getString(c.getColumnIndex(Photo.PHOTO_URI));
-
+                        break;
+                        default:
+                            Log.e(TAG, "updateAllPhoto: default mimeType = " + mimetype);
                 }
             } while (c.moveToNext());
             c.close();
         }
-//		Log.i("adsd",list.toString());
-        Iterator<Friend> iterator = list.iterator();
-        while (iterator.hasNext()) {
-            Friend rbContact = (Friend) iterator.next();
+//		Log.i("hwj",list.toString());
+        for (Friend rbContact : list) {
             final long rawContactId = rbContact.contactId;
             String url = ICON_URL + rbContact.uuid;
             if (TextUtils.isEmpty(rbContact.photoUri)) {
@@ -110,7 +114,7 @@ public class UpdateContactPhotoService extends IntentService {
                     @Override
                     public void onResponse(Bitmap response) {
                         // TODO Auto-generated method stub
-                        Log.i("adsd", "insert onResponse success");
+                        Log.i("whj", "insert onResponse success");
                         insertPhoto(context, rawContactId, response);
                     }
                 }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Config.ARGB_8888, errorListener);
@@ -121,7 +125,7 @@ public class UpdateContactPhotoService extends IntentService {
                     @Override
                     public void onResponse(Bitmap response) {
                         // TODO Auto-generated method stub
-                        Log.i("adsd", "update onResponse success");
+                        Log.i("hwj", "update onResponse success");
                         updateContactPhoto(context, rawContactId, response);
                     }
                 }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Config.ARGB_8888, errorListener);
@@ -156,7 +160,9 @@ public class UpdateContactPhotoService extends IntentService {
      * 插入一个联系人的头像
 	 */
     private static void insertPhoto(Context context, long rawContactId, Bitmap bmp) {
-        if (bmp == null) return;
+        if (bmp == null) {
+            return;
+        }
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
         byte[] avatar = os.toByteArray();

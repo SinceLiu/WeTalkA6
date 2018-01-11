@@ -29,6 +29,9 @@ import uk.co.senab.photoview.PhotoViewAttacher.OnMatrixChangedListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnViewTapListener;
 
+/**
+ * @author hwj
+ */
 public class PhotoView extends ImageView implements IPhotoView {
 
     private PhotoViewAttacher mAttacher;

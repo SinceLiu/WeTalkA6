@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:2:1-96:12
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:2:1-97:12
 	package
 		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:3:5-33
 		INJECTED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml
@@ -93,8 +93,12 @@ uses-permission#android.permission.READ_LOGS
 ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:28:5-68
 	android:name
 		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:28:22-65
+uses-permission#android.permission.WRITE_SECURE_SETTINGS
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:29:5-80
+	android:name
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:29:22-77
 application
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:30:5-94:19
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:31:5-95:19
 MERGED from [com.android.support:support-v4:25.3.1] C:\Users\1\.android\build-cache\0ff06044edb6dba77ec497951c2b807cc6b31f77\output\AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:support-fragment:25.3.1] C:\Users\1\.android\build-cache\08620a331bb01fb0002c97087719d389a28cc02d\output\AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:support-media-compat:25.3.1] C:\Users\1\.android\build-cache\582cc7bb4aa079f79cfe4884a5f81404f8a72bf2\output\AndroidManifest.xml:29:5-20
@@ -102,129 +106,129 @@ MERGED from [com.android.support:support-core-ui:25.3.1] C:\Users\1\.android\bui
 MERGED from [com.android.support:support-core-utils:25.3.1] C:\Users\1\.android\build-cache\05b8a346ed9f5a29a0493cd7753903f8390a3c59\output\AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:support-compat:25.3.1] C:\Users\1\.android\build-cache\f5c1bcdef2bfc73199dceea5fe36d9741feb9167\output\AndroidManifest.xml:29:5-20
 	android:label
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:34:9-41
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:35:9-41
 	android:allowBackup
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:32:9-35
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:33:9-35
 	android:icon
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:33:9-45
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:34:9-45
 	android:theme
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:35:9-51
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:36:9-51
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:31:9-42
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:32:9-42
 	android:usesCleartextTraffic
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:36:9-44
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:37:9-44
 meta-data#com.readboy.utils.GlideConfiguration
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:37:9-39:43
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:38:9-40:43
 	android:value
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:39:13-40
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:40:13-40
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:38:13-64
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:39:13-64
 provider#com.readboy.provider.ConversationProvider
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:40:9-43:39
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:41:9-44:39
 	android:authorities
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:42:13-75
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:43:13-75
 	android:exported
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:43:13-36
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:44:13-36
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:41:13-69
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:42:13-69
 receiver#com.readboy.receiver.MessageReceiver
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:44:9-51:20
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:45:9-52:20
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:44:19-70
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:45:19-70
 intent-filter#readboy.action.NOTIFY_MESSAGE
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:45:13-47:29
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:46:13-48:29
 action#readboy.action.NOTIFY_MESSAGE
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:46:17-72
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:47:17-72
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:46:25-69
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:47:25-69
 intent-filter#com.readboy.action.SENDPICTURE
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:48:13-50:29
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:49:13-51:29
 action#com.readboy.action.SENDPICTURE
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:49:17-73
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:50:17-73
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:49:25-70
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:50:25-70
 activity#com.readboy.wetalk.FirstStartActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:53:9-64:20
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:54:9-65:20
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:57:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:58:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:56:13-43
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:57:13-43
 	android:exported
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:55:13-36
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:56:13-36
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:54:13-47
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:55:13-47
 intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER+android.readboy.WATCH.FLAG
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:58:13-63:29
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:59:13-64:29
 action#android.intent.action.MAIN
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:59:17-69
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:60:17-69
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:59:25-66
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:60:25-66
 category#android.readboy.WATCH.FLAG
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:61:17-71
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:62:17-71
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:61:27-68
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:62:27-68
 category#android.intent.category.LAUNCHER
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:62:17-77
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:63:17-77
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:62:27-74
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:63:27-74
 activity#com.readboy.wetalk.FriendActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:65:9-69:52
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:66:9-70:52
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:69:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:70:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:68:13-44
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:69:13-44
 	android:exported
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:67:13-36
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:68:13-36
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:66:13-43
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:67:13-43
 activity#com.readboy.wetalk.DisplayImageActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:70:9-74:52
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:71:9-75:52
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:74:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:75:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:73:13-43
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:74:13-43
 	android:exported
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:72:13-36
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:73:13-36
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:71:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:72:13-49
 activity#com.readboy.wetalk.GetImageActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:75:9-79:52
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:76:9-80:52
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:79:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:80:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:78:13-43
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:79:13-43
 	android:exported
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:77:13-36
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:78:13-36
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:76:13-45
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:77:13-45
 activity#com.readboy.wetalk.EmojiActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:80:9-83:52
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:81:9-84:52
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:83:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:84:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:82:13-44
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:83:13-44
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:81:13-42
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:82:13-42
 activity#com.readboy.wetalk.ConversationActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:84:9-87:52
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:85:9-88:52
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:87:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:88:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:86:13-44
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:87:13-44
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:85:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:86:13-49
 activity#com.readboy.wetalk.ChooseFriendActivity
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:88:9-91:52
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:89:9-92:52
 	android:screenOrientation
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:91:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:92:13-49
 	android:launchMode
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:90:13-43
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:91:13-43
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:89:13-49
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:90:13-49
 service#com.readboy.wetalk.UpdateContactPhotoService
-ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:93:9-62
+ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:94:9-62
 	android:name
-		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:93:18-59
+		ADDED from E:\AW7Project\SquareWeTalk\app\src\main\AndroidManifest.xml:94:18-59
 meta-data#android.support.VERSION
 ADDED from [com.android.support:support-v4:25.3.1] C:\Users\1\.android\build-cache\0ff06044edb6dba77ec497951c2b807cc6b31f77\output\AndroidManifest.xml:25:5-27:34
 MERGED from [com.android.support:support-fragment:25.3.1] C:\Users\1\.android\build-cache\08620a331bb01fb0002c97087719d389a28cc02d\output\AndroidManifest.xml:25:5-27:34
