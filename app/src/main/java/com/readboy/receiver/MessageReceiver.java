@@ -32,6 +32,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * @author hwwjian
@@ -40,18 +41,19 @@ import android.text.TextUtils;
  */
 
 public class MessageReceiver extends BroadcastReceiver {
+    private static final String TAG = "hwj_MessageReceiver";
 
     public static final String READBOY_ACTION_NOTIFY_MESSAGE = "readboy.action.NOTIFY_MESSAGE";
+    /**
+     * 发送监拍命令
+     */
     public static final String READBOY_ACTION_SEND_CAPTURE = "com.readboy.action.SENDPICTURE";
 
     private static final int DOWNLOAD_MSG = 0x13;
 
     /**
-     * TODO 修改mContext, 不是静态，防止无法释放, 内存泄露。
+     * TODO: 网络慢是否会导致内容丢失，不会马上获取到最新的消息。
      */
-//    private Context mContext;
-//    private static Context mContext;
-
     private static boolean isGettingMessage = false;
     private static boolean isNotify = false;
 
@@ -71,20 +73,25 @@ public class MessageReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
         String action = intent.getAction();
+        Log.e(TAG, "onReceive: action = " + action);
         if (TextUtils.isEmpty(action)) {
             return;
         }
         switch (action) {
-            case READBOY_ACTION_NOTIFY_MESSAGE://收到消息
+            case READBOY_ACTION_NOTIFY_MESSAGE:
+                //收到消息
                 isNotify = true;
-                LogInfo.i("hwj", "isGettingMessage : " + isGettingMessage);
+                LogInfo.i("hwj", "onReceive: isGettingMessage : " + isGettingMessage);
                 if (!isGettingMessage) {
                     LogInfo.i("hwj", "------------------- getAllMessage start");
                     getAllMessage(context);
                     LogInfo.i("hwj", "------------------- getAllMessage finish");
+                }else {
+                    Log.e(TAG, "onReceive: isGettingMessage = " + isGettingMessage);
                 }
                 break;
-            case READBOY_ACTION_SEND_CAPTURE://发送监拍指令
+            case READBOY_ACTION_SEND_CAPTURE:
+                //发送监拍指令
                 String path = intent.getStringExtra("picture_path");
                 ArrayList<String> ids = intent.getStringArrayListExtra("capture_uuid");
                 if (TextUtils.isEmpty(path) || ids == null) {
@@ -97,8 +104,11 @@ public class MessageReceiver extends BroadcastReceiver {
         }
     }
 
+    private boolean canGetMessage(Context context){
+        return Constant.ENABLE_FAKE || NetWorkUtils.isWifiConnected(context) ;
+    }
+
     public static void getAllMessage(final Context context) {
-//        mContext = context;
         final NetWorkUtils mNetWorkUtils = NetWorkUtils.getInstance(context);
         isGettingMessage = true;
         isNotify = false;
@@ -148,10 +158,12 @@ public class MessageReceiver extends BroadcastReceiver {
                         switch (messageInfo[2]) {
                             case NetWorkUtils.TEXT:
                                 String content = data.optString(NetWorkUtils.MESSAGE);
-                                //表情
-                                if (EmojiUtils.getEmojiId(content) != -1) {
+                                //表情，可能会收到旧编码，来自W5.
+                                int emojiId = EmojiUtils.getEmojiIdContainOldCode(content);
+                                Log.e(TAG, "pushSucceed: emojiId = " + emojiId);
+                                if (emojiId != -1) {
                                     conversation.emojiCode = content;
-                                    conversation.emojiId = EmojiUtils.getEmojiId(content);
+                                    conversation.emojiId = emojiId;
                                     conversation.type = Constant.REC_EMOJI;
                                 }
                                 //文本
@@ -169,7 +181,6 @@ public class MessageReceiver extends BroadcastReceiver {
                                 conversation.isPlaying = Constant.FALSE;
                                 conversation.type = Constant.REC_VOICE;
                                 hasFile = true;
-//                                mHandler.obtainMessage(DOWNLOAD_MSG, conversation).sendToTarget();
                                 mHandler.post(new Runnable() {
                                     @Override
                                     public void run() {
@@ -198,9 +209,7 @@ public class MessageReceiver extends BroadcastReceiver {
                     e.printStackTrace();
                 }
                 isGettingMessage = false;
-                /**
-                 * 两种情况会再次获取
-                 */
+                //两种情况会再次获取
                 mHandler.post(new Runnable() {
 
                     @Override
@@ -234,9 +243,9 @@ public class MessageReceiver extends BroadcastReceiver {
         String classState = Settings.Global.getString(context.getContentResolver(), "class_disabled");
         LogInfo.i("hwj", "classState = " + classState);
         if (!TextUtils.isEmpty(classState)) {
-            LogInfo.i("hwj", "isNowEnable = " + isTimeEnable(context, classState));
             //未开启上课禁用
             if (!isTimeEnable(context, classState)) {
+                Log.e(TAG, "sendNotification: ");
                 NotificationUtils.notification(context);
             }
         } else {
@@ -244,6 +253,10 @@ public class MessageReceiver extends BroadcastReceiver {
         }
     }
 
+    /**
+     * 判断data时间是否在上课禁用时间段内。
+     * @param data 当前时间
+     */
     private static boolean isTimeEnable(Context context, String data) {
         long time = System.currentTimeMillis();
         SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm", Locale.CHINESE);

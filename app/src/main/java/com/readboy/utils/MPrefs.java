@@ -45,12 +45,10 @@ public class MPrefs {
      * 获取服务器消息标识
      */
     public static String getMessageTag(Context context) {
-//        return mSp.getString(MESSAGE_TAG,"");
         return IOs.readTimeTag(context);
     }
 
     public static void setMessageTag(Context context, String tag) {
-//        mSp.edit().putString(MESSAGE_TAG,tag).apply();
         IOs.saveTimeTag(context, tag);
     }
 

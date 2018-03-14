@@ -2078,8 +2078,84 @@
                     "startLine": 117,
                     "startColumn": 4,
                     "startOffset": 6108,
+                    "endColumn": 70,
+                    "endOffset": 6174
+                },
+                "from": {
+                    "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 26,
+                        "startColumn": 4,
+                        "startOffset": 1228,
+                        "endColumn": 70,
+                        "endOffset": 1294
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 118,
+                    "startColumn": 4,
+                    "startOffset": 6179,
                     "endColumn": 50,
-                    "endOffset": 6154
+                    "endOffset": 6225
+                },
+                "from": {
+                    "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 28,
+                        "startColumn": 4,
+                        "startOffset": 1354,
+                        "endColumn": 50,
+                        "endOffset": 1400
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 119,
+                    "startColumn": 4,
+                    "startOffset": 6230,
+                    "endColumn": 55,
+                    "endOffset": 6281
+                },
+                "from": {
+                    "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 25,
+                        "startColumn": 4,
+                        "startOffset": 1171,
+                        "endColumn": 55,
+                        "endOffset": 1222
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 120,
+                    "startColumn": 4,
+                    "startOffset": 6286,
+                    "endColumn": 52,
+                    "endOffset": 6334
+                },
+                "from": {
+                    "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 27,
+                        "startColumn": 4,
+                        "startOffset": 1300,
+                        "endColumn": 52,
+                        "endOffset": 1348
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 121,
+                    "startColumn": 4,
+                    "startOffset": 6339,
+                    "endColumn": 50,
+                    "endOffset": 6385
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\strings.xml",
@@ -2094,11 +2170,11 @@
             },
             {
                 "to": {
-                    "startLine": 118,
+                    "startLine": 122,
                     "startColumn": 4,
-                    "startOffset": 6159,
+                    "startOffset": 6390,
                     "endColumn": 45,
-                    "endOffset": 6200
+                    "endOffset": 6431
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\strings.xml",
@@ -2113,12 +2189,12 @@
             },
             {
                 "to": {
-                    "startLine": 119,
+                    "startLine": 123,
                     "startColumn": 4,
-                    "startOffset": 6205,
-                    "endLine": 126,
+                    "startOffset": 6436,
+                    "endLine": 130,
                     "endColumn": 12,
-                    "endOffset": 6669
+                    "endOffset": 6900
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\styles.xml",
@@ -2134,12 +2210,12 @@
             },
             {
                 "to": {
-                    "startLine": 127,
+                    "startLine": 131,
                     "startColumn": 4,
-                    "startOffset": 6674,
-                    "endLine": 131,
+                    "startOffset": 6905,
+                    "endLine": 135,
                     "endColumn": 12,
-                    "endOffset": 6899
+                    "endOffset": 7130
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\styles.xml",
@@ -2155,12 +2231,12 @@
             },
             {
                 "to": {
-                    "startLine": 132,
+                    "startLine": 136,
                     "startColumn": 4,
-                    "startOffset": 6904,
-                    "endLine": 142,
+                    "startOffset": 7135,
+                    "endLine": 146,
                     "endColumn": 12,
-                    "endOffset": 7510
+                    "endOffset": 7741
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\styles.xml",
@@ -2176,12 +2252,12 @@
             },
             {
                 "to": {
-                    "startLine": 143,
+                    "startLine": 147,
                     "startColumn": 4,
-                    "startOffset": 7515,
-                    "endLine": 151,
+                    "startOffset": 7746,
+                    "endLine": 155,
                     "endColumn": 12,
-                    "endOffset": 8002
+                    "endOffset": 8233
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\styles.xml",
@@ -2197,12 +2273,12 @@
             },
             {
                 "to": {
-                    "startLine": 152,
+                    "startLine": 156,
                     "startColumn": 4,
-                    "startOffset": 8007,
-                    "endLine": 159,
+                    "startOffset": 8238,
+                    "endLine": 163,
                     "endColumn": 12,
-                    "endOffset": 8544
+                    "endOffset": 8775
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\styles.xml",
@@ -2218,12 +2294,12 @@
             },
             {
                 "to": {
-                    "startLine": 160,
+                    "startLine": 164,
                     "startColumn": 4,
-                    "startOffset": 8549,
-                    "endLine": 165,
+                    "startOffset": 8780,
+                    "endLine": 169,
                     "endColumn": 12,
-                    "endOffset": 8833
+                    "endOffset": 9064
                 },
                 "from": {
                     "file": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\values\\styles.xml",

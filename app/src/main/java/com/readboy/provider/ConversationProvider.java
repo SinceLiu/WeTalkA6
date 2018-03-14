@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,26 +15,32 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
 import com.readboy.utils.WTContactUtils;
+import com.readboy.provider.WeTalkContract.ProfileColumns;
 
 /**
- * Created by hwwjian on 2016/12/1.
+ * @author hwwjian
+ * @date 2016/12/1
  */
 
 public class ConversationProvider extends ContentProvider {
+    private static final String TAG = "hwj_ContentProvider";
 
     private static final int CONVERSATION = 0;
+    private static final int PROFILE = 1;
 
     public static final String IS_RECEIVE_MESSAGE = "receive";
 
-    private final static UriMatcher mMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    private final static UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         //为UriMatcher注册Uri
-        mMatcher.addURI(Conversations.AUTHORITY, "conversation", CONVERSATION);
+        sUriMatcher.addURI(Conversations.AUTHORITY, "conversation", CONVERSATION);
+        sUriMatcher.addURI(WeTalkContract.AUTHORITY, "profiles", PROFILE);
     }
 
     private DatabaseHelper mHelper;
@@ -57,78 +64,113 @@ public class ConversationProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String where, String[] whereArgs, String sortOrder) {
-        if (mMatcher.match(uri) == CONVERSATION) {
-            Cursor cursor = null;
-            if (sortOrder != null) {
-                cursor = mHelper.getWritableDatabase()
-                        .query(DatabaseHelper.CONVERSATION_TABLE_NAME,
-                                projection, where, whereArgs, null, null, sortOrder);
-            } else {
-                cursor = mHelper.getWritableDatabase()
-                        .query(DatabaseHelper.CONVERSATION_TABLE_NAME,
-                                projection, where, whereArgs, null, null, Conversations.Conversation.DEFAULT_SORT_ORDER);
-            }
-            return cursor;
+        Cursor cursor = null;
+        switch (sUriMatcher.match(uri)) {
+            case CONVERSATION:
+                if (sortOrder != null) {
+                    cursor = mHelper.getWritableDatabase()
+                            .query(DatabaseHelper.CONVERSATION_TABLE_NAME,
+                                    projection, where, whereArgs, null, null, sortOrder);
+                } else {
+                    cursor = mHelper.getWritableDatabase()
+                            .query(DatabaseHelper.CONVERSATION_TABLE_NAME,
+                                    projection, where, whereArgs, null, null, Conversations.Conversation.DEFAULT_SORT_ORDER);
+                }
+                break;
+            case PROFILE:
+                cursor = mHelper.getWritableDatabase().query(ProfileColumns.PROFILE_TABLE_NAME,
+                        projection, where, whereArgs, null, null, sortOrder);
+                break;
+            default:
+                Log.e(TAG, "query: default = " + uri);
         }
+        return cursor;
+    }
+
+    @Nullable
+    @Override
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
-        if (mMatcher.match(uri) == CONVERSATION) {
-            synchronized (this) {
-                boolean isReceive = contentValues.getAsBoolean(IS_RECEIVE_MESSAGE);
-                contentValues.remove(IS_RECEIVE_MESSAGE);
-                try (Cursor cursor = mHelper.getWritableDatabase().query(DatabaseHelper.CONVERSATION_TABLE_NAME,
-                        new String[]{Conversations.Conversation.CONVERSATION_ID},
-                        Conversations.Conversation.CONVERSATION_ID + " = ? AND " + Conversations.Conversation.TIME + " = ? ",
-                        new String[]{contentValues.getAsString(Conversations.Conversation.CONVERSATION_ID),
-                                contentValues.getAsString(Conversations.Conversation.TIME)}, null, null, null)) {
-                    if (cursor != null && cursor.getCount() != 0) {
-                        return null;
-                    }
-
-                    //数据库不存在才插入数据
-                    long rawId = mHelper.getWritableDatabase().insert(
-                            DatabaseHelper.CONVERSATION_TABLE_NAME, null, contentValues);
-                    //插入成功返回Uri
-                    if (rawId > CONVERSATION) {
-                        Uri conUri = ContentUris.withAppendedId(
-                                Conversations.Conversation.CONVERSATION_URI, rawId);
-                        if (isReceive) {
-                            getContext().getContentResolver().notifyChange(conUri, null);
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
+        switch (sUriMatcher.match(uri)) {
+            case CONVERSATION:
+                synchronized (this) {
+                    boolean isReceive = contentValues.getAsBoolean(IS_RECEIVE_MESSAGE);
+                    contentValues.remove(IS_RECEIVE_MESSAGE);
+                    try (Cursor cursor = mHelper.getWritableDatabase().query(DatabaseHelper.CONVERSATION_TABLE_NAME,
+                            new String[]{Conversations.Conversation.CONVERSATION_ID},
+                            Conversations.Conversation.CONVERSATION_ID + " = ? AND " + Conversations.Conversation.TIME + " = ? ",
+                            new String[]{contentValues.getAsString(Conversations.Conversation.CONVERSATION_ID),
+                                    contentValues.getAsString(Conversations.Conversation.TIME)}, null, null, null)) {
+                        if (cursor != null && cursor.getCount() != 0) {
+                            return null;
                         }
-                        return conUri;
+
+                        //数据库不存在才插入数据
+                        long rawId = mHelper.getWritableDatabase().insert(
+                                DatabaseHelper.CONVERSATION_TABLE_NAME, null, contentValues);
+                        //插入成功返回Uri
+                        if (rawId > CONVERSATION) {
+                            Uri conUri = ContentUris.withAppendedId(
+                                    Conversations.Conversation.CONVERSATION_URI, rawId);
+                            if (isReceive && getContext() != null) {
+                                getContext().getContentResolver().notifyChange(conUri, null);
+                            }
+                            return conUri;
+                        }
                     }
                 }
-            }
+                break;
+            case PROFILE:
+                long rawId = mHelper.getWritableDatabase().insert(ProfileColumns.PROFILE_TABLE_NAME,
+                        null, contentValues);
+                if (rawId > 0) {
+                    Uri result = ContentUris.withAppendedId(ProfileColumns.CONTENT_URI, rawId);
+                    notifyChange(result);
+                    return result;
+                }
+                break;
+            default:
+                Log.e(TAG, "insert: default : " + uri);
         }
         return null;
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] args) {
+    public int delete(@NonNull Uri uri, String selection, String[] args) {
         int count = -1;
-        if (mMatcher.match(uri) == CONVERSATION) {
-            count = mHelper.getWritableDatabase().delete(
-                    DatabaseHelper.CONVERSATION_TABLE_NAME, selection, args);
+        switch (sUriMatcher.match(uri)) {
+            case CONVERSATION:
+                count = mHelper.getWritableDatabase().delete(
+                        DatabaseHelper.CONVERSATION_TABLE_NAME, selection, args);
+                break;
+            case PROFILE:
+                count = mHelper.getWritableDatabase().delete(
+                        WeTalkContract.ProfileColumns.PROFILE_TABLE_NAME, selection, args);
+                break;
         }
         return count;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String selection, String[] args) {
+    public int update(@NonNull Uri uri, ContentValues contentValues, String selection, String[] args) {
         int count = -1;
-        if (mMatcher.match(uri) == CONVERSATION) {
-            count = mHelper.getWritableDatabase().update(
-                    DatabaseHelper.CONVERSATION_TABLE_NAME, contentValues, selection, args);
+        switch (sUriMatcher.match(uri)) {
+            case CONVERSATION:
+                count = mHelper.getWritableDatabase().update(
+                        DatabaseHelper.CONVERSATION_TABLE_NAME, contentValues, selection, args);
+                break;
+            case PROFILE:
+                count = mHelper.getWritableDatabase().update(
+                        WeTalkContract.ProfileColumns.PROFILE_TABLE_NAME, contentValues, selection, args);
+                break;
+            default:
+                Log.e(TAG, "update: default = " + uri);
+                break;
         }
         return count;
     }
@@ -252,5 +294,15 @@ public class ConversationProvider extends ContentProvider {
             cursor.close();
         }
         return conversations;
+    }
+
+    /**
+     * Notify affected URIs of changes.
+     */
+    private void notifyChange(Uri uri) {
+        if (getContext() != null) {
+            ContentResolver resolver = getContext().getContentResolver();
+            resolver.notifyChange(uri, null);
+        }
     }
 }

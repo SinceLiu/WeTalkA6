@@ -115,6 +115,10 @@
     <string name="speak">按住说话</string>
     <string name="square_mode">方屏模式</string>
     <string name="synchronizing">正在加载</string>
+    <string name="traffic_dialog_content">流量已经被家长禁止使用，请连接wifi</string>
+    <string name="traffic_dialog_exit">取消</string>
+    <string name="traffic_dialog_title">流量禁止使用</string>
+    <string name="traffic_dialog_wifi">WIFI</string>
     <string name="voice_error_msg">录音时间太短</string>
     <string name="wrong_data">获取用户失败</string>
     <style name="ConversationItemStyle">

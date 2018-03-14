@@ -202,12 +202,17 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             case Constant.SEND_EMOJI:
                 //发送的表情显示本地的
                 emojiItemHolder.item.setVisibility(View.VISIBLE);
-                emojiItemHolder.content.setImageResource(conversation.emojiId);
+                if (conversation.emojiId == 0 && !TextUtils.isEmpty(conversation.emojiCode)) {
+                    emojiItemHolder.content.setImageResource(EmojiUtils.getEmojiIdContainOldCode(conversation.emojiCode));
+                } else {
+                    emojiItemHolder.content.setImageResource(conversation.emojiId);
+                }
                 showSendEmojiProgressOrResend(conversation, emojiItemHolder);
                 showReceiveOrSendTime(conversation, position, emojiItemHolder);
                 break;
             case Constant.REC_EMOJI:
-                //网络获取的图片
+                //接收的图片
+                LogInfo.e(TAG, " type = " + type + ", emojiId = " + conversation.emojiId);
                 if (conversation.isHomeGroup == Constant.TRUE) {
                     emojiItemHolder.userName.setText(conversation.senderName);
                     //WTContactUtils.getNameById(mContext,conversation.realSendId));
@@ -215,7 +220,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     emojiItemHolder.userName.setVisibility(View.GONE);
                 }
                 emojiItemHolder.item.setVisibility(View.VISIBLE);
-                emojiItemHolder.content.setImageResource(EmojiUtils.getEmojiId(conversation.emojiCode));
+                emojiItemHolder.content.setImageResource(EmojiUtils.getEmojiIdContainOldCode(conversation.emojiCode));
                 showReceiveOrSendTime(conversation, position, emojiItemHolder);
                 break;
             case Constant.SEND_IMAGE:
@@ -275,7 +280,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             case Constant.REC_TEXT:
                 //接收的文字
                 if (conversation.isHomeGroup == Constant.TRUE) {
-                    textItemHolder.userName.setText(conversation.senderName);//WTContactUtils.getNameById(mContext,conversation.realSendId));
+                    //WTContactUtils.getNameById(mContext,conversation.realSendId));
+                    textItemHolder.userName.setText(conversation.senderName);
                 } else {
                     textItemHolder.userName.setVisibility(View.GONE);
                 }
@@ -365,7 +371,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         holder.progress.setVisibility(View.GONE);
         //显示重新发送
         Log.e(TAG, "showUploadFileProgressOrResend: shouldResend = " + conversation.shouldResend
-         + ", isSending = " + conversation.isSending);
+                + ", isSending = " + conversation.isSending);
         if (conversation.shouldResend == Constant.TRUE) {
             holder.retry.setVisibility(View.VISIBLE);
             holder.progress.setVisibility(View.GONE);

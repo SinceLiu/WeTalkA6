@@ -7,13 +7,18 @@ import android.widget.Toast;
 
 /**
  * Created by oubin on 2016/9/21.
+ *
+ * @author oubin
+ * @date 2016/9/21
  */
 public abstract class BaseActivity extends Activity {
 
-    public static final String TAG = "WeTalk";
+    public static final String TAG = "hwj_WeTalk";
 
     private int animIn = R.anim.slide_in_right;
     private int animOut = R.anim.slide_out_right;
+
+    private TrafficDialog mTrafficDialog;
 
     protected abstract void initView();
 
@@ -40,8 +45,22 @@ public abstract class BaseActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
     public void finish() {
         super.finish();
 //        overridePendingTransition(animIn, animOut);
     }
+
+    private void showTrafficDialog() {
+        if (mTrafficDialog == null) {
+            mTrafficDialog = new TrafficDialog(this);
+        }
+        mTrafficDialog.show();
+    }
+
 }

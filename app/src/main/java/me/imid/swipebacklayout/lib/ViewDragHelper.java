@@ -193,7 +193,7 @@ public class ViewDragHelper {
          * is programmatic instead of pointer-initiated.
          *
          * @param capturedChild   Child view that was captured
-         * @param activePointerId Pointer id tracking the child capture
+         * @param activePointerId Pointer uuid tracking the child capture
          */
         public void onViewCaptured(View capturedChild, int activePointerId) {
         }

@@ -127,8 +127,8 @@ public class ChooseFriendActivity extends BaseRequestPermissionActivity {
                     }
                     Intent sendImageIntent = new Intent(ChooseFriendActivity.this, ConversationActivity.class);
                     sendImageIntent.putExtra(Constant.FROM, Constant.SHOW_CHAT);
-                    sendImageIntent.putExtra(Constant.FRIEND_ID, friend.uuid);
-                    sendImageIntent.putExtra(Constant.FRIEND_NAME, friend.name);
+                    sendImageIntent.putExtra(Constant.EXTRA_FRIEND_ID, friend.uuid);
+                    sendImageIntent.putExtra(Constant.EXTRA_FRIEND_NAME, friend.name);
                     sendImageIntent.putExtra(Constant.FRIEND_UNREAD_COUNT, friend.unreadCount);
                     sendImageIntent.putExtra(Constant.FRIEND_AVATAR, friend.avatar);
                     sendImageIntent.putExtra(Constant.SHARE_IMAGE_PATH, intent.getStringExtra("share_image"));

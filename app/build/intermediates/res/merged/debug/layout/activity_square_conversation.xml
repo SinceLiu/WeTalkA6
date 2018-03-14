@@ -1,93 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/square_screen_width"
     android:layout_height="@dimen/square_screen_width"
+    android:layout_gravity="center"
     android:background="@color/main_color"
-    android:splitMotionEvents="false"
-    android:layout_gravity="center">
-    <ListView 
+    android:splitMotionEvents="false">
+
+    <ListView
         android:id="@+id/conversation_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="none"
         android:divider="@null"
-        android:listSelector="@android:color/transparent"/>
-    <RelativeLayout 
+        android:listSelector="@android:color/transparent"
+        android:overScrollMode="never"
+        android:scrollbars="none" />
+
+    <!--TopBar-->
+    <RelativeLayout
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
         android:layout_height="35px">
-        <View 
+
+        <View
             android:id="@+id/space"
             android:layout_width="match_parent"
             android:layout_height="20px"
-            android:background="@color/main_color"/>
-        <View 
+            android:background="@color/main_color" />
+
+        <View
             android:layout_width="match_parent"
             android:layout_height="15px"
             android:layout_below="@id/space"
-            android:background="@drawable/title_bar_bg"/>
-        <TextView 
-	        android:id="@+id/conversation_name_tip"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textColor="@color/green"
-	        android:textSize="24px"
-	        android:maxWidth="200px"
-	        android:singleLine="true"
-	        android:ellipsize="end"
-	        android:text="@string/app_name"
-	        android:layout_marginLeft="10px"/>
-	    <DigitalClock
-	        android:id="@+id/conversation_time"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentRight="true"
-	        android:textColor="@android:color/white"
-	        android:textSize="20px"
-	        android:layout_marginRight="5px"
-	        android:visibility="gone"/>
+            android:background="@drawable/title_bar_bg" />
+
+        <TextView
+            android:id="@+id/conversation_name_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10px"
+            android:ellipsize="end"
+            android:maxWidth="200px"
+            android:singleLine="true"
+            android:text="@string/app_name"
+            android:textColor="@color/green"
+            android:textSize="24px" />
+
+        <DigitalClock
+            android:id="@+id/conversation_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5px"
+            android:textColor="@android:color/white"
+            android:textSize="20px"
+            android:visibility="gone" />
     </RelativeLayout>
-    <LinearLayout 
+
+    <!--BottomBar-->
+    <LinearLayout
         android:id="@+id/conversation_send_msg_tab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
-        android:paddingBottom="1px"
-        android:background="@drawable/action_bar_bg">
-        <View 
+        android:background="@drawable/action_bar_bg"
+        android:orientation="horizontal"
+        android:paddingBottom="1px">
+
+        <Space
+            android:layout_width="6px"
+            android:layout_height="wrap_content" />
+
+        <View
             android:id="@+id/send_emoji_btn"
             android:layout_width="48px"
             android:layout_height="48px"
             android:background="@drawable/send_emoji_btn_sel"
-            android:layout_marginLeft="6px"
-            android:clickable="true"/>
-        <Button 
+            android:clickable="true" />
+
+        <Button
             android:id="@+id/send_voice_btn"
-            android:layout_width="120px"
+            android:layout_width="0dp"
             android:layout_height="48px"
-            android:textColor="@android:color/white"
-            android:background="@drawable/send_voice_btn_sel"
             android:layout_marginLeft="6px"
-            android:layout_marginRight="6px"/>
-        <View 
+            android:layout_marginRight="6px"
+            android:layout_weight="1"
+            android:background="@drawable/btn_send_voice_short_selector"
+            android:textColor="@android:color/white" />
+
+        <View
             android:id="@+id/send_image_btn"
             android:layout_width="48px"
             android:layout_height="48px"
             android:background="@drawable/send_image_btn_sel"
-            android:layout_marginRight="6px"
-            android:clickable="true"/>
+            android:clickable="true" />
+
+        <Space
+            android:layout_width="6px"
+            android:layout_height="wrap_content" />
     </LinearLayout>
+
     <TextView
         android:id="@+id/no_msg_tip"
         android:layout_width="match_parent"
         android:layout_height="@dimen/conversation_item_height"
+        android:layout_marginTop="65dp"
+        android:gravity="center"
         android:text="@string/no_data"
         android:textColor="#cccccc"
         android:textSize="24px"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_color"
         android:gravity="center"
-        android:visibility="gone"
-        android:layout_marginTop="65dp"/>
+        android:text="@string/synchronizing"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/friend_name_textSize"
+        android:visibility="gone" />
+
 </RelativeLayout>

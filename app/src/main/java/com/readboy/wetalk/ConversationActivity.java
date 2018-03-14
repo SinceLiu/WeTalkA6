@@ -2,6 +2,7 @@ package com.readboy.wetalk;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import android.app.Dialog;
@@ -21,11 +22,13 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewParent;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
@@ -37,23 +40,33 @@ import com.readboy.adapter.ConversationListAdapterSimple;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
 import com.readboy.bean.Friend;
+import com.readboy.bean.Model;
 import com.readboy.provider.ConversationProvider;
 import com.readboy.provider.Conversations;
+import com.readboy.provider.Profile;
 import com.readboy.record.AudioRecorder;
 import com.readboy.record.RecordStrategy;
+import com.readboy.utils.EmojiUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.utils.WTContactUtils;
 import com.tencent.bugly.crashreport.BuglyLog;
+import com.tencent.bugly.crashreport.CrashReport;
 
+/**
+ * @author hwj
+ * @author oubin
+ */
 public class ConversationActivity extends BaseActivity implements OnClickListener,
         OnScrollListener, OnLongClickListener, OnTouchListener {
+    private static final String TAG = "hwj_ConversaActivity";
+
     private static final int MAX_COUNT = 100;
 
+    private View mParent;
     private ListView mConversationList;
-    private Button mSendVoiceBtn;
     private View mSendEmojiBtn;
     private View mSendImageBtn;
     private TextView mConversationName;
@@ -65,25 +78,37 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     private NetWorkUtils mNetWorkUtils;
     private View mSendBtnLayout;
     private boolean isOnPause = false;
+    private Button mSendVoiceBtn;
     private ImageView mRecordStateImg;
+    private View mLoading;
 
     /**
      * 录音相关
      */
     private static final int MIN_RECORD_TIME = 1;
-    private static final int MAX_RECORD_TIME = 10;
-    private final int STOP_TIMER = 0x982;
+    private static final int MAX_RECORD_TIME = 10_000;
+    private static final int MESSAGE_STOP_RECORD = 1;
     private int mRecordTime;
-    private int limitTime = MAX_RECORD_TIME;
+    private long startRecordTime;
     private Dialog mRecordDialog;
     private RecordStrategy mRecorder;
-    private Thread mTimerThread;
+
+    //    private ThreadFactory mThreadFactory = new ThreadFactory() {
+//        @Override
+//        public Thread newThread(@NonNull Runnable r) {
+//            return new Thread("RecordTimerThread");
+//        }
+//    };
+//    private ExecutorService mTimerExecutor = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.SECONDS,
+//            new LinkedBlockingDeque<Runnable>(1024), mThreadFactory);
     private boolean isRecording = false;
     private String mCurrentImagePath = "";
 
     private float density;
 
-    //监听消息ContentProvider数据变化,只有收到消息时候才会回调
+    /**
+     * 监听消息ContentProvider数据变化,只有收到消息时候才会回调
+     */
     private ContentObserver mObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
@@ -91,6 +116,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             List<Conversation> conversations = ConversationProvider.getConversationList(ConversationActivity.this, mCurrentFriend.uuid);
             if (conversations == null || mConversations == null ||
                     conversations.size() <= mConversations.size()) {
+                CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于旧的conversations"));
                 return;
             }
             int length = conversations.size();
@@ -144,15 +170,40 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         LogInfo.i("ConversationActivity --- onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_square_conversation);
+        mParent = LayoutInflater.from(this).inflate(R.layout.activity_square_conversation, null);
+        setContentView(mParent);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         density = displayMetrics.density;
         initView();
+        Log.e(TAG, "onCreate: homeGroup = " + MPrefs.getHomeGroupId(this));
+
+//        test();
+    }
+
+    private void test() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Collection<String> collection = EmojiUtils.test3();
+                for (String s : collection) {
+                    Log.e(TAG, "run: s = " + s);
+                    Conversation emoji = getSendBaseConversation(Constant.SEND_EMOJI);
+                    emoji.emojiCode = s;
+                    emoji.recId = mCurrentFriend.uuid;
+                    emoji.shouldResend = Constant.FALSE;
+                    emoji.isSending = Constant.TRUE;
+                    saveConversationToLocal(emoji);
+                    sendConversationInfo(emoji);
+                }
+            }
+        }, 3000);
     }
 
     @Override
     protected void initView() {
+        Log.e(TAG, "initView: ");
         mConversationList = (ListView) getView(R.id.conversation_list);
         mHeaderView = getLayoutInflater().inflate(R.layout.conversation_header, mConversationList, false);
         View mFooterView = getLayoutInflater().inflate(R.layout.conversation_footer, mConversationList, false);
@@ -165,6 +216,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         View mNoDataTip = getView(R.id.no_msg_tip);
         mConversationList.setEmptyView(mNoDataTip);
         mConversationName = (TextView) getView(R.id.conversation_name_tip);
+        mLoading = getView(R.id.loading);
         initData();
         GetConversationTask mConversationTask = new GetConversationTask();
         mConversationTask.execute();
@@ -172,6 +224,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
 
     @Override
     protected void initData() {
+        Log.e(TAG, "initData: ");
         mResolver = getContentResolver();
         //初始化录音对象
         mRecorder = new AudioRecorder(this);
@@ -261,19 +314,93 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
      * 初始化好友数据
      */
     private void initFriendData() {
+        Log.e(TAG, "initFriendData() called");
         //获取传递参数(用户Id)
         Intent fromIntent = getIntent();
         if (fromIntent != null) {
             //普通的微聊界面
             mCurrentFriend = new Friend();
-            mCurrentFriend.uuid = fromIntent.getStringExtra(Constant.FRIEND_ID);
-            mCurrentFriend.name = fromIntent.getStringExtra(Constant.FRIEND_NAME);
+            mCurrentFriend.uuid = fromIntent.getStringExtra(Constant.EXTRA_FRIEND_ID);
+            mCurrentFriend.name = fromIntent.getStringExtra(Constant.EXTRA_FRIEND_NAME);
             mCurrentFriend.unreadCount = fromIntent.getIntExtra(Constant.FRIEND_UNREAD_COUNT, 0);
             mConversationName.setText(mCurrentFriend.name);
+            Log.e(TAG, "initFriendData: uuid = " + mCurrentFriend.uuid);
+            //uuid以D开头代表是手表，其他不用获取设备型号
+            if (mCurrentFriend.uuid != null && mCurrentFriend.uuid.trim().startsWith(Model.UUID_BEGINNING_CHARACTER)) {
+                mLoading.setVisibility(View.VISIBLE);
+                initModel();
+            } else {
+//                mLoading.setVisibility(View.GONE);
+            }
         } else {
             showMsg(getString(R.string.wrong_data));
             finish();
         }
+    }
+
+    private void initModel() {
+        Profile.getProfile(this, mCurrentFriend.uuid, new Profile.CallBack() {
+            @Override
+            public void onResponse(final Profile profile) {
+                Log.e(TAG, "onResponse() called with: profile = " + profile + "");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoading.setVisibility(View.GONE);
+                        mCurrentFriend.model = Model.getModel(profile.getImei());
+                        adjustViewCaseModel(mCurrentFriend.model);
+                    }
+                });
+            }
+
+            @Override
+            public void onFail(Exception e) {
+                Log.e(TAG, "onFail() called with: e = " + e + "");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoading.setVisibility(View.GONE);
+                    }
+                });
+            }
+        });
+    }
+
+    private void adjustViewCaseModel(Model model) {
+        Log.e(TAG, "adjustViewCaseModel: model = " + model);
+        if (model == null) {
+            mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_short_selector);
+            mSendImageBtn.setVisibility(View.VISIBLE);
+            mSendImageBtn.setVisibility(View.VISIBLE);
+            return;
+        }
+        switch (model) {
+            case W2S:
+            case W2T:
+            case W3T:
+                mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_long_selector);
+                mSendEmojiBtn.setVisibility(View.GONE);
+                mSendImageBtn.setVisibility(View.GONE);
+                break;
+            case W5:
+                mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_middle_selector);
+                mSendEmojiBtn.setVisibility(View.VISIBLE);
+                mSendImageBtn.setVisibility(View.GONE);
+                break;
+            default:
+                mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_short_selector);
+                mSendImageBtn.setVisibility(View.VISIBLE);
+                mSendImageBtn.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private void showSmallSystemView() {
+
+    }
+
+    private void showAndroidSystemView() {
+
     }
 
     @Override
@@ -332,7 +459,13 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         switch (requestCode) {
             case Constant.REQUEST_EMOJI:
                 Conversation emoji = getSendBaseConversation(Constant.SEND_EMOJI);
+
                 emoji.emojiId = data.getIntExtra(Constant.REQUEST_EMOJI_ID, 0);
+                if (mCurrentFriend.model == Model.W5) {
+                    emoji.emojiCode = EmojiUtils.getOldCode(emoji.emojiId);
+                } else {
+                    emoji.emojiCode = EmojiUtils.getEmojiCode(emoji.emojiId);
+                }
                 emoji.recId = mCurrentFriend.uuid;
                 emoji.shouldResend = Constant.FALSE;
                 emoji.isSending = Constant.TRUE;
@@ -398,7 +531,6 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             //添加消息数据
             if (mConversations == null) {
                 mConversations = new ArrayList<>();
-
                 BuglyLog.e(TAG, "mConversation = null.");
             }
             mConversations.add(conversation);
@@ -479,10 +611,12 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         }
         if (mRecordDialog == null) {
             mRecordDialog = new Dialog(this, R.style.FullScreenDialogTheme);
+            mRecordDialog.setCancelable(false);
+            mRecordDialog.setContentView(R.layout.record_dialog_small);
+            mRecordStateImg = (ImageView) mRecordDialog.findViewById(R.id.record_state);
+            adjustRecordBtn(mCurrentFriend.model);
         }
-        mRecordDialog.setCancelable(false);
-        mRecordDialog.setContentView(R.layout.record_dialog_small);
-        mRecordStateImg = (ImageView) mRecordDialog.findViewById(R.id.record_state);
+        mRecordStateImg.setActivated(true);
         TextView name = (TextView) mRecordDialog.findViewById(R.id.record_name);
         name.setText(mCurrentFriend.name);
         ImageView recordAnim = (ImageView) mRecordDialog.findViewById(R.id.record_voice);
@@ -491,28 +625,54 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         mRecordDialog.show();
     }
 
+    private void adjustRecordBtn(Model model) {
+        if (model == null || mRecordStateImg != null) {
+            LogInfo.e(TAG, "adjustRecordBtn model = " + model);
+            return;
+        }
+        switch (model) {
+            case W2S:
+            case W2T:
+            case W3T:
+                break;
+            case W5:
+                mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_middle_selector);
+                mSendEmojiBtn.setVisibility(View.VISIBLE);
+                mSendImageBtn.setVisibility(View.GONE);
+                break;
+            default:
+                mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_short_selector);
+                mSendImageBtn.setVisibility(View.VISIBLE);
+                mSendImageBtn.setVisibility(View.VISIBLE);
+                break;
+        }
+
+    }
+
     /**
      * 开始录音
      */
     private void startRecording() {
+        Log.e(TAG, "startRecording: ");
         showRecordDialog();
         //初始化录音相关变量
         isRecording = true;
-        //记录是否超时线程
-        mTimerThread = new Thread(limitTimeThread);
         mRecorder.ready();
         //开始录音
         mRecorder.start();
-        //开启计时线程
-        mTimerThread.start();
+        startRecordTime = System.currentTimeMillis();
+        mTimerHandler.removeMessages(MESSAGE_STOP_RECORD);
+        mTimerHandler.sendEmptyMessageDelayed(MESSAGE_STOP_RECORD, MAX_RECORD_TIME);
         muteAudioFocus(this, true);
     }
 
-    //计时线程的Handler
-    private Handler mTimerHandler = new Handler() {
+    /**
+     * 计时线程的Handler
+     */
+    private Handler mTimerHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
-            if (msg.what == STOP_TIMER) {
+            if (msg.what == MESSAGE_STOP_RECORD) {
                 //提示信息
                 showMsg(getString(R.string.out_off_limit));
                 muteAudioFocus(ConversationActivity.this, false);
@@ -523,27 +683,31 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         }
     };
 
-    //计时线程
-    private Runnable limitTimeThread = new Runnable() {
+    /**
+     * 计时线程。
+     */
+    private Runnable limitTimeRunnable = new Runnable() {
         @Override
         public void run() {
-            while (isRecording) {
-                LogInfo.i("hwj", "limitTime ------------- " + limitTime);
-                try {
-                    //录音过程中间隔1s执行一次
-                    Thread.sleep(1000);
-                    limitTime--;
-                    if (limitTime == 0) {
-                        //超过最大时长
-                        mTimerHandler.sendEmptyMessage(STOP_TIMER);
-                        mTimerHandler.sendEmptyMessageDelayed(STOP_TIMER, limitTime);
-                        break;
-                    }
-                } catch (InterruptedException e) {
-                    //当线程处于Sleep时调用会出现这个异常,所以要再执行一次
-                    mTimerThread.interrupt();
-                }
-            }
+//            Log.e(TAG, "run: limitTimeRunnable.");
+//            while (isRecording) {
+//                LogInfo.i("hwj", "limitTime ------------- " + limitTime);
+//                try {
+//                    //录音过程中间隔1s执行一次
+//                    Thread.sleep(1000);
+//                    limitTime--;
+//                    if (limitTime == 0) {
+//                        //超过最大时长
+//                        mTimerHandler.sendEmptyMessage(MESSAGE_STOP_RECORD);
+//                        mTimerHandler.sendEmptyMessageDelayed(MESSAGE_STOP_RECORD, limitTime);
+//                        break;
+//                    }
+//                } catch (InterruptedException e) {
+//                    //当线程处于Sleep时调用会出现这个异常,所以要再执行一次
+//                    CrashReport.postCatchedException(e);
+////                    mTimerThread.interrupt();
+//                }
+//            }
         }
     };
 
@@ -553,12 +717,15 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     protected void prepareSendVoiceMessage() {
         isRecording = false;
         //更新录音时间
-        mRecordTime = MAX_RECORD_TIME - limitTime;
-        LogInfo.i("hwj", "mRecordTime ---------- " + mRecordTime);
+//        mRecordTime = MAX_RECORD_TIME - limitTime;
+        mRecordTime = (int) ((System.currentTimeMillis() - startRecordTime) * 0.001);
+        Log.e(TAG, "prepareSendVoiceMessage: mRecordTime = " + mRecordTime);
         //停止计时
-        interruptRecordThread();
+        stopRecording();
         //录音时间太短
         if (mRecordTime < MIN_RECORD_TIME) {
+            Log.e(TAG, "prepareSendVoiceMessage: startRecordTime = " + startRecordTime +
+                    ", offset = " + (System.currentTimeMillis() - startRecordTime));
             mRecordDialog.dismiss();
             showMsg(getString(R.string.voice_error_msg));
             File oldFile = new File(mRecorder.getFilePath());
@@ -574,9 +741,9 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     }
 
     /**
-     *  文件上传Handler
+     * 文件上传Handler
      */
-    private Handler mUploadFileHandler = new Handler() {
+    private Handler mUploadFileHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == NetWorkUtils.UPLOAD_SUCCEED) {
@@ -678,21 +845,11 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     /**
      * 停止录音线程
      */
-    private void interruptRecordThread() {
+    private void stopRecording() {
+        Log.e(TAG, "stopRecording: ");
         isRecording = false;
-        //录音完毕
+        mTimerHandler.removeMessages(MESSAGE_STOP_RECORD);
         mRecorder.stop();
-        try {
-            //停止超时线程
-            if (mTimerThread != null && !mTimerThread.isInterrupted()) {
-                mTimerThread.interrupt();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        LogInfo.i("hwj", "interruptRecordThread ---------- ");
-        //初始化计时值
-        limitTime = MAX_RECORD_TIME;
     }
 
     private float clickY = 0;
@@ -715,14 +872,15 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                         if (clickY - motionEvent.getY() < 20) {
                             isRecording = false;
                             LogInfo.i("hwj", "ACTION_UP --- prepareSendVoiceMessage");
-                            if (mTimerThread != null && !mTimerThread.isInterrupted()) {
-                                mTimerThread.interrupt();
-                            }
+//                            if (mTimerThread != null && !mTimerThread.isInterrupted()) {
+//                                mTimerThread.interrupt();
+//                            }
                             prepareSendVoiceMessage();
                         } else {
                             //上移取消录音
                             cancelRecord();
                         }
+                        requestParentDisallowInterceptTouchEvent(false);
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
@@ -730,15 +888,23 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                     if (isRecording && mRecordStateImg != null) {
                         //上滑距离小于20
                         if (clickY - motionEvent.getY() > 20) {
-                            mRecordStateImg.setImageResource(R.drawable.cancel_record);
-                        } else {
                             //上移取消录音
-                            mRecordStateImg.setImageResource(R.drawable.record_btn_nor);
+                            if (!mRecordStateImg.isActivated()) {
+                                mRecordStateImg.setActivated(true);
+                                mRecordStateImg.setImageResource(R.drawable.btn_cancel_send_normal);
+                            }
+                        } else {
+                            if (mRecordStateImg.isActivated()) {
+                                mRecordStateImg.setActivated(false);
+                                mRecordStateImg.setImageResource(R.drawable.btn_send_voice_common_normal);
+                            }
                         }
+                        requestParentDisallowInterceptTouchEvent(true);
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
                     cancelRecord();
+                    requestParentDisallowInterceptTouchEvent(false);
                     break;
             }
         }
@@ -752,7 +918,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         if (!isRecording) {
             return;
         }
-        interruptRecordThread();
+        stopRecording();
 //        showMsg(getString(R.string.cancel_record));
         mRecordDialog.dismiss();
         File oldFile = new File(mRecorder.getFilePath());
@@ -808,10 +974,10 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         if (mTimerHandler != null) {
             mTimerHandler.removeCallbacksAndMessages(null);
         }
-        if (mSendMessageResultHandler != null) {
-            mSendMessageResultHandler.removeCallbacksAndMessages(null);
-        }
+        mSendMessageResultHandler.removeCallbacksAndMessages(null);
         muteAudioFocus(this, false);
+
+//        mTimerExecutor.shutdownNow();
     }
 
     @Override
@@ -827,6 +993,15 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             muteAudioFocus(this, false);
             LogInfo.i("hwj", "onPause --- prepareSendVoiceMessage");
             prepareSendVoiceMessage();
+        }
+    }
+
+    private void requestParentDisallowInterceptTouchEvent(boolean disallowIntercept) {
+        final ViewParent p = mParent.getParent();
+        if (p != null) {
+            p.requestDisallowInterceptTouchEvent(disallowIntercept);
+        } else {
+            Log.e(TAG, "requestParentDisallowInterceptTouchEvent: null.");
         }
     }
 

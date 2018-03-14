@@ -68,7 +68,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
     			TextUtils.isEmpty(MPrefs.getNickName(this)) ||
     			TextUtils.isEmpty(MPrefs.getMessageTag(this))){
     		//获取手表设备信息
-            MPrefs.setDeviceId(this, mNetWorkUtils.getDevicedUuid());
+            MPrefs.setDeviceId(this, mNetWorkUtils.getDeviceUuid());
             MPrefs.setNickName(this, mNetWorkUtils.getNickName());
             mNetWorkUtils.saveMessageTag(this);
     	}
@@ -88,8 +88,8 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
 			//联系人微聊
 			String id = dataIntent.getStringExtra("friend_id");
 			if(!TextUtils.isEmpty(id)){
-				intent.putExtra(Constant.FRIEND_ID, id);
-				intent.putExtra(Constant.FRIEND_NAME, WTContactUtils.getNameById(this, id));
+				intent.putExtra(Constant.EXTRA_FRIEND_ID, id);
+				intent.putExtra(Constant.EXTRA_FRIEND_NAME, WTContactUtils.getNameById(this, id));
 				intent.putExtra(Constant.FRIEND_UNREAD_COUNT, WTContactUtils.getFriendUnreadCount(this, id));
 			}
 		}

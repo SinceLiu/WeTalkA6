@@ -1,5 +1,9 @@
 [
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_send_voice_common_pressed.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_send_voice_common_pressed.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji47.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji47.png"
     },
@@ -24,6 +28,10 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_6.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_84.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_84.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji33.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji33.png"
     },
@@ -32,12 +40,24 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji17.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_cancel_send_normal.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_cancel_send_normal.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_5.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_5.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_9.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_9.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_66.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_66.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_1.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_1.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji48.png",
@@ -60,24 +80,28 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\image_full_mask.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\shadow_bottom.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\shadow_bottom.png"
-    },
-    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji29.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji29.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\shadow_bottom.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\shadow_bottom.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji15.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji15.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_8.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_8.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\retry.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\retry.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_8.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_8.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_23.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_23.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji20.png",
@@ -104,24 +128,40 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji4.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\shadow_left.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\shadow_left.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\image_mask_left.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\image_mask_left.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\shadow_left.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\shadow_left.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_86.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_86.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_83.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_83.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\avatar_mask.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\avatar_mask.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_3.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_3.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_2.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_2.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_78.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_78.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_1.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_1.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_3.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_3.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji30.png",
@@ -148,12 +188,24 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_7.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_42.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_42.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_19.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_19.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_55.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_55.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji14.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji14.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_81.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_81.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_2.png",
@@ -176,12 +228,20 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_12.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\play_wht3.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\play_wht3.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_46.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_46.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\play3.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\play3.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\play_wht3.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\play_wht3.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_send_voice_long_pressed.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_send_voice_long_pressed.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_9.png",
@@ -200,12 +260,16 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_12.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji2.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji2.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_49.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_49.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji43.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji43.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji2.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji2.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji46.png",
@@ -224,6 +288,18 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji49.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_71.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_71.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_87.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_87.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_52.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_52.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji24.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji24.png"
     },
@@ -238,6 +314,14 @@
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji40.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji40.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_17.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_17.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_send_voice_long_normal.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_send_voice_long_normal.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji21.png",
@@ -264,12 +348,24 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\send_emoji_pre.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_89.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_89.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji39.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji39.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_44.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_44.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\play_bg.9.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\play_bg.9.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_58.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_58.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji41.png",
@@ -280,24 +376,40 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji25.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji42.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji42.png"
-    },
-    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_3.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_3.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji42.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji42.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji11.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji11.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_send_voice_common_normal.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_send_voice_common_normal.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\cancel_record.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\cancel_record.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_62.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_62.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\common.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\common.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_88.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_88.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_43.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_43.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_15.png",
@@ -320,8 +432,16 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji26.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_29.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_29.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji23.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji23.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_12.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_12.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_2.png",
@@ -348,6 +468,26 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\play2.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_45.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_45.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_80.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_80.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_56.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_56.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_5.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_5.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_59.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_59.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji6.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji6.png"
     },
@@ -364,16 +504,40 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji22.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_50.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_50.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji28.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji28.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_47.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_47.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_69.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_69.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_send_voice_middle_pressed.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_send_voice_middle_pressed.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_73.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_73.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji45.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji45.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\send_emoji_nor.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\send_emoji_nor.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji45.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji45.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_51.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_51.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_6.png",
@@ -384,12 +548,40 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji51.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_82.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_82.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_54.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_54.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_85.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_85.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_57.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_57.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\play1.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\play1.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_60.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_60.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_14.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\record_14.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_76.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_76.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_79.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_79.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_11.png",
@@ -432,16 +624,24 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_4.png"
     },
     {
-        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji10.png",
-        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji10.png"
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_41.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_41.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_7.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\new_relation_head_7.png"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji10.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji10.png"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\emoji16.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\emoji16.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\btn_send_voice_middle_normal.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\btn_send_voice_middle_normal.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\new_relation_head_1.png",
@@ -450,6 +650,10 @@
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\wetalk_icon.png",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\wetalk_icon.png"
+    },
+    {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\smiley_22.png",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\drawable-ldpi\\smiley_22.png"
     },
     {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi\\record_btn_pre.png",

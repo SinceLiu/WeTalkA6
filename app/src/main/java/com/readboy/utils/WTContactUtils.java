@@ -4,22 +4,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.NotificationManager;
+import android.app.readboy.IReadboyWearListener;
+import android.app.readboy.ReadboyWearManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.os.RemoteException;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.Data;
+import android.util.Log;
 
 import com.readboy.bean.Constant;
 import com.readboy.bean.Friend;
 
+/**
+ * @author hwj
+ */
 public class WTContactUtils {
+    private static final String TAG = "hwj_WTContactUtils";
+
 
     public static String getLocalAvatarPath(Context context) {
         //获取当前手表的头像
@@ -89,10 +98,9 @@ public class WTContactUtils {
     /**
      * 获取全部联系人,支持单聊了
      *
-     * @param context
-     * @return
      */
     public static List<Friend> getFriendFromContact(Context context) {
+        ReadboyWearManager manager = (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
         List<Friend> list = new ArrayList<Friend>();
         int oldrid = -1;
         int contactId = -1;
@@ -112,7 +120,7 @@ public class WTContactUtils {
                 contact.contactId = contactId;
                 oldrid = contactId;
             }
-            if (contact == null){
+            if (contact == null) {
                 continue;
             }
             switch (cursor.getString(cursor.getColumnIndex(Data.MIMETYPE))) {
@@ -137,6 +145,64 @@ public class WTContactUtils {
                         contact.uuid = cursor.getString(cursor.getColumnIndex("data8"));
                         //				    if(unread != 0){
 //				    	mPrefs.setUserUnreadCount(contact.uuid, unread);
+                        Log.e(TAG, "getFriendFromContact: uuid = " + contact.uuid);
+                        String imei = "868706020000215";
+                        String uuid = "DA59F29B4E001B63";
+//                        manager.getInfoWithKeyAndData("info", contact.uuid, new IReadboyWearListener.Stub() {
+//                            @Override
+//                            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                                Log.e(TAG, "info pushSuc() called imei with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//                            }
+//
+//                            @Override
+//                            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                                Log.e(TAG, "info pushFail() called imei with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//                            }
+//                        });
+//                        manager.getInfoWithKeyAndData("info", contact.uuid, new IReadboyWearListener.Stub() {
+//                            @Override
+//                            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                                Log.e(TAG, "info pushSuc() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//                            }
+//
+//                            @Override
+//                            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                                Log.e(TAG, "info pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//                            }
+//                        });
+//                        manager.getInfoWithKeyAndData("profile", imei, new IReadboyWearListener.Stub() {
+//                            @Override
+//                            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                                Log.e(TAG, "profile imei pushSuc() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//                            }
+//
+//                            @Override
+//                            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                                Log.e(TAG, "profile imei pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//                            }
+//                        });
+//                        manager.getInfoWithKeyAndData("profile", uuid, new IReadboyWearListener.Stub() {
+//                            @Override
+//                            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                                Log.e(TAG, "profile uuid pushSuc() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//                            }
+//
+//                            @Override
+//                            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                                Log.e(TAG, "profile uuid pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//                            }
+//                        });
+//                        manager.operateDeviceContacts("add", contact.uuid, null, new IReadboyWearListener.Stub() {
+//                            @Override
+//                            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                                Log.e(TAG, "pushSuc() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//                            }
+//
+//                            @Override
+//                            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                                Log.e(TAG, "pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//                            }
+//                        });
 //				    }
 //				    contact.unreadCount = mPrefs.getUserUnreadCount(contact.uuid);
                         contact.unreadCount = cursor.getInt(cursor.getColumnIndex("data6"));
@@ -205,7 +271,6 @@ public class WTContactUtils {
     /**
      * 更新联系人未读信息数
      *
-     * @param context
      * @param uuid
      * @return 受影响行数
      */

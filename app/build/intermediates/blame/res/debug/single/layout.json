@@ -20,6 +20,10 @@
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\layout\\choose_friend_item.xml"
     },
     {
+        "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\layout\\dialog_traffic.xml",
+        "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\layout\\dialog_traffic.xml"
+    },
+    {
         "merged": "E:\\AW7Project\\SquareWeTalk\\app\\build\\intermediates\\res\\merged\\debug\\layout\\conversation_item_simple.xml",
         "source": "E:\\AW7Project\\SquareWeTalk\\app\\src\\main\\res\\layout\\conversation_item_simple.xml"
     },

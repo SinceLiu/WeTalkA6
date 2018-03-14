@@ -1,35 +1,47 @@
 package com.readboy.wetalk;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.app.readboy.IReadboyWearListener;
+import android.app.readboy.ReadboyWearManager;
+import android.content.Context;
+import android.content.Intent;
+import android.database.ContentObserver;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.os.RemoteException;
+import android.provider.ContactsContract;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Friend;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
+import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.WTContactUtils;
 import com.readboy.view.EmptyRecyclerView;
 import com.readboy.view.FriendGridItem;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.database.ContentObserver;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.ContactsContract;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
+/**
+ * @author hwj
+ */
 public class FriendActivity extends BaseRequestPermissionActivity {
+    private static final String TAG = "hwj_FriendActivity";
 
     private List<Friend> mFriends;
 
@@ -39,11 +51,13 @@ public class FriendActivity extends BaseRequestPermissionActivity {
     private boolean isUpdating = false;
     private Handler mHandler = new Handler();
     private boolean hasRegisterObserver = false;
+    private int successCount;
 
     private Runnable mUpdateFriendThread = new Runnable() {
 
         @Override
         public void run() {
+            LogInfo.e(TAG, "updateFriendThread run().");
             if (!isUpdating) {
                 LogInfo.i("contact notify");
                 if (mGetFriendTask != null) {
@@ -66,13 +80,58 @@ public class FriendActivity extends BaseRequestPermissionActivity {
                 mHandler.post(mUpdateFriendThread);
             }
         }
-    };
 
+    };
 
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
-        LogInfo.i(" FriendActivity --- onCreate()");
+        LogInfo.i(TAG, " --- onCreate()");
+        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
+
+//        test();
+    }
+
+    private void test() {
+        ReadboyWearManager wearManager = (ReadboyWearManager) getSystemService(Context.RBW_SERVICE);
+        String imei = "868706020000215";
+        String uuid = "DA59F29B4E001B63";
+        NetWorkUtils.getProfile(this, uuid, new NetWorkUtils.PushResultListener() {
+            @Override
+            public void pushSucceed(String type, String s1, int code, String s, String response) {
+                Log.e(TAG, "pushSucceed() profile test called with: type = " + type + ", s1 = " + s1 + ", code = " + code + ", s = " + s + ", response = " + response + "");
+            }
+
+            @Override
+            public void pushFail(String s, String s1, int i, String s2) {
+                Log.e(TAG, "pushFail() profile test called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+            }
+        });
+
+//        wearManager.getAllMessage("", new IReadboyWearListener.Stub() {
+//            @Override
+//            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                Log.e(TAG, "pushSuc() message called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//            }
+//
+//            @Override
+//            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                Log.e(TAG, "pushFail() message called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//            }
+//        });
+
+//        wearManager.operateDeviceContacts("add", uuid, null, new IReadboyWearListener.Stub() {
+//            @Override
+//            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
+//                Log.e(TAG, "pushSuc() test called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + ", s3 = " + s3 + "");
+//            }
+//
+//            @Override
+//            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+//                Log.e(TAG, "pushFail() test called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+//            }
+//        });
+
     }
 
     @Override
@@ -88,6 +147,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
 
     @Override
     protected void initData() {
+        Log.e(TAG, "initData: ");
         mGetFriendTask = new GetFriendTask();
         mGetFriendTask.execute();
     }
@@ -119,7 +179,8 @@ public class FriendActivity extends BaseRequestPermissionActivity {
 
         @Override
         protected void onPreExecute() {
-            showLoading();
+            //因为收到新消息，改写了未读信息数，所有也会回调到该方法，所有此处不显示加载窗口。
+//            showLoading();
         }
 
         @Override
@@ -131,9 +192,26 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         @Override
         protected void onPostExecute(List<Friend> friends) {
 //        	clearImageDiskCache();
+            hideLoading();
+//            if (friends != null && friends.size() > 0) {
+//                List<Friend> fs = new ArrayList<>(friends);
+//                for (Friend f : fs) {
+//                    Profile.getProfile(FriendActivity.this, f.uuid, new Profile.CallBack() {
+//                        @Override
+//                        public void onResponse(Profile profile) {
+//                            successCount--;
+//                        }
+//
+//                        @Override
+//                        public void onFail(Exception e) {
+//                            Log.e(TAG, "onFail: ");
+//                            ToastUtils.showShort(FriendActivity.this, e.toString());
+//                        }
+//                    });
+//                }
+//            }
             updateFriendData(friends);
             mFriendRecyclerList.setAdapter(new FriendRecyclerAdapter());
-            hideLoading();
             isUpdating = false;
         }
     }
@@ -162,7 +240,8 @@ public class FriendActivity extends BaseRequestPermissionActivity {
      * 隐藏加载中动画
      */
     private void hideLoading() {
-        Animator hide = ObjectAnimator.ofFloat(mLoading, "alpha", 0);
+        Animator hide = ObjectAnimator.ofFloat(mLoading, "alpha", 1.0F, 0);
+        hide.setDuration(500);
         hide.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -288,7 +367,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
             } else {
                 //根据未读数设置显示数量
                 int count = friend.unreadCount;
-                if (count > 99) {
+                if (count > Constant.MAX_MESSAGE_COUNT) {
                     holder.item.setUnreadCount("...");
                 } else {
                     holder.item.setUnreadCount(String.valueOf(friend.unreadCount));
@@ -312,8 +391,8 @@ public class FriendActivity extends BaseRequestPermissionActivity {
                                 v.setScaleY(1.0f);
                                 final Friend friend = mFriends.get(position);
                                 Intent intent = new Intent(FriendActivity.this, ConversationActivity.class);
-                                intent.putExtra(Constant.FRIEND_ID, friend.uuid);
-                                intent.putExtra(Constant.FRIEND_NAME, friend.name);
+                                intent.putExtra(Constant.EXTRA_FRIEND_ID, friend.uuid);
+                                intent.putExtra(Constant.EXTRA_FRIEND_NAME, friend.name);
                                 intent.putExtra(Constant.FRIEND_UNREAD_COUNT, friend.unreadCount);
                                 intent.putExtra(Constant.FRIEND_AVATAR, friend.avatar);
                                 startActivity(intent);
@@ -342,6 +421,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
     @Override
     protected void initContent() {
         getContentResolver().registerContentObserver(ContactsContract.Data.CONTENT_URI, true, mObserver);
+
         hasRegisterObserver = true;
         setContentView(R.layout.activity_square_friend);
         initView();

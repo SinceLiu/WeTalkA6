@@ -2,7 +2,6 @@ package com.readboy.wetalk;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.IntentService;
@@ -72,7 +71,6 @@ public class UpdateContactPhotoService extends IntentService {
         int oldId = -1;
         Friend contact = null;
         List<Friend> list = new ArrayList<Friend>();
-
         Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
                 new String[]{Data.RAW_CONTACT_ID, Data.MIMETYPE, "data8", Photo.PHOTO_URI},
                 Data.MIMETYPE + "=? OR " + Data.MIMETYPE + "=?",

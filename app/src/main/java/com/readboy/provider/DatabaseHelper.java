@@ -3,23 +3,34 @@ package com.readboy.provider;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.readboy.provider.WeTalkContract.ProfileColumns;
 
 /**
  * Created by 1-PC on 2016/10/8.
  * 数据库相关
  */
 
-class DatabaseHelper extends SQLiteOpenHelper{
+class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String TAG = "hwj_DatabaseHelper";
 
     //数据库名
-    private static final String TABLE_NAME = "wetalk";
-    //数据库版本
-    private static final int VERSION = 2;
+    private static final String DATABASE_NAME = "wetalk";
+    /**
+     * 初始版本
+     */
+    private static final int VERSION_2 = 2;
+    /**
+     * 新添{@link ProfileColumns#PROFILE_TABLE_NAME}表,
+     * @date 20180201
+     */
+    private static final int VERSION_3 = 3;
 
     static final String CONVERSATION_TABLE_NAME = "conversation";
 
     DatabaseHelper(Context context) {
-        super(context, TABLE_NAME, null, VERSION);
+        super(context, DATABASE_NAME, null, VERSION_3);
     }
 
     @Override
@@ -48,11 +59,31 @@ class DatabaseHelper extends SQLiteOpenHelper{
                 + Conversations.Conversation.SHOULD_RESEND + " INTEGER,"
                 + Conversations.Conversation.IS_SENDING + " INTEGER,"
                 + Conversations.Conversation.IS_PLAYING + " INTEGER)");
+
+        createProfileTable(sqLiteDatabase);
+    }
+
+    private void createProfileTable(SQLiteDatabase db) {
+        Log.e(TAG, "createProfileTable: ");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + ProfileColumns.PROFILE_TABLE_NAME + "("
+                + ProfileColumns._ID + " INTEGER PRIMARY KEY,"
+                + ProfileColumns.UUID + " TEXT,"
+                + ProfileColumns.IMEI + " TEXT,"
+                + ProfileColumns.NAME + " TEXT,"
+                + ProfileColumns.TYPE + " TEXT,"
+                + ProfileColumns.SEX + " INTEGER,"
+                + ProfileColumns.GRADE + " INTEGER,"
+                + ProfileColumns.DATA + " TEXT);");
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CONVERSATION_TABLE_NAME);
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        Log.e(TAG, "onUpgrade: old = " + oldVersion + ", new = " + newVersion);
+        if (oldVersion == VERSION_2 && newVersion >= VERSION_3){
+            createProfileTable(sqLiteDatabase);
+        }
+//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CONVERSATION_TABLE_NAME);
+//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ProfileColumns.PROFILE_TABLE_NAME);
+//        onCreate(sqLiteDatabase);
     }
 }

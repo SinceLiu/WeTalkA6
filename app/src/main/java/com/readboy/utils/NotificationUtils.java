@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.readboy.wetalk.FriendActivity;
 import com.readboy.wetalk.R;
@@ -21,7 +22,7 @@ import com.readboy.wetalk.R;
  */
 
 public class NotificationUtils {
-    private static final String TAG = "NotificationUtils";
+    private static final String TAG = "hwj_NotificationUtils";
 
     private static final int MAX_MESSAGE_COUNT = 100;
 
@@ -31,12 +32,14 @@ public class NotificationUtils {
     public static final int NORMAL_NOTIFY_ID = "wetlak".hashCode();
 
     public static void notification(Context context) {
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        LogInfo.i("hwj", "process state = " + TaskUtils.isBackground(context));
+        NotificationManager manager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //在联系人信息界面或者
         if (!TaskUtils.isBackground(context)) {
+            Log.e(TAG, "notification: normal.");
             manager.notify(NORMAL_NOTIFY_ID, getNotification(context));
         } else {
+            Log.e(TAG, "notification: floating.");
             manager.notify(NOTIFY_ID, getFloatingNotification(context));
         }
     }
@@ -51,6 +54,7 @@ public class NotificationUtils {
         builder.setContentTitle("微聊");
         builder.setExtras(bundle);
         int count = WTContactUtils.getAllContactsUnreadCount(context);
+        Log.e(TAG, "getFloatingNotification: count = " + count);
         if (count >= MAX_MESSAGE_COUNT) {
             builder.setContentText("收到99+条新消息");
         } else if (count > 0) {

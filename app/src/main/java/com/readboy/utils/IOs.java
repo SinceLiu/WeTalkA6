@@ -26,7 +26,9 @@ import android.util.Log;
 import com.readboy.bean.Constant;
 
 /**
- * Created by 1-PC on 2016/9/24.
+ *
+ * @author 1-PC
+ * @date 2016/9/24
  */
 
 public class IOs {
@@ -261,7 +263,7 @@ public class IOs {
     }
 
     /**
-     * 要保存的文件名
+     * 用于保存上次获取最新消息的时间的文件名，内容为单行时间戳，单位为毫秒
      */
     private static String fileName = Environment.getExternalStorageDirectory() + "/get_message_time.txt";
 
@@ -317,6 +319,7 @@ public class IOs {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return "";
+        Log.e(TAG, "readTimeTag: tag = null.");
+        return null;
     }
 }

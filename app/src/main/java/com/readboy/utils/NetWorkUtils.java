@@ -46,28 +46,34 @@ import android.util.Log;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * Created by 1-PC on 2016/9/24.
+ * @author 1-PC
+ * @date 2016/9/24
  * 处理所有的网络请求
  */
 
 public class NetWorkUtils {
-    private static final String TAG = "NetWorkUtils";
+    private static final String TAG = "hwj_NetWorkUtils";
 
     //服务器相关url
 //    private static final String HOST = "http://120.25.120.222";//测试服务器
     /**
      * 上传到阿里服务器。
+     * 正式服务器
      */
-    private static final String HOST = "http://wear.readboy.com";//正式服务器
+    private static final String HOST = "http://wear.readboy.com";
     private static final String UPLOAD_IMAGE_URL = HOST + "/put/image";
     private static final String UPLOAD_AUDIO_URL = HOST + "/put/audio";
 
-    //服务器响应Key
+    /**
+     * 服务器响应Key
+     */
     private static final String STATUS = "status";
     private static final String FILE_NAME = "filename";
     private static final String SRC_NAME = "srcname";
 
-    //Json的字段
+    /**
+     * Json的字段
+     */
     public static final String TYPE = "type";
     public static final String MESSAGE = "m";
     public static final String ATTR = "attr";
@@ -140,7 +146,9 @@ public class NetWorkUtils {
         return false;
     }
 
-    //使用MD5算法进行加密
+    /**
+     * 使用MD5算法进行加密
+     */
     public static String md5(String plainText) {
         byte[] secretBytes = null;
         try {
@@ -351,7 +359,6 @@ public class NetWorkUtils {
         }
     }
 
-
     protected Message getUploadResultMessage(Conversation conversation, int result) {
         Message msg = new Message();
         msg.what = result;
@@ -451,12 +458,10 @@ public class NetWorkUtils {
         return mManager;
     }
 
-    public String getDevicedUuid() {
+    public String getDeviceUuid() {
         String uuid = "";
-        if (mManager != null) {
-            if (mManager.getPersonalInfo() != null) {
-                uuid = mManager.getPersonalInfo().getUuid();
-            }
+        if (mManager != null && mManager.getPersonalInfo() != null) {
+            uuid = mManager.getPersonalInfo().getUuid();
         }
         return uuid;
     }
@@ -484,6 +489,7 @@ public class NetWorkUtils {
                 mManager.getAllMessage(MPrefs.getMessageTag(context), new IReadboyWearListener.Stub() {
                     @Override
                     public void pushSuc(String type, String s1, int code, String s, String response) throws RemoteException {
+                        //s = mget, s1 = 119, i = 0, s2 = [], s3 = {"r":"mget","o":"119","t":"18020100229007","data":[]}
                         try {
                             MPrefs.setMessageTag(context, new JSONObject(response).getString(NetWorkUtils.TIME));
                         } catch (JSONException e) {
@@ -503,6 +509,7 @@ public class NetWorkUtils {
     }
 
     public void getAllMessage(String tag, final PushResultListener listener) {
+        Log.e(TAG, "getAllMessage: tag = " + tag);
         if (mManager == null) {
             return;
         }
@@ -528,13 +535,14 @@ public class NetWorkUtils {
         void pushSucceed(String type, String s1, int code, String s, String response);
 
         void pushFail(String s, String s1, int i, String s2);
+
     }
 
     /**
      * 发送监拍图片
      *
      * @param url      图片url
-     * @param uuid     id
+     * @param uuid     uuid
      * @param listener 回调
      */
     private void sendCapture(String url, String thumbUrl, int width, int height, String uuid,
@@ -575,7 +583,13 @@ public class NetWorkUtils {
         switch (conversation.type) {
             case Constant.SEND_EMOJI:
                 type = TEXT;
-                url = EmojiUtils.getEmojiCode(conversation.emojiId);
+//                url = EmojiUtils.getEmojiCode(conversation.emojiId);
+                if (TextUtils.isEmpty(conversation.emojiCode)) {
+                    Log.e(TAG, "sendMessage: emojiCode = " + conversation.emojiCode);
+                    url = EmojiUtils.getEmojiCode(conversation.emojiId);
+                } else {
+                    url = conversation.emojiCode;
+                }
                 break;
             case Constant.SEND_IMAGE:
                 BitmapFactory.Options opts = new BitmapFactory.Options();
@@ -613,4 +627,39 @@ public class NetWorkUtils {
             listener.pushFail("", "", 0, "");
         }
     }
+
+    public static void getProfile(Context context, String data, final PushResultListener listener) {
+        getInfoWithKeyAndData(context, "profile", data, listener);
+    }
+
+    private static void getInfoWithKeyAndData(Context context, String key, String data, final PushResultListener listener) {
+        ReadboyWearManager wearManager = (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
+        wearManager.getInfoWithKeyAndData(key, data, new IReadboyWearListener.Stub() {
+            @Override
+            public void pushSuc(String type, String s1, int code, String s2, String response) throws RemoteException {
+                listener.pushSucceed(type, s1, code, s2, response);
+            }
+
+            @Override
+            public void pushFail(String s, String s1, int i, String s2) throws RemoteException {
+                listener.pushFail(s, s1, i, s2);
+            }
+        });
+    }
+
+    /**
+     * 判断wifi是否连接状态
+     * <p>需添加权限 {@code <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>}</p>
+     *
+     * @param context 上下文
+     * @return {@code true}: 连接<br>{@code false}: 未连接
+     */
+    public static boolean isWifiConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm != null
+                && cm.getActiveNetworkInfo() != null
+                && cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
+    }
+
 }

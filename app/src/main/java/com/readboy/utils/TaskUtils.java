@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Locale;
 
 import android.content.Context;
 import android.util.Log;
 
 public class TaskUtils {
-    private static final String TAG = "TaskUtils";
+    private static final String TAG = "hwj_TaskUtils";
 
     private static final int AID_APP = 10000;
     private static final int AID_USER = 100000;
@@ -61,7 +62,7 @@ public class TaskUtils {
             }
 
             try {
-                String cgroup = read(String.format("/proc/%d/cgroup", pid));
+                String cgroup = read(String.format(Locale.getDefault(), "/proc/%d/cgroup", pid));
                 String[] lines = cgroup.split("\n");
                 String cpuSubsystem;
                 String cpuaccctSubsystem;
