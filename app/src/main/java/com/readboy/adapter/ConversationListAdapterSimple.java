@@ -597,15 +597,15 @@ public class ConversationListAdapterSimple extends BaseAdapter {
      * 语音项
      */
     protected class VoiceItemHolder extends Holder {
-        //语音时长
+        /** 语音时长 */
         TextView time;
-        //播放项
+        /** 播放项 */
         View play;
-        //播放的动画
+        /** 播放的动画 */
         ImageView playAnim;
-        //未读小红点
+        /** 未读小红点 */
         View unread;
-        //语音动画项
+        /** 语音动画项 */
         View playImg;
     }
 

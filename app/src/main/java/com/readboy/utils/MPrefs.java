@@ -4,16 +4,21 @@ import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.readboy.bean.Constant;
+import com.readboy.provider.Profile;
+
+import java.security.Key;
 
 /**
- *
  * @author hwwjian
  * @date 2017/1/16
  */
 
 public class MPrefs {
+    private static final String TAG = "whj_MPrefs";
 
     public static final String APP_NAME = "weTalk";
     public static final String LAST_POSITION = "last";
@@ -26,6 +31,8 @@ public class MPrefs {
     public static final String CURRENT_FFRIEND_ID = "current_friend_id";
     public static final String UNREAD_COUNT = "unread_count";
     public static final String USER = "user";
+
+    public static final String KEY_MESSAGE_TAG = "message_tag";
 
     public static final String IS_FLOAT_VIEW = "float";
 
@@ -45,11 +52,27 @@ public class MPrefs {
      * 获取服务器消息标识
      */
     public static String getMessageTag(Context context) {
-        return IOs.readTimeTag(context);
+        String result = IOs.readTimeTag(context);
+        if (TextUtils.isEmpty(result)) {
+            result = getMessageTagByPreference(context);
+        }
+        Log.e(TAG, "getMessageTag: result = " + result);
+        return result;
     }
 
     public static void setMessageTag(Context context, String tag) {
-        IOs.saveTimeTag(context, tag);
+        if (!IOs.saveTimeTag(context, tag)) {
+            saveMessageTagToPreference(context, tag);
+        }
+        saveMessageTagToPreference(context, tag);
+    }
+
+    private static void saveMessageTagToPreference(Context context, String tag) {
+        getSharePreference(context).edit().putString(KEY_MESSAGE_TAG, tag).apply();
+    }
+
+    private static String getMessageTagByPreference(Context context) {
+        return getSharePreference(context).getString(KEY_MESSAGE_TAG, "");
     }
 
     /**
@@ -61,7 +84,7 @@ public class MPrefs {
         getSharePreference(context).edit().putString(DEVICE_ID, id).apply();
     }
 
-    public static void setDeviceId(SharedPreferences preferences, String id){
+    public static void setDeviceId(SharedPreferences preferences, String id) {
         preferences.edit().putString(DEVICE_ID, id).apply();
     }
 

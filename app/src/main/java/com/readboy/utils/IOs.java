@@ -10,9 +10,11 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -26,14 +28,13 @@ import android.util.Log;
 import com.readboy.bean.Constant;
 
 /**
- *
  * @author 1-PC
  * @date 2016/9/24
  */
 
 public class IOs {
 
-    private static final String TAG = "IOs";
+    private static final String TAG = "hwj_IOs";
 
     /**
      * 保存bitmap到本地
@@ -270,13 +271,15 @@ public class IOs {
     /**
      * 保存消息时间标记到文件
      */
-    public static void saveTimeTag(Context context, String content) {
+    public static boolean saveTimeTag(Context context, String content) {
         try {
+            Log.e(TAG, "saveTimeTag() called with: content = " + content + "");
+
             File file = new File(fileName);
             if (!file.exists()) {
                 if (!file.createNewFile()) {
                     Log.e(TAG, "saveTimeTag: cannot create new file, filename = " + fileName);
-                    return;
+                    return false;
                 }
             }
             FileOutputStream outputStream = new FileOutputStream(file);
@@ -284,11 +287,19 @@ public class IOs {
             outputStream.flush();
             outputStream.close();
             LogInfo.i("hwj", "save time tag succeed");
+            return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            LogInfo.e(TAG, "saveTimeTag: has permission "
+                    + PermissionUtils.hadPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    + " e:" + e.toString());
         } catch (IOException e) {
+            LogInfo.e(TAG, "saveTimeTag: has permission "
+                    + PermissionUtils.hadPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    + " e:" + e.toString());
             e.printStackTrace();
         }
+        return false;
     }
 
     /**
@@ -320,6 +331,6 @@ public class IOs {
             e.printStackTrace();
         }
         Log.e(TAG, "readTimeTag: tag = null.");
-        return null;
+        return "";
     }
 }

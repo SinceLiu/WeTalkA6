@@ -660,9 +660,9 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         mRecorder.ready();
         //开始录音
         mRecorder.start();
-        startRecordTime = System.currentTimeMillis();
         mTimerHandler.removeMessages(MESSAGE_STOP_RECORD);
         mTimerHandler.sendEmptyMessageDelayed(MESSAGE_STOP_RECORD, MAX_RECORD_TIME);
+        startRecordTime = System.currentTimeMillis();
         muteAudioFocus(this, true);
     }
 
@@ -678,7 +678,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                 muteAudioFocus(ConversationActivity.this, false);
                 LogInfo.i("hwj", "timeout --- prepareSendVoiceMessage");
                 //超时之后默认还是会发送
-                prepareSendVoiceMessage();
+                prepareSendVoiceMessage(true);
             }
         }
     };
@@ -711,16 +711,27 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         }
     };
 
+    protected void prepareSendVoiceMessage() {
+        prepareSendVoiceMessage(false);
+    }
+
     /**
      * 录音结束,准备发送
+     * @param isTimeout TODO 针对最长录音时间，投机取巧，强制显示为10s
      */
-    protected void prepareSendVoiceMessage() {
+    protected void prepareSendVoiceMessage(boolean isTimeout) {
         isRecording = false;
         //更新录音时间
 //        mRecordTime = MAX_RECORD_TIME - limitTime;
-        mRecordTime = (int) ((System.currentTimeMillis() - startRecordTime) * 0.001);
+        float temp = System.currentTimeMillis() - startRecordTime;
+        Log.e(TAG, "prepareSendVoiceMessage: record time = " + temp);
+        if (isTimeout) {
+            mRecordTime = 10;
+        } else {
+            mRecordTime = (int) (temp * 0.001);
+        }
         Log.e(TAG, "prepareSendVoiceMessage: mRecordTime = " + mRecordTime);
-        //停止计时
+        //停止录音
         stopRecording();
         //录音时间太短
         if (mRecordTime < MIN_RECORD_TIME) {

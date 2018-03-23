@@ -53,7 +53,7 @@ public abstract class BaseActivity extends Activity {
     @Override
     public void finish() {
         super.finish();
-//        overridePendingTransition(animIn, animOut);
+        overridePendingTransition(animIn, animOut);
     }
 
     private void showTrafficDialog() {

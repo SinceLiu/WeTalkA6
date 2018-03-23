@@ -160,7 +160,7 @@ public class EmojiUtils {
         CODING_TABLE.put("/emoji_32", "/ch");
         CODING_TABLE.put("/emoji_33", "/kuk");
         CODING_TABLE.put("/emoji_34", "/kl");
-        CODING_TABLE.put("/emoji_35", "/fengdou");
+        CODING_TABLE.put("/emoji_35", "/fendou");
         CODING_TABLE.put("/emoji_36", "/ll");
         CODING_TABLE.put("/emoji_37", "/wq");
         CODING_TABLE.put("/emoji_38", "/dy");

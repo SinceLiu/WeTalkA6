@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Friend;
+import com.readboy.utils.AudioUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
@@ -90,6 +91,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         super.onCreate(savedInstanceState);
 
 //        test();
+        AudioUtils.requestAudioFocus(this);
     }
 
     private void test() {
@@ -173,6 +175,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
             hasRegisterObserver = false;
         }
         MPrefs.setNotificationType(this, true);
+        AudioUtils.abandonAudioFocus(this);
     }
 
     private class GetFriendTask extends AsyncTask<Void, Void, List<Friend>> {

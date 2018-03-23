@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.LogRecord;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,11 +83,12 @@ public class MessageReceiver extends BroadcastReceiver {
                 //收到消息
                 isNotify = true;
                 LogInfo.i("hwj", "onReceive: isGettingMessage : " + isGettingMessage);
+                //如果正在获取新消息，是否应已队列形式，排队获取。
                 if (!isGettingMessage) {
                     LogInfo.i("hwj", "------------------- getAllMessage start");
                     getAllMessage(context);
                     LogInfo.i("hwj", "------------------- getAllMessage finish");
-                }else {
+                } else {
                     Log.e(TAG, "onReceive: isGettingMessage = " + isGettingMessage);
                 }
                 break;
@@ -104,8 +106,8 @@ public class MessageReceiver extends BroadcastReceiver {
         }
     }
 
-    private boolean canGetMessage(Context context){
-        return Constant.ENABLE_FAKE || NetWorkUtils.isWifiConnected(context) ;
+    private boolean canGetMessage(Context context) {
+        return Constant.ENABLE_FAKE || NetWorkUtils.isWifiConnected(context);
     }
 
     public static void getAllMessage(final Context context) {
@@ -117,12 +119,14 @@ public class MessageReceiver extends BroadcastReceiver {
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
                                     String response) {
-                LogInfo.i("hwj", "receive message respon:" + response);
+                LogInfo.e(TAG, "pushSucceed() called with: type = " + type + ", s1 = " + s1 +
+                        ", code = " + code + ", s = " + s + ", response = " + response + "");
                 try {
                     JSONObject jsonObject = new JSONObject(response);
                     MPrefs.setMessageTag(context, jsonObject.optString(NetWorkUtils.TIME));
                     JSONArray array = jsonObject.getJSONArray(NetWorkUtils.DATA);
                     int count = array.length();
+                    Log.e(TAG, "pushSucceed: count = " + count);
                     if (count >= 10) {
                         isNotify = true;
                     }
@@ -149,6 +153,7 @@ public class MessageReceiver extends BroadcastReceiver {
                         } else {
                             //判断发件人是否存在通讯录中
                             if (TextUtils.isEmpty(WTContactUtils.getNameById(context, conversation.realSendId))) {
+                                LogInfo.e(TAG, conversation.realSendId + " 不在通讯录里。");
                                 break;
                             } else {
                                 conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
@@ -207,6 +212,7 @@ public class MessageReceiver extends BroadcastReceiver {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.e(TAG, "pushSucceed: e:" + e.toString());
                 }
                 isGettingMessage = false;
                 //两种情况会再次获取
@@ -224,6 +230,7 @@ public class MessageReceiver extends BroadcastReceiver {
 
             @Override
             public void pushFail(String s, String s1, int i, String s2) {
+                LogInfo.e(TAG, "pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
                 isGettingMessage = false;
             }
         });
@@ -255,6 +262,7 @@ public class MessageReceiver extends BroadcastReceiver {
 
     /**
      * 判断data时间是否在上课禁用时间段内。
+     *
      * @param data 当前时间
      */
     private static boolean isTimeEnable(Context context, String data) {
