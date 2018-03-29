@@ -717,6 +717,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
 
     /**
      * 录音结束,准备发送
+     *
      * @param isTimeout TODO 针对最长录音时间，投机取巧，强制显示为10s
      */
     protected void prepareSendVoiceMessage(boolean isTimeout) {
@@ -729,6 +730,10 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             mRecordTime = 10;
         } else {
             mRecordTime = (int) (temp * 0.001);
+            //测试测出该问题，但是不知为什么，手动调整。
+            if (mRecordTime > 10) {
+                mRecordTime = 10;
+            }
         }
         Log.e(TAG, "prepareSendVoiceMessage: mRecordTime = " + mRecordTime);
         //停止录音
