@@ -4,9 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
+import android.app.ActivityManager;
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 public class TaskUtils {
@@ -15,35 +21,72 @@ public class TaskUtils {
     private static final int AID_APP = 10000;
     private static final int AID_USER = 100000;
 
+    /**
+     * 通过Activity生命周期判断不可靠，比如跳转到表情界面，相机界面。
+     * 如何界定怎样的是前台，什么情况需要弹出通知栏，什么时候只要振动。
+     */
     public static boolean isBackground(Context context) {
         Log.e(TAG, "isBackground: context = " + context.getPackageName());
-        String foregroundApp = getForegroundApp();
-        Log.e(TAG, "isBackground: foregroundApp = " + foregroundApp);
-        return !context.getPackageName().equalsIgnoreCase(foregroundApp);
+//        String foregroundApp = getForegroundApp();
+//        Log.e(TAG, "isBackground: foregroundApp = " + foregroundApp);
+//        getTopApp(context);
+//        Log.e(TAG, "isBackground: processs = " + isProcess(context));
+        return isProcess(context);
+//        return !context.getPackageName().equalsIgnoreCase(foregroundApp);
 
-//        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-//        List<RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-//        for (RunningAppProcessInfo appProcess : appProcesses) {
-//            Log.e(TAG, "isBackground: processName = " + appProcess.processName);
-//            if (appProcess.processName.equals(context.getPackageName())) {
-//                Log.e(TAG, "isBackground: importance = " + appProcess.importance);
-//                Log.e(TAG, "isBackground: appProcess = " + appProcess.importanceReasonComponent
-//                        + " , " + appProcess.importanceReasonCode);
-//                Log.e(TAG, "isBackground: pkgList = " + Arrays.toString(appProcess.pkgList));
-//                for (String s : appProcess.pkgList) {
-//                    Log.e(TAG, "isBackground: pkg = " + s);
-//                }
-//                if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
-//                    LogInfo.i("hwj", "background --- " + appProcess.processName);
-//                    return true;
-//                } else {
-//                    LogInfo.i("hwj", "foregraound --- " + appProcess.processName);
-//                    return false;
-//                }
-//            }
-//        }
-//        return false;
     }
+
+    private static boolean isProcess(Context context){
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            Log.e(TAG, "isBackground: processName = " + appProcess.processName);
+            if (appProcess.processName.equals(context.getPackageName())) {
+                Log.e(TAG, "isBackground: importance = " + appProcess.importance);
+                Log.e(TAG, "isBackground: appProcess = " + appProcess.importanceReasonComponent
+                        + " , " + appProcess.importanceReasonCode);
+                Log.e(TAG, "isBackground: pkgList = " + Arrays.toString(appProcess.pkgList));
+                for (String s : appProcess.pkgList) {
+                    Log.e(TAG, "isBackground: pkg = " + s);
+                }
+                if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+                    LogInfo.i("hwj", "background --- " + appProcess.processName);
+                    return true;
+                } else {
+                    LogInfo.i("hwj", "foregraound --- " + appProcess.processName);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static void getTopApp(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            UsageStatsManager m = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+            if (m != null) {
+                long now = System.currentTimeMillis();
+                //获取60秒之内的应用数据
+                List<UsageStats> stats = m.queryUsageStats(UsageStatsManager.INTERVAL_BEST, now - 60 * 1000, now);
+                Log.i(TAG, "Running app number in last 60 seconds : " + stats.size());
+                for (UsageStats stat : stats) {
+                }
+                String topActivity = "";
+                //取得最近运行的一个app，即当前运行的app
+                if ((stats != null) && (!stats.isEmpty())) {
+                    int j = 0;
+                    for (int i = 0; i < stats.size(); i++) {
+                        if (stats.get(i).getLastTimeUsed() > stats.get(j).getLastTimeUsed()) {
+                            j = i;
+                        }
+                    }
+                    topActivity = stats.get(j).getPackageName();
+                }
+                Log.i(TAG, "top running app is : "+topActivity);
+            }
+        }
+    }
+
 
     private static String getForegroundApp() {
         File[] files = new File("/proc").listFiles();

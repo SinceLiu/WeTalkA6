@@ -371,9 +371,10 @@ public class FriendActivity extends BaseRequestPermissionActivity {
                 //根据未读数设置显示数量
                 int count = friend.unreadCount;
                 if (count > Constant.MAX_MESSAGE_COUNT) {
-                    holder.item.setUnreadCount("...");
+//                    holder.item.setUnreadCount("...");
+                    holder.item.setUnreadCount("99+", true);
                 } else {
-                    holder.item.setUnreadCount(String.valueOf(friend.unreadCount));
+                    holder.item.setUnreadCount(String.valueOf(friend.unreadCount), false);
                 }
             }
             holder.item.setFriendName(friend.name);

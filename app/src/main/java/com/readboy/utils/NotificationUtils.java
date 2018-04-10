@@ -36,14 +36,17 @@ public class NotificationUtils {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //在联系人信息界面或者
         if (!TaskUtils.isBackground(context)) {
-            Log.e(TAG, "notification: normal.");
+            Log.e(TAG, "notification: normal. ony vibrate.");
             manager.notify(NORMAL_NOTIFY_ID, getNotification(context));
         } else {
-            Log.e(TAG, "notification: floating.");
+            Log.e(TAG, "notification: floating. sound and vibrate.");
             manager.notify(NOTIFY_ID, getFloatingNotification(context));
         }
     }
 
+    /**
+     * sound and vibrate
+     */
     public static Notification getFloatingNotification(Context context) {
         PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0, new Intent(context, FriendActivity.class), 0);
         Bundle bundle = new Bundle();
@@ -68,6 +71,9 @@ public class NotificationUtils {
         return builder.build();
     }
 
+    /**
+     * only vibrate.
+     */
     public static Notification getNotification(Context context) {
         PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0, new Intent(context, FriendActivity.class), 0);
         Bundle bundle = new Bundle();

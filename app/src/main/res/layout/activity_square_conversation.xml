@@ -13,7 +13,8 @@
         android:divider="@null"
         android:listSelector="@android:color/transparent"
         android:overScrollMode="never"
-        android:scrollbars="none" />
+        android:scrollbars="none"
+        android:stackFromBottom="true" />
 
     <!--TopBar-->
     <RelativeLayout

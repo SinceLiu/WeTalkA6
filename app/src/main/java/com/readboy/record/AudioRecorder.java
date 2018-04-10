@@ -16,6 +16,7 @@ import java.io.IOException;
  *
  */
 public class AudioRecorder implements RecordStrategy {
+	private static final String TAG = "hwj_AudioRecorder";
 
 	private MediaRecorder recorder;
 	private String fileName;
@@ -41,6 +42,12 @@ public class AudioRecorder implements RecordStrategy {
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_NB);
 		// 设置MediaRecorder录制音频的编码为amr
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		recorder.setOnErrorListener(new MediaRecorder.OnErrorListener() {
+			@Override
+			public void onError(MediaRecorder mr, int what, int extra) {
+				Log.e(TAG, "onError() called with: mr = " + mr + ", what = " + what + ", extra = " + extra + "");
+			}
+		});
 	}
 
 	@Override

@@ -48,6 +48,7 @@ public class FriendGridItem extends RelativeLayout {
         mFriendImage = (ImageView) findViewById(R.id.friend_pager_item_img);
         mAvatarMask = findViewById(R.id.friend_pager_item_img_mask);
         mFriendUnread = (TextView) findViewById(R.id.friend_pager_item_unread);
+        mFriendUnread.setActivated(false);
         mFriendName = (TextView) findViewById(R.id.friend_pager_item_name);
         mAvatar = findViewById(R.id.avatar);
     }
@@ -66,9 +67,20 @@ public class FriendGridItem extends RelativeLayout {
      *
      * @param count 数量
      */
-    public void setUnreadCount(String count) {
+    public void setUnreadCount(String count, boolean isSmall) {
         if (mFriendUnread != null) {
             mFriendUnread.setText(count);
+            if (isSmall){
+                if (!mFriendUnread.isActivated()) {
+                    mFriendUnread.setTextSize(14);
+                    mFriendUnread.setActivated(true);
+                }
+            }else {
+                if (mFriendUnread.isActivated()) {
+                    mFriendUnread.setTextSize(16);
+                    mFriendUnread.setActivated(false);
+                }
+            }
             if (mFriendUnread.getVisibility() == View.GONE) {
                 mFriendUnread.setVisibility(View.VISIBLE);
             }

@@ -145,9 +145,9 @@ public class WTContactUtils {
                         contact.uuid = cursor.getString(cursor.getColumnIndex("data8"));
                         //				    if(unread != 0){
 //				    	mPrefs.setUserUnreadCount(contact.uuid, unread);
-                        Log.e(TAG, "getFriendFromContact: uuid = " + contact.uuid);
-                        String imei = "868706020000215";
-                        String uuid = "DA59F29B4E001B63";
+//                        Log.e(TAG, "getFriendFromContact: uuid = " + contact.uuid);
+//                        String imei = "868706020000215";
+//                        String uuid = "DA59F29B4E001B63";
 //                        manager.getInfoWithKeyAndData("info", contact.uuid, new IReadboyWearListener.Stub() {
 //                            @Override
 //                            public void pushSuc(String s, String s1, int i, String s2, String s3) throws RemoteException {
