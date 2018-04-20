@@ -312,6 +312,7 @@ public class NetWorkUtils {
                     });
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                    Log.e(TAG, "uploadFile: e = " + e.toString());
                     handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
                 }
                 break;
@@ -335,6 +336,9 @@ public class NetWorkUtils {
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                            Log.i(TAG, "uploadFile onFailure() called with: statusCode = " + statusCode +
+                                    ", headers = " + headers + ", throwable = " + throwable +
+                                    ", errorResponse = " + errorResponse + "");
                             if (handler != null) {
                                 handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
                             }
@@ -342,6 +346,9 @@ public class NetWorkUtils {
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            Log.i(TAG, "uploadFile onFailure() called with: statusCode = " + statusCode +
+                                    ", headers = " + headers + ", responseString = " + responseString +
+                                    ", throwable = " + throwable + "");
                             if (handler != null) {
                                 handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
                             }
@@ -349,6 +356,7 @@ public class NetWorkUtils {
                     });
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                    Log.e(TAG, "uploadFile: e = " + e.toString());
                     if (handler != null) {
                         handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
                     }
@@ -423,7 +431,7 @@ public class NetWorkUtils {
                                     ConversationProvider.getContentValue(conversation, true));
                             if (uri != null) {
                                 WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
-                                NotificationUtils.notification(context);
+                                NotificationUtils.sendNotification(context);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();

@@ -170,9 +170,8 @@ public class MessageReceiver extends BroadcastReceiver {
                                     conversation.emojiCode = content;
                                     conversation.emojiId = emojiId;
                                     conversation.type = Constant.REC_EMOJI;
-                                }
-                                //文本
-                                else {
+                                } else {
+                                    //文本
                                     conversation.textContent = content;
                                     conversation.type = Constant.REC_TEXT;
                                 }
@@ -246,76 +245,7 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     private static void sendNotification(Context context) {
-        //在聊天界面的用户不是发送用户,就更新未读信息数
-        String classState = Settings.Global.getString(context.getContentResolver(), "class_disabled");
-        LogInfo.i("hwj", "classState = " + classState);
-        if (!TextUtils.isEmpty(classState)) {
-            //未开启上课禁用
-            if (!isTimeEnable(context, classState)) {
-                Log.e(TAG, "sendNotification: ");
-                NotificationUtils.notification(context);
-            }
-        } else {
-            NotificationUtils.notification(context);
-        }
+        NotificationUtils.sendNotification(context);
     }
 
-    /**
-     * 判断data时间是否在上课禁用时间段内。
-     *
-     * @param data 当前时间
-     */
-    private static boolean isTimeEnable(Context context, String data) {
-        long time = System.currentTimeMillis();
-        SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm", Locale.CHINESE);
-        boolean isEnable = false;
-        boolean isWeekEnable = false;
-        boolean isTimeEnable = false;
-        boolean isSingleTime = false;
-        try {
-            Date date = new Date(time);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(time);
-            long startSetTime = Settings.Global.getLong(context.getContentResolver(), "class_disable_time", 0);
-            Date startSetData = new Date(startSetTime);
-            boolean isSameDay = isSameDay(date, startSetData);
-            int week = (date.getDay() + 6) % 7;
-            week = 1 << (6 - week);
-            JSONObject jsonObject = new JSONObject(data);
-            isEnable = jsonObject.optBoolean("enabled", false);
-            String repeatStr = jsonObject.optString("repeat", "0000000");
-            int repeatWeek = Integer.parseInt(repeatStr, 2);
-            isSingleTime = isSameDay && (repeatWeek == 0);
-            isWeekEnable = (week & repeatWeek) != 0;
-            JSONArray jsonArray = jsonObject.optJSONArray("time");
-            int length = jsonArray.length();
-            for (int i = 0; i < length; i++) {
-                JSONObject jsonSun = jsonArray.getJSONObject(i);
-                String startTime = jsonSun.optString("start", "00:00");
-                String endTime = jsonSun.optString("end", "00:00");
-                String nowTime = mDateFormat.format(date);
-                Date date1 = mDateFormat.parse(startTime.trim());
-                Date date2 = mDateFormat.parse(endTime.trim());
-                Date dateNow = mDateFormat.parse(nowTime.trim());
-                if (dateNow.getTime() >= date1.getTime() && dateNow.getTime() < date2.getTime()) {
-                    isTimeEnable = true;
-                    break;
-                }
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return isEnable && (isWeekEnable || isSingleTime) && isTimeEnable;
-    }
-
-    private static boolean isSameDay(Date day1, Date day2) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINESE);
-        String ds1 = sdf.format(day1);
-        String ds2 = sdf.format(day2);
-        return ds1.equals(ds2);
-    }
 }

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.readboy.wetalk"
-    android:versionCode="171230001"
-    android:versionName="1.1.9">
-
-    <uses-sdk
-        android:minSdkVersion="20"
-        android:targetSdkVersion="23" />
+    android:sharedUserId="com.android.systemui"
+    android:versionCode="180420001"
+    android:versionName="1.1.12">
 
     <!--<uses-feature android:name="android.hardware.type.watch" />-->
 

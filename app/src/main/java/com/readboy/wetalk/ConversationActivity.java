@@ -86,7 +86,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
      * 录音相关
      */
     private static final int MIN_RECORD_TIME = 1;
-    private static final int MAX_RECORD_TIME = 10_000;
+    private static final int MAX_RECORD_TIME = 20_000;
     private static final int MESSAGE_STOP_RECORD = 1;
     private int mRecordTime;
     private long startRecordTime;
@@ -130,8 +130,11 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                     break;
                 }
             }
+            Log.e(TAG, "onChange: conversations size = " + mConversations.size());
             mAdapter.notifyDataSetChanged();
-            mConversationList.setSelection(ListView.FOCUS_DOWN);
+//            mConversationList.setSelection(ListView.FOCUS_DOWN);
+            Log.e(TAG, "onChange: count = " + mAdapter.getCount());
+            mConversationList.setSelection(mAdapter.getCount() - 1);
         }
     };
 
@@ -156,11 +159,13 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             if (temp.size() > 0) {
                 mConversations.addAll(temp);
             }
+            Log.e(TAG, "onPostExecute: conversations size" + mConversations.size());
             limitConversationSize();
             mAdapter = new ConversationListAdapterSimple(ConversationActivity.this, mConversations);
             mAdapter.setSendMessageHandler(mSendMessageResultHandler);
             mConversationList.setAdapter(mAdapter);
-            mConversationList.setSelection(ListView.FOCUS_DOWN);
+//            mConversationList.setSelection(ListView.FOCUS_DOWN);
+            mConversationList.setSelection(mAdapter.getCount());
             checkIsShareImage();
         }
 
@@ -538,7 +543,8 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             //刷新显示
             mAdapter.notifyDataSetChanged();
             //自动跳转到最新一条
-            mConversationList.setSelection(ListView.FOCUS_DOWN);
+//            mConversationList.setSelection(ListView.FOCUS_DOWN);
+            mConversationList.setSelection(mAdapter.getCount());
         }
         if (cursor != null) {
             cursor.close();
@@ -726,13 +732,14 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
 //        mRecordTime = MAX_RECORD_TIME - limitTime;
         float temp = System.currentTimeMillis() - startRecordTime;
         Log.e(TAG, "prepareSendVoiceMessage: record time = " + temp);
+        int maxRecordTime = (int) (MAX_RECORD_TIME * 0.001F);
         if (isTimeout) {
-            mRecordTime = 10;
+            mRecordTime = maxRecordTime;
         } else {
             mRecordTime = (int) (temp * 0.001);
             //测试测出该问题，但是不知为什么，手动调整。
-            if (mRecordTime > 10) {
-                mRecordTime = 10;
+            if (mRecordTime > maxRecordTime) {
+                mRecordTime = maxRecordTime;
             }
         }
         Log.e(TAG, "prepareSendVoiceMessage: mRecordTime = " + mRecordTime);

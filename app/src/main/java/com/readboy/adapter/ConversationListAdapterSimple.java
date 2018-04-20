@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
 import com.readboy.provider.Conversations;
+import com.readboy.utils.ClickUtils;
 import com.readboy.utils.EmojiUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MyTimeUtils;
@@ -36,12 +39,13 @@ import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
+import com.readboy.wetalk.TextDialog;
 
 /**
  * @author hwj
  */
 public class ConversationListAdapterSimple extends BaseAdapter {
-    private static final String TAG = "ConversationListAdapter";
+    private static final String TAG = "hwj_ConversationAdapter";
 
     private Context mContext;
     private LayoutInflater mInflater;
@@ -51,6 +55,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     private ContentResolver mResolver;
     private NetWorkUtils mNetWorkUtils;
     private MediaPlayer mMediaPlayer;
+    private TextDialog textDialog;
 
     public ConversationListAdapterSimple(Context context, List<Conversation> data) {
         mConversations = data;
@@ -288,6 +293,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 displayTextDetail(conversation, textItemHolder);
                 showReceiveOrSendTime(conversation, position, textItemHolder);
                 break;
+            default:
+                Log.e(TAG, "getView: other type = " + type);
         }
         return view;
     }
@@ -479,8 +486,26 @@ public class ConversationListAdapterSimple extends BaseAdapter {
      * @param textItemHolder holder
      */
     protected void displayTextDetail(final Conversation conversation, TextItemHolder textItemHolder) {
+        final String text = conversation.textContent;
         textItemHolder.item.setVisibility(View.VISIBLE);
-        textItemHolder.content.setText(conversation.textContent);
+        textItemHolder.content.setText(text);
+        textItemHolder.content.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ClickUtils.isFastMultiClick(2)) {
+                    showMessageFullScreen(text);
+                }
+            }
+        });
+    }
+
+    private void showMessageFullScreen(String text) {
+//        if (textDialog == null) {
+//            textDialog = new TextDialog(mContext, text);
+//        } else {
+            textDialog = new TextDialog(mContext, text);
+//        }
+        textDialog.show();
     }
 
     /**
@@ -597,15 +622,25 @@ public class ConversationListAdapterSimple extends BaseAdapter {
      * 语音项
      */
     protected class VoiceItemHolder extends Holder {
-        /** 语音时长 */
+        /**
+         * 语音时长
+         */
         TextView time;
-        /** 播放项 */
+        /**
+         * 播放项
+         */
         View play;
-        /** 播放的动画 */
+        /**
+         * 播放的动画
+         */
         ImageView playAnim;
-        /** 未读小红点 */
+        /**
+         * 未读小红点
+         */
         View unread;
-        /** 语音动画项 */
+        /**
+         * 语音动画项
+         */
         View playImg;
     }
 

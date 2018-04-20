@@ -40,6 +40,7 @@
         <item name="android:windowNoTitle">true</item>    
     	<item name="android:windowFullscreen">true</item>  
     	<item name="android:windowSwipeToDismiss">false</item>
+        <item name="android:windowIsFloating">true</item>
     </style>
     <style name="SwipeBackLayout">
         <item name="edge_size">50dip</item>
@@ -50,4 +51,5 @@
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
+
 </resources>
