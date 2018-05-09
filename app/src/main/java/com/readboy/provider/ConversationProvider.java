@@ -106,7 +106,7 @@ public class ConversationProvider extends ContentProvider {
                             Conversations.Conversation.CONVERSATION_ID + " = ? AND " + Conversations.Conversation.TIME + " = ? ",
                             new String[]{contentValues.getAsString(Conversations.Conversation.CONVERSATION_ID),
                                     contentValues.getAsString(Conversations.Conversation.TIME)}, null, null, null)) {
-                        if (cursor != null && cursor.getCount() != 0) {
+                        if (cursor != null && cursor.moveToFirst() && cursor.getCount() != 0) {
                             return null;
                         }
 
@@ -205,7 +205,7 @@ public class ConversationProvider extends ContentProvider {
     }
 
     public static Conversation getConversation(Cursor cursor) {
-        if (cursor == null || cursor.getCount() == 0) {
+        if (cursor == null || cursor.getCount() == 0 || !cursor.moveToFirst()) {
             return null;
         } else if (cursor.moveToFirst()) {
             Conversation conversation = new Conversation();

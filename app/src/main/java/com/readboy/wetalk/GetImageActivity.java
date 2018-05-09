@@ -64,7 +64,7 @@ public class GetImageActivity extends BaseActivity{
 		GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
 		mImageList.setLayoutManager(layoutManager);
 		mLoading = getView(R.id.loading);
-		mImagePaths = new ArrayList<>();
+		mImagePaths = new ArrayList<String>();
 		initData();
 	}
 
@@ -306,7 +306,7 @@ public class GetImageActivity extends BaseActivity{
 		protected List<String> doInBackground(Void... params) {
 			String path = "/storage/emulated/0/DCIM/Camera/";
 			File file = new File(path);
-			List<String> paths = new ArrayList<>();
+			List<String> paths = new ArrayList<String>();
 			if(file.exists()){
 				File[] allPhoto = file.listFiles();
 				bubbleSort(allPhoto);

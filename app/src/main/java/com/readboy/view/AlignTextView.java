@@ -96,16 +96,8 @@ public class AlignTextView extends TextView {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        Log.e(TAG, "onMeasure: ");
-//        postInvalidate();
-    }
-
-    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        Log.e(TAG, "onLayout() called with: changed = " + changed + ", left = " + left + ", top = " + top + ", right = " + right + ", bottom = " + bottom + "");
 
         //首先进行高度调整
         if (firstCalc) {
@@ -140,8 +132,6 @@ public class AlignTextView extends TextView {
                     originalPaddingBottom + heightGap);
 
             firstCalc = false;
-            LinearLayout.LayoutParams layoutParams;
-            Log.e(TAG, "onLayout: width = " + width + ", padding = " + getPaddingLeft());
         }
     }
 
@@ -222,7 +212,6 @@ public class AlignTextView extends TextView {
         // 起始位置
         int startPosition = 0;
         float oneChineseWidth = paint.measureText("中");
-        Log.e(TAG, "calc: oneChineseWidth = " + oneChineseWidth);
         // 忽略计算的长度
         int ignoreCalcLength = (int) (width / oneChineseWidth);
         StringBuilder sb = new StringBuilder(text.substring(0, Math.min(ignoreCalcLength + 1,
@@ -254,7 +243,6 @@ public class AlignTextView extends TextView {
         }
 
         tailLines.add(lines.size() - 1);
-        Log.e(TAG, "calc: lines.size = " + lines.size());
     }
 
 
@@ -290,6 +278,5 @@ public class AlignTextView extends TextView {
         textView.measure(widthMeasureSpec, heightMeasureSpec);
         originalLineCount = textView.getLineCount();
         originalHeight = textView.getMeasuredHeight();
-        Log.e(TAG, "measureTextViewHeight: originalLine = " + originalLineCount + ", height = " + originalHeight);
     }
 }

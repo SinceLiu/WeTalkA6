@@ -170,8 +170,8 @@ public class Profile implements WeTalkContract.ProfileColumns {
     }
 
     public static int delete(ContentResolver resolver, String uuid) {
-        String where = UUID + "=" + uuid;
-        return resolver.delete(CONTENT_URI, where, null);
+        String where = UUID + "=?";
+        return resolver.delete(CONTENT_URI, where, new String[]{uuid});
     }
 
     public String getUuid() {

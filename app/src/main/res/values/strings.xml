@@ -6,6 +6,7 @@
     <string name="homeGroup">家庭圈</string>
     <string name="voice_error_msg">录音时间太短</string>
     <string name="out_off_limit">录音最大时长为20秒</string>
+    <string name="out_off_limit_format">录音最大时长为%s秒</string>
     <string name="synchronizing">正在加载</string>
     <string name="disk_error">创建本地目录失败</string>
     <string name="cancel_record">取消录音</string>

@@ -2,6 +2,7 @@ package com.readboy.adapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.IllegalFormatException;
 import java.util.List;
 
 import android.app.Dialog;
@@ -36,10 +37,13 @@ import com.readboy.utils.LogInfo;
 import com.readboy.utils.MyTimeUtils;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
+import com.readboy.utils.ToastUtils;
 import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
 import com.readboy.wetalk.TextDialog;
+import com.tencent.bugly.crashreport.BuglyLog;
+import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * @author hwj
@@ -56,6 +60,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     private NetWorkUtils mNetWorkUtils;
     private MediaPlayer mMediaPlayer;
     private TextDialog textDialog;
+    private View mKeepScreenView;
 
     public ConversationListAdapterSimple(Context context, List<Conversation> data) {
         mConversations = data;
@@ -182,6 +187,9 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     textItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
                     view.setTag(textItemHolder);
                     break;
+                default:
+                    CrashReport.postCatchedException(new IllegalAccessException("message send type = " + type));
+                    break;
             }
         } else {
             switch (type) {
@@ -200,6 +208,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 case Constant.REC_TEXT:
                     textItemHolder = (TextItemHolder) view.getTag();
                     break;
+                default:
+
             }
         }
         //设置显示的数据
@@ -235,7 +245,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 break;
             case Constant.REC_IMAGE:
                 if (conversation.isHomeGroup == Constant.TRUE) {
-                    imageItemHolder.userName.setText(conversation.senderName);//WTContactUtils.getNameById(mContext,conversation.realSendId));
+                    imageItemHolder.userName.setText(conversation.senderName);
+                    //WTContactUtils.getNameById(mContext,conversation.realSendId));
                 } else {
                     imageItemHolder.userName.setVisibility(View.GONE);
                 }
@@ -378,7 +389,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         holder.progress.setVisibility(View.GONE);
         //显示重新发送
         Log.e(TAG, "showUploadFileProgressOrResend: shouldResend = " + conversation.shouldResend
-                + ", isSending = " + conversation.isSending);
+                + ", isSending = " + conversation.isSending + ", id = " + conversation.conversationId);
         if (conversation.shouldResend == Constant.TRUE) {
             holder.retry.setVisibility(View.VISIBLE);
             holder.progress.setVisibility(View.GONE);
@@ -500,11 +511,13 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     }
 
     private void showMessageFullScreen(String text) {
-//        if (textDialog == null) {
-//            textDialog = new TextDialog(mContext, text);
-//        } else {
+        if (textDialog == null) {
             textDialog = new TextDialog(mContext, text);
-//        }
+        } else {
+            textDialog = new TextDialog(mContext, text);
+            //多次设置，并且文本长度不一，可能AlignTextView显示会有问题,
+//            textDialog.setText(text);
+        }
         textDialog.show();
     }
 
@@ -519,7 +532,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         //播放的点击事件
         holder.play.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 //语音文件不存在
                 if (TextUtils.isEmpty(path) || !new File(path).exists()) {
                     if (!mIsToastShow) {
@@ -550,6 +563,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
+                            setKeepScreenOn(view, false);
                             ConversationActivity.muteAudioFocus(mContext, false);
                             //更新接收语音信息,要更新列表的数据才能刷新界面显示
                             if (!isSend && conv.isUnPlay == Constant.TRUE) {
@@ -578,6 +592,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                         conv.isPlaying = Constant.TRUE;
                         notifyDataSetChanged();
+                        setKeepScreenOn(view, true);
                     } catch (IOException e) {
                         conv.isPlaying = Constant.FALSE;
                         notifyDataSetChanged();
@@ -591,10 +606,21 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         mMediaPlayer = null;
                         conv.isPlaying = Constant.FALSE;
                         notifyDataSetChanged();
+                        setKeepScreenOn(view, false);
                     }
                 }
             }
         });
+    }
+
+    private void setKeepScreenOn(View view, boolean keepScreenOn) {
+        if (mKeepScreenView != null && mKeepScreenView.getKeepScreenOn()) {
+            mKeepScreenView.setKeepScreenOn(false);
+        }
+        if (view != null) {
+            view.setKeepScreenOn(keepScreenOn);
+        }
+        mKeepScreenView = view;
     }
 
     class Holder {
@@ -668,6 +694,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             ConversationActivity.muteAudioFocus(mContext, false);
             mMediaPlayer.stop();
             stopPlayingAnimation();
+            setKeepScreenOn(null, false);
         }
     }
 

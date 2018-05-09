@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -29,6 +30,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewParent;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.Button;
@@ -86,7 +88,8 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
      * 录音相关
      */
     private static final int MIN_RECORD_TIME = 1;
-    private static final int MAX_RECORD_TIME = 20_000;
+    private int maxRecordTime = 20_000;
+    private String maxRecordTimeSecond = "20";
     private static final int MESSAGE_STOP_RECORD = 1;
     private int mRecordTime;
     private long startRecordTime;
@@ -386,16 +389,22 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                 mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_long_selector);
                 mSendEmojiBtn.setVisibility(View.GONE);
                 mSendImageBtn.setVisibility(View.GONE);
+                maxRecordTime = 10_000;
+                maxRecordTimeSecond = "10";
                 break;
             case W5:
                 mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_middle_selector);
                 mSendEmojiBtn.setVisibility(View.VISIBLE);
                 mSendImageBtn.setVisibility(View.GONE);
+                maxRecordTime = 10_000;
+                maxRecordTimeSecond = "10";
                 break;
             default:
                 mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_short_selector);
                 mSendImageBtn.setVisibility(View.VISIBLE);
                 mSendImageBtn.setVisibility(View.VISIBLE);
+                maxRecordTime = 20_000;
+                maxRecordTimeSecond = "20";
                 break;
         }
     }
@@ -530,7 +539,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                 new String[]{Conversations.Conversation.CONVERSATION_ID},
                 Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId}, null);
         //本地没有当前信息,就保存
-        if (cursor == null || cursor.getCount() == 0) {
+        if (cursor == null || cursor.getCount() == 0 || !cursor.moveToFirst()) {
             mResolver.insert(Conversations.Conversation.CONVERSATION_URI,
                     ConversationProvider.getContentValue(conversation, false));
             //添加消息数据
@@ -621,6 +630,12 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             mRecordDialog.setContentView(R.layout.record_dialog_small);
             mRecordStateImg = (ImageView) mRecordDialog.findViewById(R.id.record_state);
             adjustRecordBtn(mCurrentFriend.model);
+            mRecordDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    cancelScreenOn();
+                }
+            });
         }
         mRecordStateImg.setActivated(true);
         TextView name = (TextView) mRecordDialog.findViewById(R.id.record_name);
@@ -629,9 +644,11 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         AnimationDrawable drawable = (AnimationDrawable) recordAnim.getBackground();
         drawable.start();
         mRecordDialog.show();
+        keepScreenOn();
     }
 
     private void adjustRecordBtn(Model model) {
+        Log.e(TAG, "adjustRecordBtn() called with: model = " + model + "");
         if (model == null || mRecordStateImg != null) {
             LogInfo.e(TAG, "adjustRecordBtn model = " + model);
             return;
@@ -667,7 +684,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         //开始录音
         mRecorder.start();
         mTimerHandler.removeMessages(MESSAGE_STOP_RECORD);
-        mTimerHandler.sendEmptyMessageDelayed(MESSAGE_STOP_RECORD, MAX_RECORD_TIME);
+        mTimerHandler.sendEmptyMessageDelayed(MESSAGE_STOP_RECORD, maxRecordTime);
         startRecordTime = System.currentTimeMillis();
         muteAudioFocus(this, true);
     }
@@ -680,7 +697,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         public void handleMessage(Message msg) {
             if (msg.what == MESSAGE_STOP_RECORD) {
                 //提示信息
-                showMsg(getString(R.string.out_off_limit));
+                showMsg(getString(R.string.out_off_limit_format, maxRecordTimeSecond));
                 muteAudioFocus(ConversationActivity.this, false);
                 LogInfo.i("hwj", "timeout --- prepareSendVoiceMessage");
                 //超时之后默认还是会发送
@@ -724,15 +741,15 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     /**
      * 录音结束,准备发送
      *
-     * @param isTimeout TODO 针对最长录音时间，投机取巧，强制显示为10s
+     * @param isTimeout TODO 针对最长录音时间，投机取巧，强制显示为10s, 或者20s
      */
     protected void prepareSendVoiceMessage(boolean isTimeout) {
         isRecording = false;
         //更新录音时间
-//        mRecordTime = MAX_RECORD_TIME - limitTime;
+//        mRecordTime = maxRecordTime - limitTime;
         float temp = System.currentTimeMillis() - startRecordTime;
         Log.e(TAG, "prepareSendVoiceMessage: record time = " + temp);
-        int maxRecordTime = (int) (MAX_RECORD_TIME * 0.001F);
+        int maxRecordTime = (int) (this.maxRecordTime * 0.001F);
         if (isTimeout) {
             mRecordTime = maxRecordTime;
         } else {
@@ -889,6 +906,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                     break;
                 case MotionEvent.ACTION_UP:
                     //处于录音状态
+                    Log.e(TAG, "onTouch: action_up");
                     if (isRecording) {
                         muteAudioFocus(this, false);
                         //上滑距离小于20
@@ -938,6 +956,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
      * 上滑取消录音
      */
     private void cancelRecord() {
+        Log.e(TAG, "cancelRecord: ");
         if (!isRecording) {
             return;
         }
@@ -949,6 +968,14 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         if (oldFile.exists()) {
             oldFile.delete();
         }
+    }
+
+    private void keepScreenOn() {
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void cancelScreenOn() {
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
