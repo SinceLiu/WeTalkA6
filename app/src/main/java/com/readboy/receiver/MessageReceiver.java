@@ -1,11 +1,6 @@
 package com.readboy.receiver;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.logging.LogRecord;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,12 +21,10 @@ import com.readboy.utils.WTContactUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.ParseException;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -114,7 +107,9 @@ public class MessageReceiver extends BroadcastReceiver {
         final NetWorkUtils mNetWorkUtils = NetWorkUtils.getInstance(context);
         isGettingMessage = true;
         isNotify = false;
-        mNetWorkUtils.getAllMessage(MPrefs.getMessageTag(context), new PushResultListener() {
+        final String messageTag = MPrefs.getMessageTag(context);
+        Log.e(TAG, "getAllMessage: messageTag = " + messageTag);
+        mNetWorkUtils.getAllMessage(messageTag, new PushResultListener() {
 
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
@@ -126,6 +121,10 @@ public class MessageReceiver extends BroadcastReceiver {
                     MPrefs.setMessageTag(context, jsonObject.optString(NetWorkUtils.TIME));
                     JSONArray array = jsonObject.getJSONArray(NetWorkUtils.DATA);
                     int count = array.length();
+                    //校准第一次无messageTag, 但是未必可靠。
+                    if (TextUtils.isEmpty(messageTag) && count == 0) {
+//                        getAllMessage(context);
+                    }
                     Log.e(TAG, "pushSucceed: count = " + count);
                     if (count >= 10) {
                         isNotify = true;

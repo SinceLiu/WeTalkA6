@@ -88,8 +88,8 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
      * 录音相关
      */
     private static final int MIN_RECORD_TIME = 1;
-    private int maxRecordTime = 20_000;
-    private String maxRecordTimeSecond = "20";
+    private int maxRecordTime = Model.DEFAULT_MAX_RECORD_TIME * 1000;
+    private String maxRecordTimeSecond = String.valueOf(Model.DEFAULT_MAX_RECORD_TIME);
     private static final int MESSAGE_STOP_RECORD = 1;
     private int mRecordTime;
     private long startRecordTime;
@@ -382,6 +382,9 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             mSendImageBtn.setVisibility(View.VISIBLE);
             return;
         }
+        int maxTime = Model.getMaxRecordTime(model);
+        maxRecordTime = maxTime * 1000;
+        maxRecordTimeSecond = String.valueOf(maxTime);
         switch (model) {
             case W2S:
             case W2T:
@@ -389,22 +392,16 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                 mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_long_selector);
                 mSendEmojiBtn.setVisibility(View.GONE);
                 mSendImageBtn.setVisibility(View.GONE);
-                maxRecordTime = 10_000;
-                maxRecordTimeSecond = "10";
                 break;
             case W5:
                 mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_middle_selector);
                 mSendEmojiBtn.setVisibility(View.VISIBLE);
                 mSendImageBtn.setVisibility(View.GONE);
-                maxRecordTime = 10_000;
-                maxRecordTimeSecond = "10";
                 break;
             default:
                 mSendVoiceBtn.setBackgroundResource(R.drawable.btn_send_voice_short_selector);
                 mSendImageBtn.setVisibility(View.VISIBLE);
                 mSendImageBtn.setVisibility(View.VISIBLE);
-                maxRecordTime = 20_000;
-                maxRecordTimeSecond = "20";
                 break;
         }
     }

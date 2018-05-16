@@ -38,6 +38,8 @@ public enum Model implements Serializable {
      * uuid开头为D的，代表是手表用户
      */
     public static final String UUID_BEGINNING_CHARACTER = "D";
+    public static final int DEFAULT_MAX_RECORD_TIME = 15;
+    public static final int MAX_RECORD_TIME_SHORT = 10;
 
     /**
      * 蓝牙地址UAP, 蓝牙地址第17-24位。用于标识设备型号。
@@ -172,6 +174,20 @@ public enum Model implements Serializable {
         } else {
             return "";
         }
+    }
+
+    /**
+     * 不同设备限制的录音时长不一样，单位:毫秒
+     */
+    public static int getMaxRecordTime(Model model){
+        switch (model) {
+            case W2S:
+            case W2T:
+            case W3T:
+            case W5:
+                return MAX_RECORD_TIME_SHORT;
+        }
+        return DEFAULT_MAX_RECORD_TIME;
     }
 
     @Override

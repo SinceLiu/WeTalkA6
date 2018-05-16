@@ -23,7 +23,7 @@
             android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lineSpacingExtra="9px"
+            android:lineSpacingExtra="4px"
             android:paddingBottom="8px"
             android:paddingEnd="13px"
             android:paddingStart="13px"
