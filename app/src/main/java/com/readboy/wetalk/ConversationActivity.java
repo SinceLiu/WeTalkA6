@@ -15,11 +15,13 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -65,7 +67,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         OnScrollListener, OnLongClickListener, OnTouchListener {
     private static final String TAG = "hwj_ConversaActivity";
 
-    private static final int MAX_COUNT = 100;
+    private static final int MAX_COUNT = Constant.MAX_CONVERSATION_SIZE;
 
     private View mParent;
     private ListView mConversationList;
@@ -73,7 +75,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     private View mSendImageBtn;
     private TextView mConversationName;
     private View mHeaderView;
-    private List<Conversation> mConversations;
+    private final List<Conversation> mConversations = new ArrayList<>();
     private ConversationListAdapterSimple mAdapter;
     private Friend mCurrentFriend = null;
     private ContentResolver mResolver;
@@ -109,6 +111,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
 
     private float density;
 
+    private ContentObserver mContactsObserver;
     /**
      * 监听消息ContentProvider数据变化,只有收到消息时候才会回调
      */
@@ -116,10 +119,14 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         @Override
         public void onChange(boolean selfChange) {
             //获取最新的消息集合
+            Log.e(TAG, "onChange() called with: selfChange = " + selfChange + "");
+            Log.d(TAG, "onChange: friend name = " + WTContactUtils.getNameById(ConversationActivity.this, mCurrentFriend.uuid));
             List<Conversation> conversations = ConversationProvider.getConversationList(ConversationActivity.this, mCurrentFriend.uuid);
             if (conversations == null || mConversations == null ||
                     conversations.size() <= mConversations.size()) {
-                CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于旧的conversations"));
+                Log.e(TAG, "onChange: old size = " + conversations.size() + ", size = " + mConversations.size());
+                CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于现有的conversations, " +
+                        "new size = " + conversations.size() + ", old size = " + mConversations.size()));
                 return;
             }
             int length = conversations.size();
@@ -129,15 +136,12 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                 if (!conversation.sendId.equals(MPrefs.getDeviceId(ConversationActivity.this))) {
                     //添加到显示的消息列表集合
                     mConversations.add(conversation);
-                    LogInfo.i("hwj", "onChange ---------- add conversation notifyDataSetChanged");
+                    LogInfo.i(TAG, "onChange ---------- add conversation notifyDataSetChanged");
                     break;
                 }
             }
             Log.e(TAG, "onChange: conversations size = " + mConversations.size());
-            mAdapter.notifyDataSetChanged();
-//            mConversationList.setSelection(ListView.FOCUS_DOWN);
-            Log.e(TAG, "onChange: count = " + mAdapter.getCount());
-            mConversationList.setSelection(mAdapter.getCount() - 1);
+            notifyAndScrollBottom();
         }
     };
 
@@ -155,20 +159,17 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         protected void onPostExecute(List<Conversation> result) {
             Log.e(TAG, "onPostExecute: mConversations = " + mConversations);
             List<Conversation> temp = new ArrayList<>();
-            if (mConversations != null && mConversations.size() > 0) {
+            if (mConversations.size() > 0) {
                 temp.addAll(mConversations);
             }
-            mConversations = result;
+            mConversations.clear();
+            mConversations.addAll(result);
             if (temp.size() > 0) {
                 mConversations.addAll(temp);
             }
             Log.e(TAG, "onPostExecute: conversations size" + mConversations.size());
             limitConversationSize();
-            mAdapter = new ConversationListAdapterSimple(ConversationActivity.this, mConversations);
-            mAdapter.setSendMessageHandler(mSendMessageResultHandler);
-            mConversationList.setAdapter(mAdapter);
-//            mConversationList.setSelection(ListView.FOCUS_DOWN);
-            mConversationList.setSelection(mAdapter.getCount());
+            notifyAndScrollBottom();
             checkIsShareImage();
         }
 
@@ -184,7 +185,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         density = displayMetrics.density;
         initView();
-        Log.e(TAG, "onCreate: homeGroup = " + MPrefs.getHomeGroupId(this));
+//        Log.e(TAG, "onCreate: homeGroup = " + MPrefs.getHomeGroupId(this));
 
 //        test();
     }
@@ -217,6 +218,10 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         View mFooterView = getLayoutInflater().inflate(R.layout.conversation_footer, mConversationList, false);
         mConversationList.addHeaderView(mHeaderView);
         mConversationList.addFooterView(mFooterView);
+        mAdapter = new ConversationListAdapterSimple(ConversationActivity.this, mConversations);
+        mAdapter.setSendMessageHandler(mSendMessageResultHandler);
+        mConversationList.setAdapter(mAdapter);
+
         mSendEmojiBtn = getView(R.id.send_emoji_btn);
         mSendVoiceBtn = (Button) getView(R.id.send_voice_btn);
         mSendImageBtn = getView(R.id.send_image_btn);
@@ -237,13 +242,24 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         //初始化录音对象
         mRecorder = new AudioRecorder(this);
         mNetWorkUtils = NetWorkUtils.getInstance(this);
-        mResolver.registerContentObserver(Conversations.Conversation.CONVERSATION_URI, true, mObserver);
         mSendEmojiBtn.setOnClickListener(this);
         mSendImageBtn.setOnClickListener(this);
         mSendVoiceBtn.setOnLongClickListener(this);
         mSendVoiceBtn.setOnTouchListener(this);
         mConversationList.setOnScrollListener(this);
         initFriendData();
+        registerContentObserver();
+    }
+
+    private void registerContentObserver(){
+        mContactsObserver = new ContactsObserver(new Handler());
+        mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
+        mResolver.registerContentObserver(Conversations.Conversation.CONVERSATION_URI, true, mObserver);
+    }
+
+    private void unregisterContentObserver(){
+        mResolver.unregisterContentObserver(mObserver);
+        mResolver.unregisterContentObserver(mContactsObserver);
     }
 
     /**
@@ -256,7 +272,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
         int count = mConversations.size();
         if (count > MAX_COUNT) {
             for (int i = 0; i < count - MAX_COUNT; i++) {
-                deleteConversation(mConversations.get(0));
+                    deleteConversation(mConversations.get(0));
             }
         }
     }
@@ -540,21 +556,23 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             mResolver.insert(Conversations.Conversation.CONVERSATION_URI,
                     ConversationProvider.getContentValue(conversation, false));
             //添加消息数据
-            if (mConversations == null) {
-                mConversations = new ArrayList<>();
-                BuglyLog.e(TAG, "mConversation = null.");
-            }
             mConversations.add(conversation);
             LogInfo.i("hwj", "saveConversationToLocal ---------- add conversation notifyDataSetChanged");
             //刷新显示
-            mAdapter.notifyDataSetChanged();
-            //自动跳转到最新一条
-//            mConversationList.setSelection(ListView.FOCUS_DOWN);
-            mConversationList.setSelection(mAdapter.getCount());
+            notifyAndScrollBottom();
         }
         if (cursor != null) {
             cursor.close();
         }
+    }
+
+    /**
+     * 刷新，并跳转到最新一条
+     */
+    private void notifyAndScrollBottom(){
+        mAdapter.notifyDataSetChanged();
+        //本应该是mAdapter.getCount-1的，但是发送图片时有bug，显示的不是最底下的图片。
+        mConversationList.setSelection(mAdapter.getCount());
     }
 
     public static final int SEND_MESSAGE_SUCCESS = 0x11;
@@ -1010,7 +1028,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mResolver.unregisterContentObserver(mObserver);
+       unregisterContentObserver();
         if (mAdapter != null) {
             mAdapter.stopPlaying();
             mAdapter.release();
@@ -1080,5 +1098,29 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         LogInfo.i("ConversationActivity ------ onRestoreInstanceState");
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    private class ContactsObserver extends ContentObserver{
+
+        /**
+         * Creates a content observer.
+         *
+         * @param handler The handler to run {@link #onChange} on, or null if none.
+         */
+        public ContactsObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            Log.e(TAG, "onChange() called with: selfChange = " + selfChange + "");
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            Log.e(TAG, "onChange() called with: selfChange = " + selfChange + ", uri = " + uri);
+        }
     }
 }

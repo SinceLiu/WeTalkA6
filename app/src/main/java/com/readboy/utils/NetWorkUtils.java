@@ -133,15 +133,9 @@ public class NetWorkUtils {
     public boolean isConnectingToInternet(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null) {
-            Network[] networks = connectivity.getAllNetworks();
-            if (networks != null) {
-                for (Network network : networks) {
-                    if (connectivity.getNetworkInfo(network).getState() == NetworkInfo.State.CONNECTED) {
-                        return true;
-                    }
-                }
-            }
+        if (connectivity != null){
+            NetworkInfo info = connectivity.getActiveNetworkInfo();
+            return info != null && info.isAvailable() && info.isConnected();
         }
         return false;
     }
@@ -665,9 +659,8 @@ public class NetWorkUtils {
     public static boolean isWifiConnected(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        return cm != null
-                && cm.getActiveNetworkInfo() != null
-                && cm.getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
+        NetworkInfo info = cm == null ? null : cm.getActiveNetworkInfo();
+        return info!=null && info.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
 }

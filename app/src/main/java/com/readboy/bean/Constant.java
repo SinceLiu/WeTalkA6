@@ -35,8 +35,14 @@ public final class Constant {
 
     /**
      * 可显示新消息最大数量值，超过该值，显示“...”
+     * 后修改为显示“99+”
      */
     public static final int MAX_MESSAGE_COUNT = 99;
+
+    /**
+     * 现在最大聊天记录数。
+     */
+    public static final int MAX_CONVERSATION_SIZE = 100;
 
     /**
      * 跳转参数

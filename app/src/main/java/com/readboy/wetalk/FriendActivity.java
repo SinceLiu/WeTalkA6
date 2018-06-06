@@ -3,17 +3,13 @@ package com.readboy.wetalk;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
-import android.app.readboy.IReadboyWearListener;
 import android.app.readboy.ReadboyWearManager;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -58,9 +54,9 @@ public class FriendActivity extends BaseRequestPermissionActivity {
 
         @Override
         public void run() {
-            LogInfo.e(TAG, "updateFriendThread run().");
+            LogInfo.d(TAG, "updateFriendThread run().");
             if (!isUpdating) {
-                LogInfo.i("contact notify");
+                LogInfo.d(TAG, "contact notify");
                 if (mGetFriendTask != null) {
                     mGetFriendTask.cancel(true);
                 }
@@ -156,19 +152,19 @@ public class FriendActivity extends BaseRequestPermissionActivity {
 
     @Override
     protected void onResume() {
-        LogInfo.i(" FriendActivity --- onResume()");
+        LogInfo.i(TAG, " FriendActivity --- onResume()");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        LogInfo.i(" FriendActivity --- onPause()");
+        LogInfo.i(TAG, " FriendActivity --- onPause()");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        LogInfo.i(" FriendActivity --- onDestroy()");
+        LogInfo.i(TAG, " FriendActivity --- onDestroy()");
         super.onDestroy();
         if (hasRegisterObserver) {
             getContentResolver().unregisterContentObserver(mObserver);
@@ -178,7 +174,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         AudioUtils.abandonAudioFocus(this);
     }
 
-    private class GetFriendTask extends AsyncTask<Void, Void, List<Friend>> {
+    private class  GetFriendTask extends AsyncTask<Void, Void, List<Friend>> {
 
         @Override
         protected void onPreExecute() {

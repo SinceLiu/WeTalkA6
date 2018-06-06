@@ -153,7 +153,8 @@ public class MessageReceiver extends BroadcastReceiver {
                             //判断发件人是否存在通讯录中
                             if (TextUtils.isEmpty(WTContactUtils.getNameById(context, conversation.realSendId))) {
                                 LogInfo.e(TAG, conversation.realSendId + " 不在通讯录里。");
-                                break;
+                                isGettingMessage = false;
+                                return;
                             } else {
                                 conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
                             }

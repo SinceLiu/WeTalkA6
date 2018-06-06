@@ -4,24 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.NotificationManager;
-import android.app.readboy.IReadboyWearListener;
 import android.app.readboy.ReadboyWearManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
-import android.os.RemoteException;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.Data;
-import android.util.Log;
 
 import com.readboy.bean.Constant;
 import com.readboy.bean.Friend;
+import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * @author hwj
@@ -282,8 +281,12 @@ public class WTContactUtils {
         values.put(Data.MIMETYPE, StructuredPostal.CONTENT_ITEM_TYPE);
         values.put(StructuredPostal.TYPE, StructuredPostal.TYPE_WORK);
         values.put("data6", 0);
-        context.getContentResolver().update(Data.CONTENT_URI, values, "data8 = ?",
-                new String[]{uuid});
+        try {
+            context.getContentResolver().update(Data.CONTENT_URI, values, "data8 = ?",
+                    new String[]{uuid});
+        }catch (SQLiteException e){
+            CrashReport.postCatchedException(e);
+        }
     }
 
     /**

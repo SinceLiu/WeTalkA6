@@ -37,7 +37,6 @@ dependencies {
     compile files('libs/bugly_crash_release.jar')
     compile files('libs/glide-3.7.0.jar')
     compile files('libs/httpclient-4.3.6.jar')
-    compile files('libs/picasso-2.5.2.jar')
     compile files('libs/RBVolley.jar')
     compile files('libs/wetalk_android-async-http-1.4.9.jar')
 }

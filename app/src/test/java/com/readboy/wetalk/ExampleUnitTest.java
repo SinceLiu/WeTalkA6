@@ -26,10 +26,12 @@ public class ExampleUnitTest {
 //        EmojiUtils.test();
 //        String s = EmojiUtils.test2();
 //        String s1 = s;
+//
+//        int i = 1<<7;
+//        String hex = Integer.toBinaryString(i);
+//        hex = Integer.toHexString(i);
 
-        int i = 1<<7;
-        String hex = Integer.toBinaryString(i);
-        hex = Integer.toHexString(i);
+
 
 
     }
