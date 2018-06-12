@@ -735,10 +735,10 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     if (voice != null) {
                         ContentValues values = new ContentValues();
                         values.put(Conversations.Conversation.VOICE_URL, voice.voiceUrl);
-                        mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                        int row = mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
                                 Conversations.Conversation.CONVERSATION_ID + " = ?",
                                 new String[]{voice.conversationId});
-                        LogInfo.i("hwj", "mReUploadFileHandler ----- sendConversationInfo voice");
+                        LogInfo.i("hwj", "mReUploadFileHandler ----- sendConversationInfo voice, row = " + row);
                         sendConversationInfo(voice);
                     }
                 } else if (msg.arg1 == Constant.SEND_IMAGE) {

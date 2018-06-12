@@ -808,10 +808,10 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                     if (voice != null) {
                         ContentValues values = new ContentValues();
                         values.put(Conversations.Conversation.VOICE_URL, voice.voiceUrl);
-                        mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                        int row = mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
                                 Conversations.Conversation.CONVERSATION_ID + " = ?",
                                 new String[]{voice.conversationId});
-                        LogInfo.i("hwj", "mUploadFileHandler --- sendConversationInfo voice");
+                        LogInfo.i("hwj", "mUploadFileHandler --- sendConversationInfo voice, row = " + row);
                         sendConversationInfo(voice);
                     }
                 } else if (msg.arg1 == Constant.SEND_IMAGE) {
@@ -867,6 +867,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             //上传语音文件,上传成功之后再发送消息
             mNetWorkUtils.uploadFile(voice, mUploadFileHandler);
         } else {
+            Log.d(TAG, "showVoiceMessage: voice not exists.");
             showMsg(getString(R.string.send_voice_fail));
         }
     }
@@ -959,6 +960,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
+                    Log.d(TAG, "onTouch: action_cancel.");
                     cancelRecord();
                     requestParentDisallowInterceptTouchEvent(false);
                     break;

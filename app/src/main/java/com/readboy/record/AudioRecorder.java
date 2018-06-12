@@ -7,6 +7,7 @@ import android.util.Log;
 import com.readboy.bean.Constant;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.NetWorkUtils;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.File;
 import java.io.IOException;
@@ -56,10 +57,22 @@ public class AudioRecorder implements RecordStrategy {
 			try {
 				recorder.prepare();
 				recorder.start();
+				isRecording = true;
 			} catch (IllegalStateException | IOException e) {
 				e.printStackTrace();
+				Log.w(TAG, "start: 开始录音识别。", e);
+				CrashReport.postCatchedException(e);
+				recorder.setOnErrorListener(null);
+				recorder.setOnInfoListener(null);
+				recorder.setPreviewDisplay(null);
+				try {
+					recorder.reset();
+					recorder.release();
+					recorder = null;
+				}catch (Exception e2){
+					Log.w(TAG, "start: 释放资源失败。", e2);
+				}
 			}
-			isRecording = true;
 		}
 	}
 
@@ -71,6 +84,7 @@ public class AudioRecorder implements RecordStrategy {
 				recorder.setOnInfoListener(null);    
 				recorder.setPreviewDisplay(null);  
 				recorder.stop();
+				recorder.reset();
 				recorder.release();
 				recorder = null;
 				isRecording = false;
@@ -84,6 +98,8 @@ public class AudioRecorder implements RecordStrategy {
                 // TODO: handle exception  
             	LogInfo.i("Exception", Log.getStackTraceString(e));  
             }  
+		} else {
+
 		}
 	}
 
