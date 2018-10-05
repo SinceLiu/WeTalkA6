@@ -39,7 +39,7 @@ public class Friend{
      */
     public String phone;
     /**
-     * 关系
+     * 关系0-12
      */
     public int relation;
     /**

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.readboy.wetalk.R;
+import com.tencent.bugly.crashreport.CrashReport;
 
 public class FriendGridItem extends RelativeLayout {
 
@@ -106,6 +107,10 @@ public class FriendGridItem extends RelativeLayout {
                         .into(mFriendImage);
             } else {
                 if (relation < defaultAvatars.length) {
+                    if (relation < 0){
+                        CrashReport.postCatchedException(new Exception("relation is invalid, relation = " + relation));
+                        relation = 0;
+                    }
                     //没有头像,根据关系设置默认头像
                     Glide.with(context)
                             .load(defaultAvatars[relation])

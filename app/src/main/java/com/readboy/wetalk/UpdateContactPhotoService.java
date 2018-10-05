@@ -3,6 +3,7 @@ package com.readboy.wetalk;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.IntentService;
 import android.content.ContentValues;
@@ -11,10 +12,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.Data;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
@@ -28,9 +31,10 @@ import com.android.volley.toolbox.Volley;
 import com.readboy.bean.Friend;
 
 public class UpdateContactPhotoService extends IntentService {
-    private static final String TAG = "hwj_UpdateContact";
+    private static final String TAG = "hwj_UpdateContactSer";
 
     private static final String ICON_URL = "http://img.readboy.com/avatar/";
+    private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
     private static final int IMAGE_WIDTH = 126;
 
     public UpdateContactPhotoService() {
@@ -57,17 +61,37 @@ public class UpdateContactPhotoService extends IntentService {
         updateAllPhoto(getApplicationContext());
     }
 
-    private static ErrorListener errorListener = new ErrorListener() {
+    private ErrorListener errorListener = new ErrorListener() {
 
         @Override
         public void onErrorResponse(VolleyError error) {
             // TODO Auto-generated method stub
-            Log.i("", "VolleyError = " + error.toString());
+            Log.e(TAG, "VolleyError = " + error.toString());
+            if (error.networkResponse != null) {
+                byte[] data = error.networkResponse.data;
+                String response = data != null ? new String(data) : "";
+                Log.i(TAG, "onErrorResponse: status = " + error.networkResponse.statusCode
+                        + ", " + response);
+            }
+            //更新失败，置零，下次进入可以更新。
+            handleError();
         }
     };
 
-    public static void updateAllPhoto(final Context context) {
+    private void handleError() {
+        Log.e(TAG, "handleError: ");
+        try {
+            Settings.System.putLong(UpdateContactPhotoService.this.getContentResolver()
+                    , RB_UPDATE_PHOTO_PER_HOUR, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e(TAG, "handleError: e = " + e.toString());
+        }
+    }
+
+    public void updateAllPhoto(final Context context) {
 //		getQueue(context).getCache().clear();
+        Log.e(TAG, "updateAllPhoto() called with:");
         int oldId = -1;
         Friend contact = null;
         List<Friend> list = new ArrayList<Friend>();
@@ -85,7 +109,7 @@ public class UpdateContactPhotoService extends IntentService {
                     contact.contactId = rawId;
                     list.add(contact);
                 }
-                if (contact == null){
+                if (contact == null) {
                     continue;
                 }
                 String mimetype = c.getString(c.getColumnIndex(Data.MIMETYPE));
@@ -96,23 +120,29 @@ public class UpdateContactPhotoService extends IntentService {
                     case Photo.CONTENT_ITEM_TYPE:
                         contact.photoUri = c.getString(c.getColumnIndex(Photo.PHOTO_URI));
                         break;
-                        default:
-                            Log.e(TAG, "updateAllPhoto: default mimeType = " + mimetype);
+                    default:
+                        Log.e(TAG, "updateAllPhoto: default mimeType = " + mimetype);
                 }
             } while (c.moveToNext());
             c.close();
         }
-//		Log.i("hwj",list.toString());
+        Log.i(TAG, "updateAllPhoto: size = " + list.size());
         for (Friend rbContact : list) {
             final long rawContactId = rbContact.contactId;
+            Log.i(TAG, "updateAllPhoto: uuid = " + rbContact.uuid);
+            if (TextUtils.isEmpty(rbContact.uuid) || rbContact.uuid.startsWith("G")) {
+                //过滤家庭圈。
+                continue;
+            }
             String url = ICON_URL + rbContact.uuid;
+            Log.i(TAG, "updateAllPhoto: photoUri = " + url);
             if (TextUtils.isEmpty(rbContact.photoUri)) {
                 ImageRequest request = new ImageRequest(url, new Listener<Bitmap>() {
 
                     @Override
                     public void onResponse(Bitmap response) {
                         // TODO Auto-generated method stub
-                        Log.i("whj", "insert onResponse success");
+                        Log.i(TAG, "imageRequest onResponse success, then insert photo.");
                         insertPhoto(context, rawContactId, response);
                     }
                 }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Config.ARGB_8888, errorListener);
@@ -123,7 +153,7 @@ public class UpdateContactPhotoService extends IntentService {
                     @Override
                     public void onResponse(Bitmap response) {
                         // TODO Auto-generated method stub
-                        Log.i("hwj", "update onResponse success");
+                        Log.i(TAG, "imageRequest onResponse success, then updateContact.");
                         updateContactPhoto(context, rawContactId, response);
                     }
                 }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Config.ARGB_8888, errorListener);
@@ -154,10 +184,11 @@ public class UpdateContactPhotoService extends IntentService {
 //            }
 //        }
 //	}
-    /*
+
+    /**
      * 插入一个联系人的头像
-	 */
-    private static void insertPhoto(Context context, long rawContactId, Bitmap bmp) {
+     */
+    private void insertPhoto(Context context, long rawContactId, Bitmap bmp) {
         if (bmp == null) {
             return;
         }
@@ -168,24 +199,28 @@ public class UpdateContactPhotoService extends IntentService {
         cv.put(Data.RAW_CONTACT_ID, rawContactId);
         cv.put(Data.MIMETYPE, Photo.CONTENT_ITEM_TYPE);
         cv.put(Photo.PHOTO, avatar);
-        context.getContentResolver().insert(ContactsContract.Data.CONTENT_URI, cv);
+        Uri uri = context.getContentResolver().insert(ContactsContract.Data.CONTENT_URI, cv);
+        Log.i(TAG, "insertPhoto: uri = " + uri);
+        if (uri == null) {
+            handleError();
+        }
     }
 
     /**
      * 更新头像
-     *
-     * @param context
-     * @param rawContactId
-     * @param bmp
      */
-    public static void updateContactPhoto(Context context, long rawContactId, Bitmap bmp) {
+    private void updateContactPhoto(Context context, long rawContactId, Bitmap bmp) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte[] data = baos.toByteArray();
         ContentValues values = new ContentValues();
         values.put(Photo.PHOTO, data);
-        context.getContentResolver().update(ContactsContract.Data.CONTENT_URI, values,
+        int rows = context.getContentResolver().update(ContactsContract.Data.CONTENT_URI, values,
                 ContactsContract.Data.RAW_CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "=? ",
                 new String[]{rawContactId + "", ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE});
+        Log.i(TAG, "updateContactPhoto: rows = " + rows);
+        if (rows <= 0) {
+            handleError();
+        }
     }
 }

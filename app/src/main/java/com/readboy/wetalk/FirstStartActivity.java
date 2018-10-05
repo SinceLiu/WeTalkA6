@@ -28,11 +28,10 @@ import com.readboy.utils.WTContactUtils;
 public class FirstStartActivity extends BaseRequestPermissionActivity {
     private static final String TAG = "hwj_FirstStartActivity";
 
-
     private NetWorkUtils mNetWorkUtils;
 
     private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
-
+    private static final int UPDATE_CYCLE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +44,15 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
     private void startUpdateContactService() {
         try {
             long last = Settings.System.getLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR, 0);
-            if ((System.currentTimeMillis() - last) > 60 * 60 * 1000 && !WeTalkApplication.IS_TEST_MODE) {
+            Log.e(TAG, "startUpdateContactService() called: last = " + last);
+            if ((System.currentTimeMillis() - last) > UPDATE_CYCLE && !WeTalkApplication.IS_TEST_MODE) {
                 Intent serviceIntent = new Intent(this, UpdateContactPhotoService.class);
                 startService(serviceIntent);
                 Settings.System.putLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR, System.currentTimeMillis());
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG, "startUpdateContactService: e = " + e.toString());
         }
     }
 

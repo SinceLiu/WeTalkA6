@@ -25,6 +25,12 @@ public class LogInfo {
         }
     }
 
+    public static void w(String tag, String msg) {
+        if (IS_DEBUG) {
+            Log.w(tag, msg);
+        }
+    }
+
     public static void e(String msg) {
         if (IS_DEBUG) {
             Log.e(BaseActivity.TAG, msg);

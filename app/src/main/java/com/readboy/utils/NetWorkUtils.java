@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
@@ -267,6 +266,7 @@ public class NetWorkUtils {
             return;
         }
         final int type = conversation.type;
+        conversation.isSending = Constant.TRUE;
         RequestParams params = getRequestParams();
         switch (type) {
             //发送图片
@@ -277,7 +277,7 @@ public class NetWorkUtils {
                     RequestHandle handle = getClient().post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            LogInfo.i("hwj", "upload file: onSuccess " + response);
+                            LogInfo.i("hwj", "upload image file: onSuccess " + response);
                             int status = response.optInt(STATUS);
                             if (status == 200 && handler != null) {
                                 conversation.imageUrl = response.optString(SRC_NAME);
@@ -290,7 +290,7 @@ public class NetWorkUtils {
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            LogInfo.i("hwj", "upload file: onFailure 1 :" + errorResponse);
+                            LogInfo.i("hwj", "upload image file: onFailure 1 :" + errorResponse);
                             if (handler != null) {
                                 handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
                             }
@@ -318,7 +318,7 @@ public class NetWorkUtils {
                     getClient().post(UPLOAD_AUDIO_URL, params, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            LogInfo.i("hwj", "upload file: onSuccess " + response);
+                            LogInfo.i("hwj", "upload voice file: onSuccess " + response);
                             int status = response.optInt(STATUS);
                             if (status == 200 && handler != null) {
                                 conversation.voiceUrl = response.optString(FILE_NAME);
@@ -330,7 +330,7 @@ public class NetWorkUtils {
 
                         @Override
                         public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            Log.i(TAG, "uploadFile onFailure() called with: statusCode = " + statusCode +
+                            Log.i(TAG, "upload voice file onFailure() called with: statusCode = " + statusCode +
                                     ", headers = " + headers + ", throwable = " + throwable +
                                     ", errorResponse = " + errorResponse + "");
                             if (handler != null) {
@@ -357,6 +357,7 @@ public class NetWorkUtils {
                 }
                 break;
             default:
+                conversation.isSending = Constant.FALSE;
                 Log.e(TAG, "uploadFile: default type = " + conversation.type);
         }
     }

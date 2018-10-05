@@ -140,10 +140,11 @@ public class MyTimeUtils {
                 break;
 
             default:
-                if (year == 0) {        //一年以内，显示月-日
-                    result = getMonthAndDay(timestamp);
+                //一年以内，显示月-日 + 时间
+                if (year == 0) {
+                    result = getMonthAndDay(timestamp) + " " + getHourAndMin(timestamp);
                 } else {
-                    result = getYearMonthAndDay(timestamp);
+                    result = getYearMonthAndDay(timestamp) + " " + getHourAndMin(timestamp);
                 }
                 break;
         }

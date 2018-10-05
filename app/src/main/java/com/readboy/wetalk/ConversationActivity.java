@@ -918,6 +918,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             //长按松手监听
             switch (motionEvent.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    Log.d(TAG, "onTouch: action_down.");
                     clickY = 0;
                     break;
                 case MotionEvent.ACTION_UP:

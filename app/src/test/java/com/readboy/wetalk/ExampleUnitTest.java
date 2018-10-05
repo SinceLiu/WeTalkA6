@@ -31,7 +31,15 @@ public class ExampleUnitTest {
 //        String hex = Integer.toBinaryString(i);
 //        hex = Integer.toHexString(i);
 
-
+        String str1 = "zhong中";
+        String str2 = "zhogn";
+        String str3 = "中国";
+        byte[] data = new byte[10];
+        String str4 = new String(data);
+        String str5 = new String(str1.getBytes());
+        int length1 = str1.length();
+        int length2 = str2.length();
+        int length3 = str3.length();
 
 
     }

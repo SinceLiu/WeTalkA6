@@ -277,7 +277,7 @@ public class ConversationProvider extends ContentProvider {
                 conversation.time = cursor.getString(cursor.getColumnIndex(Conversations.Conversation.TIME));
                 conversation.isPlaying = cursor.getInt(cursor.getColumnIndex(Conversations.Conversation.IS_PLAYING));
 
-                //有发送中的消息,改成
+                //上次意外中断，有发送中的消息,改成
                 if (conversation.isSending == Constant.TRUE) {
                     conversation.isSending = Constant.FALSE;
                     conversation.shouldResend = Constant.TRUE;

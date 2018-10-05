@@ -2,10 +2,8 @@ package com.readboy.adapter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.IllegalFormatException;
 import java.util.List;
 
-import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,12 +34,10 @@ import com.readboy.utils.LogInfo;
 import com.readboy.utils.MyTimeUtils;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
-import com.readboy.utils.ToastUtils;
 import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
 import com.readboy.wetalk.TextDialog;
-import com.tencent.bugly.crashreport.BuglyLog;
 import com.tencent.bugly.crashreport.CrashReport;
 
 /**
@@ -351,8 +346,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     sendConversationInfo(conversation);
                 }
             });
-        }//正在发送
-        else if (conversation.isSending == Constant.TRUE) {
+        } else if (conversation.isSending == Constant.TRUE) {
+            //正在发送
             holder.retry.setOnClickListener(null);
             holder.retry.setVisibility(View.GONE);
             holder.progress.setVisibility(View.VISIBLE);
@@ -390,7 +385,12 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         //显示重新发送
         Log.e(TAG, "showUploadFileProgressOrResend: shouldResend = " + conversation.shouldResend
                 + ", isSending = " + conversation.isSending + ", id = " + conversation.conversationId);
-        if (conversation.shouldResend == Constant.TRUE) {
+        if (conversation.shouldResend == Constant.TRUE &&
+                conversation.isSending == Constant.TRUE){
+            //点击重发后，正在重发。点击播放按钮可能会刷新该状态
+            return;
+        }
+        if (conversation.shouldResend == Constant.TRUE ) {
             holder.retry.setVisibility(View.VISIBLE);
             holder.progress.setVisibility(View.GONE);
             holder.retry.setOnClickListener(new View.OnClickListener() {
@@ -404,6 +404,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     holder.retry.setVisibility(View.GONE);
                     holder.progress.setVisibility(View.VISIBLE);
                     Glide.with(mContext).load(R.drawable.loading_anim).into(holder.progress);
+                    //状态为正在发送，shouldResend应该为false.
+                    conversation.shouldResend = Constant.FALSE;
                     if (type == Constant.SEND_IMAGE) {
                         //文件不存在
                         if (!new File(conversation.imageLocalPath).exists()) {
