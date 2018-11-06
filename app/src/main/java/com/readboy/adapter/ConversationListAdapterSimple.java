@@ -386,11 +386,11 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         Log.e(TAG, "showUploadFileProgressOrResend: shouldResend = " + conversation.shouldResend
                 + ", isSending = " + conversation.isSending + ", id = " + conversation.conversationId);
         if (conversation.shouldResend == Constant.TRUE &&
-                conversation.isSending == Constant.TRUE){
+                conversation.isSending == Constant.TRUE) {
             //点击重发后，正在重发。点击播放按钮可能会刷新该状态
             return;
         }
-        if (conversation.shouldResend == Constant.TRUE ) {
+        if (conversation.shouldResend == Constant.TRUE) {
             holder.retry.setVisibility(View.VISIBLE);
             holder.progress.setVisibility(View.GONE);
             holder.retry.setOnClickListener(new View.OnClickListener() {

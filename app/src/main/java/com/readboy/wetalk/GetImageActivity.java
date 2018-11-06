@@ -325,7 +325,7 @@ public class GetImageActivity extends BaseActivity {
                         long t1 = var1.lastModified();
                         long t2 = var2.lastModified();
                         //防止强转int越界。
-                        return t1 == t2 ? 0 : t1 > t2 ? -1 : 1;
+                        return Long.compare(t2, t1);
 //						return (int) (var2.lastModified() - var1.lastModified());
                     }
                 });
@@ -333,17 +333,18 @@ public class GetImageActivity extends BaseActivity {
                 for (File f : allPhoto) {
                     paths.add(f.getPath());
                 }
-
                 return paths;
-
             }
-            return Collections.emptyList();
+            return null;
         }
 
         @Override
         protected void onPostExecute(List<String> result) {
             hideLoading();
-            mImagePaths = result;
+            mImagePaths.clear();
+            if (result != null) {
+                mImagePaths.addAll(result);
+            }
             mImagePaths.add(0, "camera");
             mImageList.setAdapter(new ImageAdapter());
         }

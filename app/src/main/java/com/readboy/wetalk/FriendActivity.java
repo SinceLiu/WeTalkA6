@@ -3,6 +3,7 @@ package com.readboy.wetalk;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.readboy.ReadboyWearManager;
 import android.content.Context;
 import android.content.Intent;
@@ -172,9 +173,22 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         }
         MPrefs.setNotificationType(this, true);
         AudioUtils.abandonAudioFocus(this);
+        killBackgroundProcesses();
     }
 
-    private class  GetFriendTask extends AsyncTask<Void, Void, List<Friend>> {
+    private void killBackgroundProcesses() {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
+            Log.e(TAG, "stopService: info = " + info.service.getClassName());
+            if (info.service != null
+                    && this.getPackageName().equals(info.service.getPackageName())) {
+                Log.e(TAG, "stopService: removeTask: " + info.service);
+            }
+        }
+        manager.killBackgroundProcesses(getPackageName());
+    }
+
+    private class GetFriendTask extends AsyncTask<Void, Void, List<Friend>> {
 
         @Override
         protected void onPreExecute() {
