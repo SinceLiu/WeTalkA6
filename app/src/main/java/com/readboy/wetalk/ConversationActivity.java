@@ -167,7 +167,7 @@ public class ConversationActivity extends BaseActivity implements OnClickListene
             if (temp.size() > 0) {
                 mConversations.addAll(temp);
             }
-            Log.e(TAG, "onPostExecute: conversations size" + mConversations.size());
+            Log.i(TAG, "onPostExecute: conversations size = " + mConversations.size());
             limitConversationSize();
             notifyAndScrollBottom();
             checkIsShareImage();

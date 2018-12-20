@@ -43,6 +43,7 @@ public class WeTalkContract {
          */
         String SEX = "sex";
         /**
+         * hwj_UpdateContactSer
          * 年级信息
          * value: 数据类型:int
          * value: 0代表一年级

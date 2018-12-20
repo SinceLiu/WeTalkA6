@@ -1,8 +1,6 @@
 package com.readboy.wetalk;
 
-import com.mediatek.common.mom.MobileManagerUtils;
-import com.readboy.bean.Model;
-import com.readboy.utils.EmojiUtils;
+
 
 import org.junit.Test;
 

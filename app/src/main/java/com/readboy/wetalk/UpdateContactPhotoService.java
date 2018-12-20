@@ -66,7 +66,7 @@ public class UpdateContactPhotoService extends IntentService {
         @Override
         public void onErrorResponse(VolleyError error) {
             // TODO Auto-generated method stub
-            Log.e(TAG, "VolleyError = " + error.toString());
+            Log.i(TAG, "VolleyError = " + error.toString());
             if (error.networkResponse != null) {
                 byte[] data = error.networkResponse.data;
                 String response = data != null ? new String(data) : "";
@@ -74,12 +74,13 @@ public class UpdateContactPhotoService extends IntentService {
                         + ", " + response);
             }
             //更新失败，置零，下次进入可以更新。
-            handleError();
+            if (error.networkResponse == null || error.networkResponse.statusCode != 404) {
+                handleError();
+            }
         }
     };
 
     private void handleError() {
-        Log.e(TAG, "handleError: ");
         try {
             Settings.System.putLong(UpdateContactPhotoService.this.getContentResolver()
                     , RB_UPDATE_PHOTO_PER_HOUR, 0);

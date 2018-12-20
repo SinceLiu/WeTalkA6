@@ -179,10 +179,9 @@ public class FriendActivity extends BaseRequestPermissionActivity {
     private void killBackgroundProcesses() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo info : manager.getRunningServices(Integer.MAX_VALUE)) {
-            Log.e(TAG, "stopService: info = " + info.service.getClassName());
             if (info.service != null
                     && this.getPackageName().equals(info.service.getPackageName())) {
-                Log.e(TAG, "stopService: removeTask: " + info.service);
+                Log.i(TAG, "stopService: removeTask: " + info.service);
             }
         }
         manager.killBackgroundProcesses(getPackageName());

@@ -12,5 +12,4 @@
 .externalNativeBuild
 /.gitignore
 /**/build
-/image
 /projectFilesBackup
