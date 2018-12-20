@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.readboy.utils.ToastUtils;
+
 import java.util.Arrays;
 
 /**
@@ -41,8 +43,7 @@ public abstract class BaseRequestPermissionActivity extends Activity {
             if (permissions != null) {
                 boolean hasPermission = true;
                 for (String permission : permissions) {
-                    if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED)
-                    {
+                    if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                         Log.e(TAG, "onCreate: has not permission : " + permission);
                     }
                 }
@@ -79,7 +80,7 @@ public abstract class BaseRequestPermissionActivity extends Activity {
                 Log.e(TAG, "onRequestPermissionsResult: initContent()");
                 initContent();
             } else {
-                Toast.makeText(this, getString(R.string.missing_required_permission), Toast.LENGTH_SHORT).show();
+                ToastUtils.show(this, R.string.missing_required_permission);
                 finish();
             }
         } else {
@@ -106,7 +107,7 @@ public abstract class BaseRequestPermissionActivity extends Activity {
     }
 
     protected void showMsg(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        ToastUtils.show(this, msg);
     }
 
     @Override

@@ -15,6 +15,9 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
+/**
+ * @author oubin
+ */
 public class TaskUtils {
     private static final String TAG = "hwj_TaskUtils";
 

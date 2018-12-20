@@ -18,6 +18,7 @@ import com.readboy.utils.AudioUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
+import com.readboy.utils.ToastUtils;
 import com.readboy.utils.WTContactUtils;
 
 /**
@@ -119,7 +120,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
         String uuid = intent.getStringExtra("friend_id");
         if (!TextUtils.isEmpty(path)) {
             if (!new File(path).exists()) {
-                Toast.makeText(this, getResources().getString(R.string.share_error), Toast.LENGTH_SHORT).show();
+                ToastUtils.show(this, R.string.share_error);
                 finish();
             }
             initIntentData(ChooseFriendActivity.class);
@@ -127,7 +128,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
             if (!TextUtils.isEmpty(WTContactUtils.getNameById(this, uuid))) {
                 initIntentData(ConversationActivity.class);
             } else {
-                Toast.makeText(this, getResources().getString(R.string.contact_fail), Toast.LENGTH_SHORT).show();
+                ToastUtils.show(this, R.string.contact_fail);
                 finish();
             }
         } else {

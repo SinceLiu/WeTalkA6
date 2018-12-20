@@ -34,6 +34,7 @@ import com.readboy.utils.LogInfo;
 import com.readboy.utils.MyTimeUtils;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
+import com.readboy.utils.ToastUtils;
 import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
@@ -337,7 +338,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     if (!mNetWorkUtils.isConnectingToInternet(mContext)) {
-                        Toast.makeText(mContext, mContext.getResources().getString(R.string.internet_down), Toast.LENGTH_SHORT).show();
+                        ToastUtils.show(mContext, R.string.internet_down);
                         return;
                     }
                     holder.retry.setVisibility(View.GONE);
@@ -397,7 +398,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     if (!mNetWorkUtils.isConnectingToInternet(mContext)) {
-                        Toast.makeText(mContext, mContext.getResources().getString(R.string.internet_down), Toast.LENGTH_SHORT).show();
+                        ToastUtils.show(mContext, R.string.internet_down);
                         return;
                     }
                     int type = conversation.type;
@@ -409,7 +410,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     if (type == Constant.SEND_IMAGE) {
                         //文件不存在
                         if (!new File(conversation.imageLocalPath).exists()) {
-                            Toast.makeText(mContext, mContext.getResources().getString(R.string.file_not_found), Toast.LENGTH_SHORT).show();
+                            ToastUtils.show(mContext, R.string.file_not_found);
                             //删除数据库中的记录
                             mResolver.delete(Conversations.Conversation.CONVERSATION_URI,
                                     Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
@@ -539,7 +540,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 if (TextUtils.isEmpty(path) || !new File(path).exists()) {
                     if (!mIsToastShow) {
                         mIsToastShow = true;
-                        Toast.makeText(mContext, mContext.getResources().getString(R.string.play_voice_error), Toast.LENGTH_SHORT).show();
+                        ToastUtils.show(mContext, R.string.play_voice_error);
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {

@@ -27,16 +27,15 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:support-v4:28.0.0'
-    compile files('libs/android-support-v7-recyclerview.jar')
-    compile files('libs/bugly_crash_release.jar')
-    compile files('libs/glide-3.7.0.jar')
-    compile files('libs/httpclient-4.3.6.jar')
-    compile files('libs/RBVolley.jar')
-    compile files('libs/wetalk_android-async-http-1.4.9.jar')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation files('libs/android-support-v7-recyclerview.jar')
+    implementation files('libs/bugly_crash_release.jar')
+    implementation files('libs/glide-3.7.0.jar')
+    implementation files('libs/httpclient-4.3.6.jar')
+    implementation files('libs/RBVolley.jar')
+    implementation files('libs/wetalk_android-async-http-1.4.9.jar')
 }

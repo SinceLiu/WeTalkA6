@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.readboy.utils.ToastUtils;
+
 /**
  * Created by oubin on 2016/9/21.
  *
@@ -31,7 +33,7 @@ public abstract class BaseActivity extends Activity {
 
     protected void showMsg(String msg) {
         Log.d(TAG, "showMsg() called with: msg = " + msg + "");
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        ToastUtils.show(this, msg);
     }
 
     @Override
