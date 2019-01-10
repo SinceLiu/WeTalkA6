@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/friend_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="1px"
+        android:background="@drawable/btn_add_group_normal" />
+
+
+    <FrameLayout
+        android:id="@+id/progress_bar_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#99000000">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="80px"
+            android:layout_height="80px"
+            android:layout_gravity="center"
+            android:indeterminateDrawable="@drawable/progress_bar"
+            android:visibility="gone" />
+
+    </FrameLayout>
+</FrameLayout>

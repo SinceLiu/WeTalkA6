@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    tools:parentTag="com.readboy.dialog.RequestFriendView">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25px"
+        android:gravity="center_horizontal"
+        android:text="@string/request_friend_title"
+        android:textColor="@android:color/white"
+        android:textSize="24px" />
+
+    <TextView
+        android:id="@+id/request_friend_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/request_friend_content"
+        android:textColor="@android:color/white"
+        android:textSize="20px" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/request_friend_refuse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_refuse_selector" />
+
+        <Button
+            android:id="@+id/request_friend_agree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2px"
+            android:background="@drawable/btn_agree_selector" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:src="@drawable/loading_animator" />
+
+</merge>

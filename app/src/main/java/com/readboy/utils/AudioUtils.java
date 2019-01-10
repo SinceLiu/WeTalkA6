@@ -5,7 +5,9 @@ import android.media.AudioManager;
 import android.util.Log;
 
 /**
- * Created by oubin on 2017/6/19.
+ *
+ * @author oubin
+ * @date 2017/6/19
  */
 
 public class AudioUtils {

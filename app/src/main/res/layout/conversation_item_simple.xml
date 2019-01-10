@@ -7,7 +7,7 @@
     android:paddingRight="6px">
 
     <TextView
-        android:id="@+id/conversaion_item_time"
+        android:id="@+id/conversation_item_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -18,7 +18,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/conversaion_item_time">
+        android:layout_below="@id/conversation_item_time">
         <!--rec_voice_item-->
         <RelativeLayout
             android:id="@+id/conversation_item_rec_voice_item"

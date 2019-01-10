@@ -28,4 +28,19 @@
     <string name="traffic_dialog_content">流量已经被家长禁止使用，请连接wifi</string>
     <string name="traffic_dialog_wifi">WIFI</string>
     <string name="traffic_dialog_exit">退出</string>
+
+    <!--A6-->
+    <string name="request_friend_title">新朋友</string>
+    <string name="warning_group_create">请选择至少两位好友</string>
+    <string name="warning_group_add">请选择至少一位好友</string>
+    <string name="warning_group_remove">请选择至少一位好友</string>
+    <string name="add_friend_content">确定添加%s为好友</string>
+    <string name="request_friend_content">%s请求添加你为好友，添加后可以微聊和打电话</string>
+
+    <string name="cancel">取消</string>
+    <string name="confirm">确定</string>
+    <string name="warning_disband_group">确定解散该群吗</string>
+    <string name="warning_leave_group" >确定退出该群吗</string>
+    <string name="load_failure">加载失败</string>
+
 </resources>

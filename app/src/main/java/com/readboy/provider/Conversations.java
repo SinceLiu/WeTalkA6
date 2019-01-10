@@ -4,7 +4,9 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- * Created by hwwjian on 2016/12/1.
+ *
+ * @author hwwjian
+ * @date 2016/12/1
  */
 
 public class Conversations {

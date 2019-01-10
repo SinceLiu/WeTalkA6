@@ -19,7 +19,7 @@ import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.ToastUtils;
-import com.readboy.utils.WTContactUtils;
+import com.readboy.wetalk.utils.WTContactUtils;
 
 /**
  * Created by hwj on 2017/3/21.

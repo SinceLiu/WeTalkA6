@@ -20,9 +20,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
-import com.readboy.bean.Friend;
+import com.readboy.wetalk.bean.Friend;
 import com.readboy.utils.GlideCircleTransform;
-import com.readboy.utils.WTContactUtils;
+import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.view.CircleImageView;
 
 public class ChooseFriendActivity extends BaseRequestPermissionActivity {
@@ -57,7 +57,7 @@ public class ChooseFriendActivity extends BaseRequestPermissionActivity {
 
         @Override
         protected List<Friend> doInBackground(Void... params) {
-            return WTContactUtils.getFriendFromContact(ChooseFriendActivity.this);
+            return WTContactUtils.getFriendFromContacts(ChooseFriendActivity.this);
         }
 
         @Override
@@ -106,7 +106,7 @@ public class ChooseFriendActivity extends BaseRequestPermissionActivity {
             }
             final Friend friend = mFriends.get(position);
             if (friend.avatar == null && friend.name.equals(getResources().getString(R.string.homeGroup))) {
-                holder.avatar.setImageResource(R.drawable.group);
+                holder.avatar.setImageResource(R.drawable.ic_family_group);
             } else if (friend.avatar == null) {
                 holder.avatar.setImageResource(R.drawable.common);
             } else {

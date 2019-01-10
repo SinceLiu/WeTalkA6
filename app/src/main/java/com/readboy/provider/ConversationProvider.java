@@ -19,7 +19,7 @@ import android.util.Log;
 
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
-import com.readboy.utils.WTContactUtils;
+import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.provider.WeTalkContract.ProfileColumns;
 
 /**

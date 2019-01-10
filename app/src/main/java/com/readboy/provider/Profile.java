@@ -5,10 +5,13 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.readboy.wetalk.bean.Friend;
 import com.readboy.utils.NetWorkUtils;
 
 import org.json.JSONException;
@@ -23,7 +26,7 @@ import java.net.UnknownServiceException;
  * @date 2018/1/30
  */
 
-public class Profile implements WeTalkContract.ProfileColumns {
+public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
     private static final String TAG = "hwj_Profile";
 
 
@@ -222,6 +225,14 @@ public class Profile implements WeTalkContract.ProfileColumns {
         this.grade = grade;
     }
 
+    public Friend convertFriend() {
+        Friend friend = new Friend();
+        friend.name = name;
+        friend.uuid = uuid;
+        return friend;
+    }
+
+
     public interface CallBack {
         /**
          * 获取Profile成功回调，可能是通过数据库或者网络获取的。
@@ -245,4 +256,40 @@ public class Profile implements WeTalkContract.ProfileColumns {
                 ", grade=" + grade +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.uuid);
+        dest.writeString(this.imei);
+        dest.writeString(this.name);
+        dest.writeString(this.type);
+        dest.writeInt(this.sex);
+        dest.writeInt(this.grade);
+    }
+
+    protected Profile(Parcel in) {
+        this.uuid = in.readString();
+        this.imei = in.readString();
+        this.name = in.readString();
+        this.type = in.readString();
+        this.sex = in.readInt();
+        this.grade = in.readInt();
+    }
+
+    public static final Creator<Profile> CREATOR = new Creator<Profile>() {
+        @Override
+        public Profile createFromParcel(Parcel source) {
+            return new Profile(source);
+        }
+
+        @Override
+        public Profile[] newArray(int size) {
+            return new Profile[size];
+        }
+    };
 }

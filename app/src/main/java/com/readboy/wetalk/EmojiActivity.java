@@ -1,5 +1,6 @@
 package com.readboy.wetalk;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -75,38 +76,35 @@ public class EmojiActivity extends BaseActivity {
             return EmojiUtils.ALL_EMOJI_SINGLE_ID.length;
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         @Override
         public void onBindViewHolder(ViewHolder holder, final int position) {
             Glide.with(EmojiActivity.this)
                     .load(EmojiUtils.ALL_EMOJI_SINGLE_ID[position])
                     .dontAnimate()
                     .into(holder.emoji);
-            holder.emoji.setOnTouchListener(new OnTouchListener() {
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            v.setScaleX(0.95f);
-                            v.setScaleY(0.95f);
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            v.setScaleX(1.0f);
-                            v.setScaleY(1.0f);
-                            Intent intent = new Intent(EmojiActivity.this, ConversationActivity.class);
-                            intent.putExtra(Constant.REQUEST_EMOJI_ID, EmojiUtils.ALL_EMOJI_SINGLE_ID[position]);
-                            setResult(RESULT_OK, intent);
-                            finish();
-                            break;
-                        case MotionEvent.ACTION_CANCEL:
-                            v.setScaleX(1.0f);
-                            v.setScaleY(1.0f);
-                            break;
-                        default:
-                            break;
-                    }
-                    return true;
+            holder.emoji.setOnTouchListener((v, event) -> {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        v.setScaleX(0.95f);
+                        v.setScaleY(0.95f);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        v.setScaleX(1.0f);
+                        v.setScaleY(1.0f);
+                        Intent intent = new Intent(EmojiActivity.this, ConversationActivity.class);
+                        intent.putExtra(Constant.REQUEST_EMOJI_ID, EmojiUtils.ALL_EMOJI_SINGLE_ID[position]);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        v.setScaleX(1.0f);
+                        v.setScaleY(1.0f);
+                        break;
+                    default:
+                        break;
                 }
+                return true;
             });
         }
 

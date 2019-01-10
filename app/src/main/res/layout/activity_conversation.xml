@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="@android:color/black">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/conversation_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.readboy.widget.ImageIndication
+        android:id="@+id/image_indication"
+        android:layout_width="40px"
+        android:layout_height="10px"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5px"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" />
+
+</FrameLayout>

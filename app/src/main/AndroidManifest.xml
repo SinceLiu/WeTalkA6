@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.readboy.wetalk"
+    coreApp="true"
     android:sharedUserId="com.android.systemui"
-    android:versionCode="180420001"
-    android:versionName="1.1.12">
+    android:versionCode="181221001"
+    android:versionName="1.2.0">
 
-    <!--<uses-feature android:name="android.hardware.type.watch" />-->
+    <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -20,7 +21,6 @@
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
@@ -37,16 +37,27 @@
         <meta-data
             android:name="com.readboy.utils.GlideConfiguration"
             android:value="GlideModule" />
+
         <provider
             android:name="com.readboy.provider.ConversationProvider"
             android:authorities="com.readboy.wetalk.provider.Conversation"
             android:exported="true" />
+
         <receiver android:name="com.readboy.receiver.MessageReceiver">
             <intent-filter>
                 <action android:name="readboy.action.NOTIFY_MESSAGE" />
             </intent-filter>
             <intent-filter>
                 <action android:name="com.readboy.action.SENDPICTURE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="readboy.action.NOTIFY_FRIEND_ADD" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="readboy.action.NOTIFY_FRIEND_REFUSE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="readboy.action.NOTIFY_FRIEND_REQUEST" />
             </intent-filter>
         </receiver>
 
@@ -91,6 +102,14 @@
             android:screenOrientation="portrait" />
 
         <service android:name=".UpdateContactPhotoService" />
+
+        <activity android:name="com.readboy.activity.GifActivity" />
+        <activity
+            android:name="com.readboy.activity.RequestFriendActivity"
+            android:screenOrientation="portrait" />
+
+        <activity android:name="com.readboy.activity.FriendSelectorActivity" />
+
     </application>
 
 </manifest>

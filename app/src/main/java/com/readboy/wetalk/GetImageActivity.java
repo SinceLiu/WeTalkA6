@@ -3,7 +3,6 @@ package com.readboy.wetalk;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -31,7 +30,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
-import com.readboy.utils.IOs;
+import com.readboy.wetalk.utils.IOs;
 import com.readboy.utils.NetWorkUtils;
 
 public class GetImageActivity extends BaseActivity {

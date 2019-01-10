@@ -8,9 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.readboy.bean.Constant;
-import com.readboy.provider.Profile;
-
-import java.security.Key;
+import com.readboy.wetalk.utils.IOs;
 
 /**
  * @author hwwjian

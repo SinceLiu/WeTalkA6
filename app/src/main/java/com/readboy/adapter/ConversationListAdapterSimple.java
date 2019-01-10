@@ -22,7 +22,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
@@ -35,6 +34,7 @@ import com.readboy.utils.MyTimeUtils;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.utils.ToastUtils;
+import com.readboy.view.ConversationView;
 import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
@@ -117,7 +117,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     emojiItemHolder.item = view.findViewById(R.id.conversation_item_send_emoji);
                     emojiItemHolder.progress = (ImageView) view.findViewById(R.id.conversation_item_send_emoji_progress);
                     emojiItemHolder.retry = (ImageView) view.findViewById(R.id.conversation_item_send_emoji_resend_btn);
-                    emojiItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    emojiItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(emojiItemHolder);
                     break;
                 //接收表情项
@@ -126,7 +126,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     emojiItemHolder.content = (ImageView) view.findViewById(R.id.conversation_item_rec_emoji_content);
                     emojiItemHolder.item = view.findViewById(R.id.conversation_item_rec_emoji);
                     emojiItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_emoji_user_name);
-                    emojiItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    emojiItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(emojiItemHolder);
                     break;
                 //发送图片项
@@ -136,7 +136,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     imageItemHolder.item = view.findViewById(R.id.conversation_item_send_image);
                     imageItemHolder.retry = (ImageView) view.findViewById(R.id.conversation_item_send_image_resend_btn);
                     imageItemHolder.progress = (ImageView) view.findViewById(R.id.conversation_item_send_image_progress);
-                    imageItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    imageItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(imageItemHolder);
                     break;
                 //接收图片项
@@ -145,7 +145,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     imageItemHolder.content = (ImageView) view.findViewById(R.id.conversation_item_rec_image_content);
                     imageItemHolder.item = view.findViewById(R.id.conversation_item_rec_image);
                     imageItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_image_user_name);
-                    imageItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    imageItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(imageItemHolder);
                     break;
                 //发送语音项
@@ -158,7 +158,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     voiceItemHolder.playImg = view.findViewById(R.id.conversation_item_send_voice_play_imgv);
                     voiceItemHolder.retry = (ImageView) view.findViewById(R.id.conversation_item_send_voice_resend_btn);
                     voiceItemHolder.progress = (ImageView) view.findViewById(R.id.conversation_item_send_voice_progress);
-                    voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(voiceItemHolder);
                     break;
                 //接收语音项
@@ -171,7 +171,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     voiceItemHolder.item = view.findViewById(R.id.conversation_item_rec_voice_item);
                     voiceItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_voice_user_name);
                     voiceItemHolder.playImg = view.findViewById(R.id.conversation_item_rec_voice_play_imgv);
-                    voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(voiceItemHolder);
                     break;
                 //接收文字项
@@ -180,7 +180,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     textItemHolder.content = (TextView) view.findViewById(R.id.conversation_item_rec_text_content);
                     textItemHolder.item = view.findViewById(R.id.conversation_item_rec_text);
                     textItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_text_user_name);
-                    textItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversaion_item_time);
+                    textItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                     view.setTag(textItemHolder);
                     break;
                 default:
@@ -223,7 +223,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 break;
             case Constant.REC_EMOJI:
                 //接收的图片
-                LogInfo.e(TAG, " type = " + type + ", emojiId = " + conversation.emojiId);
+//                LogInfo.e(TAG, " type = " + type + ", emojiId = " + conversation.emojiId);
                 if (conversation.isHomeGroup == Constant.TRUE) {
                     emojiItemHolder.userName.setText(conversation.senderName);
                     //WTContactUtils.getNameById(mContext,conversation.realSendId));
@@ -343,7 +343,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     }
                     holder.retry.setVisibility(View.GONE);
                     holder.progress.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(R.drawable.loading_anim).into(holder.progress);
+                    Glide.with(mContext).
+                            load(R.drawable.loading_anim).asGif().into(holder.progress);
                     sendConversationInfo(conversation);
                 }
             });
@@ -368,12 +369,14 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 public void pushSucceed(String type, String s1, int code, String s,
                                         String response) {
                     //存储进数据库里
-                    mSendMessageHandler.obtainMessage(ConversationActivity.SEND_MESSAGE_SUCCESS, conversation).sendToTarget();
+                    Log.i(TAG, "pushSucceed() called with: type = " + type + ", s1 = " + s1 + ", code = " + code + ", s = " + s + ", response = " + response + "");
+                    mSendMessageHandler.obtainMessage(ConversationView.SEND_MESSAGE_SUCCESS, conversation).sendToTarget();
                 }
 
                 @Override
                 public void pushFail(String s, String s1, int i, String s2) {
-                    mSendMessageHandler.obtainMessage(ConversationActivity.SEND_MESSAGE_FAIL, conversation).sendToTarget();
+                    Log.i(TAG, "pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+                    mSendMessageHandler.obtainMessage(ConversationView.SEND_MESSAGE_FAIL, conversation).sendToTarget();
                 }
             });
         }
@@ -384,8 +387,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         holder.retry.setVisibility(View.GONE);
         holder.progress.setVisibility(View.GONE);
         //显示重新发送
-        Log.e(TAG, "showUploadFileProgressOrResend: shouldResend = " + conversation.shouldResend
-                + ", isSending = " + conversation.isSending + ", id = " + conversation.conversationId);
+//        Log.e(TAG, "showUploadFileProgressOrResend: shouldResend = " + conversation.shouldResend
+//                + ", isSending = " + conversation.isSending + ", id = " + conversation.conversationId);
         if (conversation.shouldResend == Constant.TRUE &&
                 conversation.isSending == Constant.TRUE) {
             //点击重发后，正在重发。点击播放按钮可能会刷新该状态
@@ -404,7 +407,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     int type = conversation.type;
                     holder.retry.setVisibility(View.GONE);
                     holder.progress.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(R.drawable.loading_anim).into(holder.progress);
+                    Glide.with(mContext).load(R.drawable.loading_anim).asGif().into(holder.progress);
                     //状态为正在发送，shouldResend应该为false.
                     conversation.shouldResend = Constant.FALSE;
                     if (type == Constant.SEND_IMAGE) {
@@ -567,7 +570,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         @Override
                         public void onCompletion(MediaPlayer mediaPlayer) {
                             setKeepScreenOn(view, false);
-                            ConversationActivity.muteAudioFocus(mContext, false);
+                            ConversationView.muteAudioFocus(mContext, false);
                             //更新接收语音信息,要更新列表的数据才能刷新界面显示
                             if (!isSend && conv.isUnPlay == Constant.TRUE) {
                                 //数据库更新播放状态
@@ -588,7 +591,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     });
                     //播放语音文件
                     try {
-                        ConversationActivity.muteAudioFocus(mContext, true);
+                        ConversationView.muteAudioFocus(mContext, true);
                         mMediaPlayer.setDataSource(path);
                         mMediaPlayer.prepare();
                         mMediaPlayer.start();
@@ -603,7 +606,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     }
                 } else {
                     if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-                        ConversationActivity.muteAudioFocus(mContext, false);
+                        ConversationView.muteAudioFocus(mContext, false);
                         mMediaPlayer.stop();
                         stopPlayingAnimation();
                         mMediaPlayer = null;
@@ -694,7 +697,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
      */
     public void stopPlaying() {
         if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            ConversationActivity.muteAudioFocus(mContext, false);
+            ConversationView.muteAudioFocus(mContext, false);
             mMediaPlayer.stop();
             stopPlayingAnimation();
             setKeepScreenOn(null, false);

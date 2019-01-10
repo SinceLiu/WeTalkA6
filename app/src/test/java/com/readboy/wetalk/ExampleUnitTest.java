@@ -39,6 +39,13 @@ public class ExampleUnitTest {
         int length2 = str2.length();
         int length3 = str3.length();
 
+        String lcm = "0-1h154q01_vdo";
+        int index = lcm.indexOf("-");
+        String result = lcm.substring(index + 1, lcm.length());
+        boolean b = "1h154q01_vdo".equals(result);
+        if (b) {
+
+        }
 
     }
 }

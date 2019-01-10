@@ -64,4 +64,7 @@
     <dimen name="conversation_square_voice_width">100px</dimen>
     <dimen name="retry_square_btn_width">35px</dimen>
     <dimen name="record_dialog_width">150px</dimen>
+    <dimen name="group_members_width">120px</dimen>
+    <dimen name="group_members_height">110px</dimen>
+
 </resources>

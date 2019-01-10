@@ -14,4 +14,11 @@
     </declare-styleable>
 
     <attr name="SwipeBackLayoutStyle" format="reference"/>
+
+    <declare-styleable name="DragFrameLayout">
+        <attr name="dragOrientation">
+            <enum name="horizontal" value="0"/>
+            <enum name="vertical" value="1"/>
+        </attr>
+    </declare-styleable>
 </resources>

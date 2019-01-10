@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.readboy.view.ConversationView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/square_screen_width"
     android:layout_height="@dimen/square_screen_width"
     android:layout_gravity="center"
-    android:background="@color/main_color"
     android:splitMotionEvents="false">
 
     <ListView
@@ -13,49 +12,20 @@
         android:divider="@null"
         android:listSelector="@android:color/transparent"
         android:overScrollMode="never"
-        android:scrollbars="none"/>
+        android:scrollbars="none" />
 
     <!--TopBar-->
-    <RelativeLayout
-        android:id="@+id/title_bar"
-        android:layout_width="match_parent"
-        android:layout_height="35px">
-
-        <View
-            android:id="@+id/space"
-            android:layout_width="match_parent"
-            android:layout_height="20px"
-            android:background="@color/main_color" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="15px"
-            android:layout_below="@id/space"
-            android:background="@drawable/title_bar_bg" />
-
-        <TextView
-            android:id="@+id/conversation_name_tip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10px"
-            android:ellipsize="end"
-            android:maxWidth="200px"
-            android:singleLine="true"
-            android:text="@string/app_name"
-            android:textColor="@color/green"
-            android:textSize="24px" />
-
-        <DigitalClock
-            android:id="@+id/conversation_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="5px"
-            android:textColor="@android:color/white"
-            android:textSize="20px"
-            android:visibility="gone" />
-    </RelativeLayout>
-
+    <TextView
+        android:id="@+id/conversation_name_tip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10px"
+        android:ellipsize="end"
+        android:maxWidth="105px"
+        android:singleLine="true"
+        android:text="@string/app_name"
+        android:textColor="@color/green"
+        android:textSize="20px" />
     <!--BottomBar-->
     <LinearLayout
         android:id="@+id/conversation_send_msg_tab"
@@ -121,4 +91,4 @@
         android:textSize="@dimen/friend_name_textSize"
         android:visibility="gone" />
 
-</RelativeLayout>
+</com.readboy.view.ConversationView>

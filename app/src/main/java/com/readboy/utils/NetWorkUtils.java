@@ -37,6 +37,7 @@ import com.readboy.bean.Conversation;
 import com.readboy.provider.ConversationProvider;
 import com.readboy.provider.Conversations;
 import com.readboy.wetalk.WeTalkApplication;
+import com.readboy.wetalk.utils.WTContactUtils;
 
 import android.app.readboy.ReadboyWearManager;
 import android.app.readboy.IReadboyWearListener;
@@ -93,7 +94,7 @@ public class NetWorkUtils {
     public static final String LINK = "link";
     public static final String A = "a";
     public static final String SEND_MSG_ID = "sendmsgId";
-    private static final String IMAGE_TYPE = "image/png";
+    private static final String IMAGE_TYPE = "image/jpeg";
     private static final String AUDIO_TYPE = "audio/amr";
     public static final int UPLOAD_SUCCEED = 0x90;
     public static final int UPLOAD_FAIL = 0x71;
@@ -132,7 +133,7 @@ public class NetWorkUtils {
     public boolean isConnectingToInternet(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null){
+        if (connectivity != null) {
             NetworkInfo info = connectivity.getActiveNetworkInfo();
             return info != null && info.isAvailable() && info.isConnected();
         }
@@ -175,6 +176,7 @@ public class NetWorkUtils {
             final int width = opts.outWidth;
             final int height = opts.outHeight;
             params.put(IMAGE, file, IMAGE_TYPE);
+            Log.i(TAG, "uploadCaptureFile: request = " + params.toString());
             getClient().post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -274,9 +276,15 @@ public class NetWorkUtils {
                 try {
                     File image = new File(conversation.imageLocalPath);
                     params.put(IMAGE, image, IMAGE_TYPE);
-                    RequestHandle handle = getClient().post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
+                    Log.i(TAG, "uploadFile: params = " + params.toString());
+                    AsyncHttpClient client = getClient();
+                    client.setLoggingLevel(2);
+                    RequestHandle handle = client.post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            for (Header header : headers) {
+                                Log.i(TAG, "onSuccess: header " + header.getName() + ":" + header.getValue());
+                            }
                             LogInfo.i("hwj", "upload image file: onSuccess " + response);
                             int status = response.optInt(STATUS);
                             if (status == 200 && handler != null) {
@@ -512,7 +520,6 @@ public class NetWorkUtils {
     }
 
     public void getAllMessage(String tag, final PushResultListener listener) {
-        Log.e(TAG, "getAllMessage: tag = " + tag);
         if (mManager == null) {
             return;
         }
@@ -661,7 +668,7 @@ public class NetWorkUtils {
         ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm == null ? null : cm.getActiveNetworkInfo();
-        return info!=null && info.getType() == ConnectivityManager.TYPE_WIFI;
+        return info != null && info.getType() == ConnectivityManager.TYPE_WIFI;
     }
 
 }

@@ -43,12 +43,7 @@ public class TaskUtils {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
-            Log.e(TAG, "isBackground: processName = " + appProcess.processName);
             if (appProcess.processName.equals(context.getPackageName())) {
-                Log.e(TAG, "isBackground: importance = " + appProcess.importance);
-                Log.e(TAG, "isBackground: appProcess = " + appProcess.importanceReasonComponent
-                        + " , " + appProcess.importanceReasonCode);
-                Log.e(TAG, "isBackground: pkgList = " + Arrays.toString(appProcess.pkgList));
                 for (String s : appProcess.pkgList) {
                     Log.e(TAG, "isBackground: pkg = " + s);
                 }

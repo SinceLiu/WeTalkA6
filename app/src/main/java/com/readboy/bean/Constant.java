@@ -3,6 +3,8 @@ package com.readboy.bean;
 import android.content.Context;
 import android.os.Environment;
 
+import com.readboy.wetalk.utils.IOs;
+
 import java.io.File;
 
 /**
@@ -25,6 +27,8 @@ public final class Constant {
     public static final int SEND_EMOJI = 4;
     public static final int REC_EMOJI = 5;
     public static final int REC_TEXT = 6;
+    public static final int SEND_VIDEO = 7;
+    public static final int REC_VIDEO = 8;
 
     public static final String EMPTY = "";
 
@@ -52,6 +56,7 @@ public final class Constant {
     public static final int REQUEST_CAMERA = 0x124;
     //主界面用户跳转
     public static final String FROM = "from";
+    public static final String EXTRA_FRIEND = "friend";
     public static final String FRIEND_DATA = "friend_data";
     public static final String EXTRA_FRIEND_ID = "friend_id";
     public static final String FRIEND_CONTRACT_ID = "friend_contact_id";
@@ -84,7 +89,7 @@ public final class Constant {
     /**
      * 图片操作相关
      */
-    public static final int IMAGE_DONE = 0x21;
+    public static final int IMAGE_DONE = IOs.IMAGE_DONE;
 
     /**
      * 永久化数据相关
@@ -99,6 +104,11 @@ public final class Constant {
     public static final String PARAM_APPID = "AndroidWear";
     public static final String PARAM_SN = "65cbcdeef24de25e5ed45338f06a1b37";
 
+    public static final String ICON_URL = "http://img.readboy.com/avatar/";
+
+    public static String getAvatarUrl(String uuid) {
+        return ICON_URL + uuid;
+    }
 
     /**
      * 路径相关

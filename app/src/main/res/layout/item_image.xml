@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_image"
     android:layout_width="120px"
     android:layout_height="120px"
-    android:padding="3px"
-    android:id="@+id/item_image">
+    android:padding="3px">
+
     <ImageView
         android:id="@+id/image_content"
         android:layout_width="114px"
         android:layout_height="114px"
-        android:scaleType="centerCrop"/>
-    <ImageView 
+        android:scaleType="centerCrop" />
+
+    <ImageView
         android:layout_width="114px"
         android:layout_height="114px"
-        android:src="@drawable/image_full_mask"/>
+        android:src="@drawable/image_full_mask" />
 </RelativeLayout>

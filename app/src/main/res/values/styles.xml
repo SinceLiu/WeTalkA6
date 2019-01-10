@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
+
     <style name="InputTypeStyle">
         <item name="android:layout_width">@dimen/input_type_btn_width</item>
         <item name="android:layout_height">@dimen/input_type_btn_width</item>
@@ -11,6 +12,7 @@
         <item name="android:clickable">true</item>
         <item name="android:padding">10px</item>
     </style>
+
     <style name="ConversationItemStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -26,22 +28,25 @@
         <item name="android:textSize">15px</item>
         <item name="android:textColor">@color/username_color</item>
     </style>
-    
+
     <style name="SwipeToDismissTheme" parent="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
         <item name="android:windowSwipeToDismiss">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-	    <item name="android:windowIsTranslucent">true</item>
-	    <item name="android:keycode">KEYCODE_SOFT_LEFT</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:keycode">KEYCODE_SOFT_LEFT</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
-	    <!-- <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item> -->
+        <item name="android:alertDialogStyle">@android:style/Theme.Holo.NoActionBar.Fullscreen
+        </item>
+        <!-- <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item> -->
     </style>
-    
+
     <style name="FullScreenDialogTheme">
-        <item name="android:windowNoTitle">true</item>    
-    	<item name="android:windowFullscreen">true</item>  
-    	<item name="android:windowSwipeToDismiss">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowSwipeToDismiss">false</item>
         <item name="android:windowIsFloating">true</item>
     </style>
+
     <style name="SwipeBackLayout">
         <item name="edge_size">50dip</item>
         <item name="shadow_left">@drawable/shadow_left</item>
