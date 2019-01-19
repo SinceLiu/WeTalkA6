@@ -26,7 +26,7 @@ public class WeTalkContract {
 
         Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/profiles");
 
-        String PROFILE_TABLE_NAME = "profile";
+        String TABLE_NAME = "profile";
 
 
         /**
@@ -61,6 +61,31 @@ public class WeTalkContract {
         int INDEX_SEX = 5;
         int INDEX_GRADE = 6;
         int INDEX_DATA = 7;
+
+    }
+
+    /**
+     * id : GXXXXXXXXXX
+     * owner : <UUID>
+     * name : xxxxxxxx
+     * members : ["<UUID>|<name>","..."]
+     * v : 123
+     */
+    public interface GroupColumns extends BaseColumns {
+        Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/groups");
+        String TABLE_NAME = "groups";
+
+        String UUID = "uuid";
+        String OWNER = "owner";
+        String NAME = "name";
+        String MEMBERS = "members";
+        String VERSION = "version";
+
+        int INDEX_UUID = 1;
+        int INDEX_OWNER = 2;
+        int INDEX_NAME = 3;
+        int INDEX_MEMBERS = 4;
+        int INDEX_VERSION = 5;
 
     }
 

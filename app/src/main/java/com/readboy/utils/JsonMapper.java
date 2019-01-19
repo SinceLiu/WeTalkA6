@@ -4,14 +4,18 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +25,7 @@ import java.util.Map;
 public class JsonMapper {
 
     private static ObjectMapper mapper;
+
     static {
         mapper = new ObjectMapper();
         // 设置输出时包含属性的风格
@@ -72,15 +77,15 @@ public class JsonMapper {
 
     /**
      * 反序列化POJO或简单Collection如List<String>.
-     *
+     * <p>
      * 如果JSON字符串为Null或"null"字符串, 返回Null.
      * 如果JSON字符串为"[]", 返回空集合.
-     *
+     * <p>
      * 如需反序列化复杂Collection如List<MyBean>, 请使用fromJson(String, JavaType)
      *
      * @see #fromJson(String, JavaType)
      */
-    public static  <T> T fromJson(String jsonString, Class<T> clazz) {
+    public static <T> T fromJson(String jsonString, Class<T> clazz) {
         if (TextUtils.isEmpty(jsonString)) {
             return null;
         }
@@ -94,7 +99,6 @@ public class JsonMapper {
 
     /**
      * 反序列化复杂Collection如List<Bean>, 先使用createCollectionType()或contructMapType()构造类型, 然后调用本函数.
-     *
      */
     @SuppressWarnings("unchecked")
     public static  <T> T fromJson(String jsonString, JavaType javaType) {
@@ -107,6 +111,18 @@ public class JsonMapper {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public static <T> List<T> fromJsonArray(String jsonString, Class<T> tClass) {
+        if (TextUtils.isEmpty(jsonString)) {
+            return null;
+        }
+        try {
+            return mapper.readValue(jsonString, new TypeReference<List<T>>(){});
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

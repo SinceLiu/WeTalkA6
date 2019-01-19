@@ -29,7 +29,6 @@ public class TaskUtils {
      * 如何界定怎样的是前台，什么情况需要弹出通知栏，什么时候只要振动。
      */
     public static boolean isBackground(Context context) {
-        Log.e(TAG, "isBackground: context = " + context.getPackageName());
 //        String foregroundApp = getForegroundApp();
 //        Log.e(TAG, "isBackground: foregroundApp = " + foregroundApp);
 //        getTopApp(context);
@@ -45,7 +44,7 @@ public class TaskUtils {
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
             if (appProcess.processName.equals(context.getPackageName())) {
                 for (String s : appProcess.pkgList) {
-                    Log.e(TAG, "isBackground: pkg = " + s);
+//                    Log.e(TAG, "isBackground: pkg = " + s);
                 }
                 if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
                     LogInfo.i("hwj", "background --- " + appProcess.processName);

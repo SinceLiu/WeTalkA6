@@ -1,5 +1,6 @@
 package com.readboy.view;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -13,15 +14,16 @@ import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,6 +41,9 @@ import android.widget.TextView;
 import com.readboy.adapter.ConversationListAdapterSimple;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
+import com.readboy.bean.VideoInfo;
+import com.readboy.http.HttpClient;
+import com.readboy.utils.MediaUtils;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.wetalk.bean.Model;
 import com.readboy.provider.ConversationProvider;
@@ -59,10 +64,19 @@ import com.readboy.wetalk.GetImageActivity;
 import com.readboy.wetalk.R;
 import com.tencent.bugly.crashreport.CrashReport;
 
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * @author hwj
@@ -133,13 +147,14 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         public void onChange(boolean selfChange) {
             //获取最新的消息集合
             Log.e(TAG, "onChange() called with: selfChange = " + selfChange + "");
-            Log.d(TAG, "onChange: friend name = " + WTContactUtils.getNameById(mContext, mCurrentFriend.uuid));
+//            Log.d(TAG, "onChange: friend name = " + WTContactUtils.getNameById(mContext, mCurrentFriend.uuid));
             List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
-            if (conversations == null || mConversations == null ||
-                    conversations.size() <= mConversations.size()) {
-                Log.e(TAG, "onChange: old size = " + conversations.size() + ", size = " + mConversations.size());
+            if (conversations == null || conversations.size() <= mConversations.size()) {
+                if (conversations != null) {
+                    Log.e(TAG, "onChange: old size = " + conversations.size() + ", size = " + mConversations.size());
+                }
                 CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于现有的conversations, " +
-                        "new size = " + conversations.size() + ", old size = " + mConversations.size()));
+                        "new size = " + (conversations != null ? conversations.size() : 0) + ", old size = " + mConversations.size()));
                 return;
             }
             int length = conversations.size();
@@ -165,12 +180,12 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
         @Override
         protected List<Conversation> doInBackground(Void... params) {
+            Log.i(TAG, "doInBackground: uuid = " + mCurrentFriend.uuid);
             return ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
         }
 
         @Override
         protected void onPostExecute(List<Conversation> result) {
-            Log.e(TAG, "onPostExecute: mConversations = " + mConversations);
             List<Conversation> temp = new ArrayList<>();
             if (mConversations.size() > 0) {
                 temp.addAll(mConversations);
@@ -423,6 +438,11 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     }
 
+    public void updateMembers(Map<String, Friend> map) {
+        mMemberMap = map;
+        mAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void onClick(final View v) {
         int id = v.getId();
@@ -439,12 +459,34 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                 getEmojiId();
                 break;
             case R.id.send_image_btn:
-                getImage();
-//                getImageOrVideo();
+//                getImage();
+                getImageOrVideo();
+//                uploadVideo();
+//                uploadTest();
                 break;
             default:
                 break;
         }
+    }
+
+    private void uploadTest(String path) {
+        HttpClient.uploadImage(path, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.i(TAG, "onFailure() called with: call = " + call + ", e = " + e + "");
+            }
+
+            @Override
+            public void onResponse(Call call, @NonNull Response response) throws IOException {
+                Log.i(TAG, "onResponse: ");
+                Log.i(TAG, "onResponse: header = " + response.headers().toString());
+                ResponseBody body = response.body();
+                if (body != null) {
+                    String result = body.string();
+                    Log.i(TAG, "onResponse: body = " + result);
+                }
+            }
+        });
     }
 
     /**
@@ -460,6 +502,26 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         String action = "com.readboy.gallery3.get_media";
         Intent intent = new Intent(action);
         startActivityForResult(intent, REQUEST_CODE_IMAGE);
+    }
+
+    private void uploadVideo() {
+        String path = Environment.getExternalStorageDirectory().getPath()
+                + "/Gallery3/tmp/Video/Video_1547274715584.mp4";
+        Conversation video = getSendBaseConversation(Constant.SEND_VIDEO);
+        try {
+            video.lastTime = Integer.valueOf(MediaUtils.getVideoDuration(path));
+        } catch (Exception e) {
+            Log.i(TAG, "uploadVideo: e = " + e.toString());
+            video.lastTime = 0;
+        }
+        video.voiceLocalPath = path;
+        if (new File(path).exists()) {
+//            saveConversationToLocal(video);
+//            mNetWorkUtils.uploadFile(video, mUploadFileHandler);
+
+        } else {
+            Log.e(TAG, "uploadVideo: file not exit. " + path);
+        }
     }
 
     /**
@@ -485,8 +547,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                     emoji.emojiCode = EmojiUtils.getEmojiCode(emoji.emojiId);
                 }
                 emoji.recId = mCurrentFriend.uuid;
-                emoji.shouldResend = Constant.FALSE;
-                emoji.isSending = Constant.TRUE;
                 saveConversationToLocal(emoji);
                 sendConversationInfo(emoji);
                 break;
@@ -494,17 +554,18 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                 Uri uri = data.getData();
                 int fileType = data.getIntExtra("fileType", 1);
                 if (uri != null) {
-                    String path = getRealFilePath(mContext, uri);
                     if (fileType == FILE_TYPE_IMAGE) {
-                        mCurrentImagePath = path;
+                        mCurrentImagePath = MediaUtils.getImagePath(mContext, uri);
+                        showImageConversation();
                     } else if (fileType == FILE_TYPE_VIDEO) {
-                        handleVideoData(path);
+                        handleVideoData(MediaUtils.getVideoInfo(mContext, uri));
                     }
                 } else {
                     mCurrentImagePath = data.getStringExtra("path");
+                    showImageConversation();
                 }
                 LogInfo.i("hwj", "send image path : " + mCurrentImagePath);
-                showImageConversation();
+//                uploadTest();
                 break;
             default:
                 break;
@@ -522,18 +583,27 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         } else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             data = uri.getPath();
         } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
-            Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Images.ImageColumns.DATA}, null, null, null);
-            if (null != cursor) {
-                if (cursor.moveToFirst()) {
-                    int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-                    if (index > -1) {
-                        data = cursor.getString(index);
+            try {
+                Cursor cursor = context.getContentResolver().query(uri, new String[]{MediaStore.Images.ImageColumns.DATA}, null, null, null);
+                if (null != cursor) {
+                    if (cursor.moveToFirst()) {
+                        int index = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                        if (index > -1) {
+                            data = cursor.getString(index);
+                        }
                     }
+                    cursor.close();
                 }
-                cursor.close();
+            } catch (Exception e) {
+                Log.w(TAG, "getRealFilePath: e = " + e.toString(), e);
+                return "";
             }
         }
         return data;
+    }
+
+    private void getVideoInfo(Context context, final Uri uri) {
+
     }
 
     private void checkIsShareImage() {
@@ -555,8 +625,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private void showImageConversation() {
         Conversation img = getSendBaseConversation(Constant.SEND_IMAGE);
         img.imageLocalPath = mCurrentImagePath;
-        img.shouldResend = Constant.FALSE;
-        img.isSending = Constant.TRUE;
         if (new File(img.imageLocalPath).exists()) {
             saveConversationToLocal(img);
             mNetWorkUtils.uploadFile(img, mUploadFileHandler);
@@ -565,15 +633,38 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         }
     }
 
-    private void handleVideoData(String path) {
+    private void handleVideoData(VideoInfo videoInfo) {
+        if (videoInfo == null) {
+            showMsg("视频获取失败");
+            return;
+        }
+        String path = videoInfo.data;
+        Log.i(TAG, "handleVideoData: path = " + path);
         mCurrentVideoPath = path;
         Conversation video = getSendBaseConversation(Constant.SEND_VIDEO);
+        video.lastTime = videoInfo.duration;
         video.imageLocalPath = path;
-        video.shouldResend = Constant.FALSE;
-        video.isSending = Constant.TRUE;
+        video.voiceLocalPath = path;
         if (new File(path).exists()) {
             saveConversationToLocal(video);
             mNetWorkUtils.uploadFile(video, mUploadFileHandler);
+//            HttpClient.uploadVideo(path, new Callback() {
+//                @Override
+//                public void onFailure(Call call, IOException e) {
+//                    Log.i(TAG, "onFailure() called with: call = " + call + ", e = " + e + "");
+//                }
+//
+//                @Override
+//                public void onResponse(Call call, Response response) throws IOException {
+//                    Log.i(TAG, "onResponse: ");
+//                    Log.i(TAG, "onResponse: header = " + response.headers().toString());
+//                    ResponseBody body = response.body();
+//                    if (body != null) {
+//                        String result = body.string();
+//                        Log.i(TAG, "onResponse: body = " + result);
+//                    }
+//                }
+//            });
         } else {
             showMsg("视频不存在");
         }
@@ -607,9 +698,15 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
      * 刷新，并跳转到最新一条
      */
     private void notifyAndScrollBottom() {
+        Log.i(TAG, "notifyAndScrollBottom: thread = " + Thread.currentThread().getName());
         mAdapter.notifyDataSetChanged();
         //本应该是mAdapter.getCount-1的，但是发送图片时有bug，显示的不是最底下的图片。
-        mConversationList.setSelection(mAdapter.getCount());
+        mConversationList.post(new Runnable() {
+            @Override
+            public void run() {
+                mConversationList.setSelection(mAdapter.getCount());
+            }
+        });
     }
 
     public static final int SEND_MESSAGE_SUCCESS = 0x11;
@@ -647,7 +744,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
                 Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
         LogInfo.i("hwj", "handleSendMessageResult ---------- change conversation sending state notifyDataSetChanged");
-        mAdapter.notifyDataSetChanged();
+        notifyAndScrollBottom();
     }
 
     private void sendConversationInfo(final Conversation conversation) {
@@ -840,7 +937,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         public void handleMessage(Message msg) {
             if (msg.what == NetWorkUtils.UPLOAD_SUCCEED) {
                 //文件上传成功
-                if (msg.arg1 == Constant.SEND_VOICE) {
+                if (msg.arg1 == Constant.SEND_VOICE
+                        || msg.arg1 == Constant.SEND_VIDEO) {
                     Conversation voice = msg.getData().getParcelable(NetWorkUtils.CONVERSATION_TAG);
                     if (voice != null) {
                         ContentValues values = new ContentValues();
@@ -873,7 +971,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                             Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
                     conversation.isSending = Constant.FALSE;
                     conversation.shouldResend = Constant.TRUE;
-                    LogInfo.i("hwj", "mUploadFileHandler ---------- change conversation upload state notifyDataSetChanged");
+                    LogInfo.i("hwj", "mUploadFileHandler ---------- change conversation uploadFile state notifyDataSetChanged");
                     mAdapter.notifyDataSetChanged();
                 }
             }
@@ -894,10 +992,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         voice.lastTime = mRecordTime;
         //保存语音文件的本地路径
         voice.voiceLocalPath = mRecorder.getFilePath();
-        //重发标识
-        voice.shouldResend = Constant.FALSE;
-        //发送进度
-        voice.isSending = Constant.TRUE;
         if (new File(voice.voiceLocalPath).exists()) {
             //存入数据库
             saveConversationToLocal(voice);
@@ -922,13 +1016,14 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         conversation.sendId = MPrefs.getDeviceId(mContext);
         //收件人的Id
         conversation.recId = mCurrentFriend.uuid;
-        LogInfo.i("hwj", "recId = " + conversation.recId + "  homeGroupId = " + MPrefs.getHomeGroupId(mContext));
+        conversation.isSending = Constant.TRUE;
+        conversation.shouldResend = Constant.FALSE;
         if (conversation.recId.equals(MPrefs.getHomeGroupId(mContext))) {
             conversation.isHomeGroup = Constant.TRUE;
         }
         //消息类型
         conversation.type = type;
-        if (type == Constant.SEND_VOICE) {
+        if (type == Constant.SEND_VOICE || type == Constant.SEND_VIDEO) {
             conversation.isPlaying = Constant.FALSE;
         }
         conversation.time = String.valueOf(System.currentTimeMillis());
@@ -1101,14 +1196,18 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         ToastUtils.show(mContext, message);
     }
 
-    private String getMemberName(String uuid) {
+    private String resolveMemberName(String uuid) {
+        return resolveMemberName(uuid, "");
+    }
+
+    private String resolveMemberName(String uuid, String defaultValue) {
         if (mMemberMap != null) {
             Friend friend = mMemberMap.get(uuid);
             if (friend != null) {
                 return friend.name;
             }
         }
-        return "";
+        return defaultValue;
     }
 
     public void setMemberMap(Map<String, Friend> map) {
@@ -1117,6 +1216,16 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     private void runOnUiThread(Runnable runnable) {
         getActivity().runOnUiThread(runnable);
+    }
+
+    private void resolverConversations(List<Conversation> conversations) {
+        Log.i(TAG, "resolverConversations:  1  >> ");
+        for (Conversation conversation : conversations) {
+            if (TextUtils.isEmpty(conversation.voiceUrl) && TextUtils.isEmpty(conversation.voiceLocalPath)) {
+                conversation.shouldResend = Constant.TRUE;
+            }
+        }
+        Log.i(TAG, "resolverConversations:  2 >> ");
     }
 
     private void requestParentDisallowInterceptTouchEvent(boolean disallowIntercept) {
@@ -1160,13 +1269,13 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            Log.e(TAG, "onChange() called with: selfChange = " + selfChange + "");
+            Log.e(TAG, "contacts onChange() called with: selfChange = " + selfChange + "");
         }
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
             super.onChange(selfChange, uri);
-            Log.e(TAG, "onChange() called with: selfChange = " + selfChange + ", uri = " + uri);
+            Log.e(TAG, "contacts onChange() called with: selfChange = " + selfChange + ", uri = " + uri);
         }
     }
 }

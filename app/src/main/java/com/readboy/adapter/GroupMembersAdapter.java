@@ -49,7 +49,7 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
         MemberViewHolder viewHolder;
         if (viewType == TYPE_FOOTER) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.footer, viewGroup, false);
-            viewHolder = new FooterViewHolder(view);
+            viewHolder = new FooterViewHolder(view, isOwner);
         } else if (viewType == TYPE_ACTION_ADD) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.item_action, viewGroup, false);
             viewHolder = new ActionViewHolder(view, TYPE_ACTION_ADD);
@@ -123,17 +123,22 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
 
     class FriendViewHolder extends MemberViewHolder {
         private ImageView mIcon;
-        private ImageView mAdd;
+        private View mAdd;
         private TextView mName;
         private Context mContext;
 
         FriendViewHolder(View itemView) {
             super(itemView);
             mContext = itemView.getContext();
-            itemView.findViewById(R.id.group_members_parent).setOnClickListener(v -> {
-                handlerInnerItemClickEvent();
-            });
-            mIcon = itemView.findViewById(R.id.group_members_icon);
+            itemView.findViewById(R.id.group_members_parent)
+                    .setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                            handlerInnerItemClickEvent();
+                        }
+                    });
+            mIcon = (ImageView) itemView.findViewById(R.id.group_members_icon);
             mAdd = itemView.findViewById(R.id.group_members_add);
             mName = itemView.findViewById(R.id.group_members_name);
         }
@@ -167,24 +172,36 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
 
         ActionViewHolder(View itemView, int a) {
             super(itemView);
-            action = itemView.findViewById(R.id.group_members_action);
+            action = (ImageView) itemView.findViewById(R.id.group_members_action);
             if (a == TYPE_ACTION_ADD) {
                 action.setImageResource(R.drawable.btn_action_add_selector);
             } else {
                 action.setImageResource(R.drawable.btn_action_remove_selector);
             }
-            action.setOnClickListener(v -> handlerInnerItemClickEvent());
+            action.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    handlerInnerItemClickEvent();
+
+                }
+            });
         }
     }
 
     class FooterViewHolder extends MemberViewHolder {
 
-        FooterViewHolder(View itemView) {
+        FooterViewHolder(View itemView, boolean isOwner) {
             super(itemView);
-            View footer = itemView.findViewById(R.id.footer);
-            footer.setOnClickListener(v -> {
-                handlerInnerItemClickEvent();
+            ImageView footer = itemView.findViewById(R.id.footer);
+            footer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    handlerInnerItemClickEvent();
+                }
             });
+            if (!isOwner) {
+                footer.setImageResource(R.drawable.btn_withdraw_group_normal);
+            }
         }
 
         @Override
@@ -192,6 +209,5 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
 
         }
     }
-
 
 }

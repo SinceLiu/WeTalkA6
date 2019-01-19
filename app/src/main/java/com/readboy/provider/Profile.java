@@ -86,8 +86,6 @@ public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
     }
 
     public static Profile createProfile(Cursor cursor) {
-        Log.e(TAG, "createProfile: uuid index = " + cursor.getColumnIndex(UUID));
-        Log.e(TAG, "createProfile: imei index = " + cursor.getColumnIndex(IMEI));
         Profile profile = new Profile();
         profile.uuid = cursor.getString(cursor.getColumnIndex(UUID));
         profile.imei = cursor.getString(cursor.getColumnIndex(IMEI));

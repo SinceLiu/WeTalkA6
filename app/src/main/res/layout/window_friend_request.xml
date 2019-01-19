@@ -19,7 +19,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8px"
         android:layout_weight="1"
-        android:text="请求添加你为好友，添加后可以微聊和打电话"
+        android:text="@string/request_friend_content"
         android:textColor="@android:color/white"
         android:textSize="20px" />
 

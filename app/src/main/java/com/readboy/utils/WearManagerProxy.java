@@ -25,6 +25,14 @@ public class WearManagerProxy {
         return (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
     }
 
+    public static String getMyUuid(Context context) {
+        PersonalInfo info = getManager(context).getPersonalInfo();
+        if (info != null) {
+            return info.getUuid();
+        }
+        return "";
+    }
+
     /**
      * {
      * "q": "mgroup",

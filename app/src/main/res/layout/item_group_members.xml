@@ -8,8 +8,8 @@
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
 
         <ImageView
             android:id="@+id/group_members_icon"
@@ -34,7 +34,6 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="6px"
         android:maxLines="1"
-        android:text="通用"
         android:textColor="#cdcdcd"
         android:textSize="16px" />
 

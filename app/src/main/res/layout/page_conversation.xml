@@ -12,6 +12,7 @@
         android:divider="@null"
         android:listSelector="@android:color/transparent"
         android:overScrollMode="never"
+        android:stackFromBottom="true"
         android:scrollbars="none" />
 
     <!--TopBar-->

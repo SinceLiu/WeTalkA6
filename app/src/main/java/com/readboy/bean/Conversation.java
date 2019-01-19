@@ -4,8 +4,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by 1-PC on 2016/9/21.
+ *
+ * @author 1-PC
+ * @date 2016/9/21
  * 消息
+ * 音频和视频共享多个字段。
  */
 public class Conversation implements Parcelable{
 
@@ -119,4 +122,20 @@ public class Conversation implements Parcelable{
             return new Conversation[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return "Conversation{" +
+                "type=" + type +
+                ", sendId='" + sendId + '\'' +
+                ", senderName='" + senderName + '\'' +
+                ", imageLocalPath='" + imageLocalPath + '\'' +
+                ", thumbImageUrl='" + thumbImageUrl + '\'' +
+                ", textContent='" + textContent + '\'' +
+                ", voiceLocalPath='" + voiceLocalPath + '\'' +
+                ", voiceUrl='" + voiceUrl + '\'' +
+                ", lastTime=" + lastTime +
+                ", time='" + time + '\'' +
+                '}';
+    }
 }

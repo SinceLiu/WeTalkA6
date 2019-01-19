@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
- *
  * @author hwwjian
  * @date 2016/12/1
  */
@@ -21,8 +20,11 @@ public class Conversations {
         private Conversation() {
         }
 
-        //访问Uri
-        public static final Uri CONVERSATION_URI = Uri.parse("content://" + AUTHORITY + "/conversation");
+        public static final String TABLE_NAME = "conversation";
+        /**
+         * 访问Uri
+         */
+        public static final Uri CONVERSATION_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
         //默认排序常量,按id升序
         static final String DEFAULT_SORT_ORDER = "_id ASC";
         //字段

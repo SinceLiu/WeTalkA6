@@ -21,6 +21,7 @@ import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
 import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.provider.WeTalkContract.ProfileColumns;
+import com.readboy.provider.WeTalkContract.GroupColumns;
 
 /**
  * @author hwwjian
@@ -30,8 +31,10 @@ import com.readboy.provider.WeTalkContract.ProfileColumns;
 public class ConversationProvider extends ContentProvider {
     private static final String TAG = "hwj_ContentProvider";
 
-    private static final int CONVERSATION = 0;
-    private static final int PROFILE = 1;
+    private static final int CODE_CONVERSATION = 1001;
+    private static final int CODE_PROFILE = 1002;
+    private static final int CODE_GROUP = 1003;
+    private static final int CODE_GROUP_ID = 1004;
 
     public static final String IS_RECEIVE_MESSAGE = "receive";
 
@@ -39,8 +42,10 @@ public class ConversationProvider extends ContentProvider {
 
     static {
         //为UriMatcher注册Uri
-        sUriMatcher.addURI(Conversations.AUTHORITY, "conversation", CONVERSATION);
-        sUriMatcher.addURI(WeTalkContract.AUTHORITY, "profiles", PROFILE);
+        sUriMatcher.addURI(Conversations.AUTHORITY, "conversation", CODE_CONVERSATION);
+        sUriMatcher.addURI(WeTalkContract.AUTHORITY, "profiles", CODE_PROFILE);
+        sUriMatcher.addURI(WeTalkContract.AUTHORITY, GroupColumns.TABLE_NAME, CODE_GROUP);
+        sUriMatcher.addURI(WeTalkContract.AUTHORITY, GroupColumns.TABLE_NAME + "/#", CODE_GROUP_ID);
     }
 
     private DatabaseHelper mHelper;
@@ -65,24 +70,10 @@ public class ConversationProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String where, String[] whereArgs, String sortOrder) {
         Cursor cursor = null;
-        switch (sUriMatcher.match(uri)) {
-            case CONVERSATION:
-                if (sortOrder != null) {
-                    cursor = mHelper.getWritableDatabase()
-                            .query(DatabaseHelper.CONVERSATION_TABLE_NAME,
-                                    projection, where, whereArgs, null, null, sortOrder);
-                } else {
-                    cursor = mHelper.getWritableDatabase()
-                            .query(DatabaseHelper.CONVERSATION_TABLE_NAME,
-                                    projection, where, whereArgs, null, null, Conversations.Conversation.DEFAULT_SORT_ORDER);
-                }
-                break;
-            case PROFILE:
-                cursor = mHelper.getWritableDatabase().query(ProfileColumns.PROFILE_TABLE_NAME,
-                        projection, where, whereArgs, null, null, sortOrder);
-                break;
-            default:
-                Log.e(TAG, "query: default = " + uri);
+        Table table = Table.valueOf(sUriMatcher.match(uri));
+        if (table != null) {
+            cursor = mHelper.getWritableDatabase()
+                    .query(table.tableName, projection, where, whereArgs, null, null, sortOrder);
         }
         return cursor;
     }
@@ -97,7 +88,7 @@ public class ConversationProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
         switch (sUriMatcher.match(uri)) {
-            case CONVERSATION:
+            case CODE_CONVERSATION:
                 synchronized (this) {
                     boolean isReceive = contentValues.getAsBoolean(IS_RECEIVE_MESSAGE);
                     contentValues.remove(IS_RECEIVE_MESSAGE);
@@ -107,6 +98,7 @@ public class ConversationProvider extends ContentProvider {
                             new String[]{contentValues.getAsString(Conversations.Conversation.CONVERSATION_ID),
                                     contentValues.getAsString(Conversations.Conversation.TIME)}, null, null, null)) {
                         if (cursor != null && cursor.moveToFirst() && cursor.getCount() != 0) {
+                            Log.i(TAG, "insert: insert fail. cursor = " + cursor);
                             return null;
                         }
 
@@ -114,19 +106,21 @@ public class ConversationProvider extends ContentProvider {
                         long rawId = mHelper.getWritableDatabase().insert(
                                 DatabaseHelper.CONVERSATION_TABLE_NAME, null, contentValues);
                         //插入成功返回Uri
-                        if (rawId > CONVERSATION) {
+                        if (rawId > 0) {
                             Uri conUri = ContentUris.withAppendedId(
                                     Conversations.Conversation.CONVERSATION_URI, rawId);
                             if (isReceive && getContext() != null) {
                                 getContext().getContentResolver().notifyChange(conUri, null);
                             }
                             return conUri;
+                        } else {
+                            Log.i(TAG, "insert: insert fail, rawId = " + rawId);
                         }
                     }
                 }
                 break;
-            case PROFILE:
-                long rawId = mHelper.getWritableDatabase().insert(ProfileColumns.PROFILE_TABLE_NAME,
+            case CODE_PROFILE:
+                long rawId = mHelper.getWritableDatabase().insert(ProfileColumns.TABLE_NAME,
                         null, contentValues);
                 if (rawId > 0) {
                     Uri result = ContentUris.withAppendedId(ProfileColumns.CONTENT_URI, rawId);
@@ -134,6 +128,25 @@ public class ConversationProvider extends ContentProvider {
                     return result;
                 }
                 break;
+            case CODE_GROUP:
+                long count = mHelper.getWritableDatabase().replace(GroupColumns.TABLE_NAME, null, contentValues);
+                if (count <= 0) {
+                    Log.w(TAG, "insert: group table, replace fail.");
+                    return null;
+                }
+                String uuid = contentValues.getAsString(GroupColumns.UUID);
+                if (TextUtils.isEmpty(uuid)) {
+                    return null;
+                }
+                try (Cursor cursor = mHelper.getWritableDatabase().query(GroupColumns.TABLE_NAME,
+                        null, GroupColumns.UUID + "=?", new String[]{uuid},
+                        null, null, null)) {
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int _id = cursor.getInt(cursor.getColumnIndex(GroupColumns._ID));
+                        return ContentUris.withAppendedId(GroupColumns.CONTENT_URI, _id);
+                    }
+                }
+                return insertCommon(contentValues, Table.GROUP);
             default:
                 Log.e(TAG, "insert: default : " + uri);
         }
@@ -143,14 +156,20 @@ public class ConversationProvider extends ContentProvider {
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] args) {
         int count = -1;
-        switch (sUriMatcher.match(uri)) {
-            case CONVERSATION:
-                count = mHelper.getWritableDatabase().delete(
-                        DatabaseHelper.CONVERSATION_TABLE_NAME, selection, args);
+        int code = sUriMatcher.match(uri);
+        switch (code) {
+            case CODE_CONVERSATION:
+            case CODE_PROFILE:
+            case CODE_GROUP:
+                Table table = Table.valueOf(code);
+                if (table != null) {
+                    count = deleteCommon(table, selection, args);
+                }
                 break;
-            case PROFILE:
-                count = mHelper.getWritableDatabase().delete(
-                        WeTalkContract.ProfileColumns.PROFILE_TABLE_NAME, selection, args);
+            case CODE_GROUP_ID:
+                String id = uri.getLastPathSegment();
+                String where = "id=?";
+                count = mHelper.getWritableDatabase().delete(GroupColumns.TABLE_NAME, where, new String[]{id});
                 break;
         }
         return count;
@@ -159,18 +178,9 @@ public class ConversationProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues contentValues, String selection, String[] args) {
         int count = -1;
-        switch (sUriMatcher.match(uri)) {
-            case CONVERSATION:
-                count = mHelper.getWritableDatabase().update(
-                        DatabaseHelper.CONVERSATION_TABLE_NAME, contentValues, selection, args);
-                break;
-            case PROFILE:
-                count = mHelper.getWritableDatabase().update(
-                        WeTalkContract.ProfileColumns.PROFILE_TABLE_NAME, contentValues, selection, args);
-                break;
-            default:
-                Log.e(TAG, "update: default = " + uri);
-                break;
+        Table table = Table.valueOf(sUriMatcher.match(uri));
+        if (table != null) {
+            count = mHelper.getWritableDatabase().update(table.tableName, contentValues, selection, args);
         }
         return count;
     }
@@ -303,6 +313,74 @@ public class ConversationProvider extends ContentProvider {
         if (getContext() != null) {
             ContentResolver resolver = getContext().getContentResolver();
             resolver.notifyChange(uri, null);
+        }
+    }
+
+    private Uri insertCommon(ContentValues values, Table table) {
+        long rawId = mHelper.getWritableDatabase().insert(table.tableName,
+                null, values);
+        if (rawId > 0) {
+            Uri result = ContentUris.withAppendedId(table.uri, rawId);
+            notifyChange(result);
+            return result;
+        }
+        return null;
+    }
+
+    private Long replaceCommon(ContentValues values, Table table) {
+        return mHelper.getWritableDatabase().replace(table.tableName, null, values);
+    }
+
+    private int deleteCommon(Table table, String selection, String[] args) {
+        return deleteCommon(table.tableName, selection, args);
+    }
+
+    private int deleteCommon(String tableName, String selection, String[] args) {
+        return mHelper.getWritableDatabase().delete(tableName, selection, args);
+    }
+
+    private int updateCommon(Table table, ContentValues values, String selection, String[] args) {
+        return mHelper.getWritableDatabase().update(
+                DatabaseHelper.CONVERSATION_TABLE_NAME, values, selection, args);
+    }
+
+    private long parseId(Uri uri) {
+        String last = uri.getLastPathSegment();
+        try {
+            return last == null ? -1 : Long.parseLong(last);
+        } catch (Exception exception) {
+            return -1;
+        }
+    }
+
+    private enum Table {
+        /**
+         * 枚举，方便统一处理，便于维护
+         */
+        CONVERSATION(Conversations.Conversation.TABLE_NAME, Conversations.Conversation.CONVERSATION_URI, CODE_CONVERSATION),
+        PROFILE(ProfileColumns.TABLE_NAME, ProfileColumns.CONTENT_URI, CODE_GROUP),
+        GROUP(GroupColumns.TABLE_NAME, GroupColumns.CONTENT_URI, CODE_GROUP);
+
+        String tableName;
+        Uri uri;
+        /**
+         * UriMather code.
+         */
+        int code;
+
+        Table(String tableName, Uri uri, int code) {
+            this.tableName = tableName;
+            this.uri = uri;
+            this.code = code;
+        }
+
+        static Table valueOf(int code) {
+            for (Table table : values()) {
+                if (table.code == code) {
+                    return table;
+                }
+            }
+            return null;
         }
     }
 }

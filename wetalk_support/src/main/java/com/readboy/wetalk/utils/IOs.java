@@ -290,12 +290,13 @@ public class IOs {
             outputStream.write(content.getBytes());
             outputStream.flush();
             outputStream.close();
-            Log.i("hwj", "save time tag succeed");
             return true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            Log.i(TAG, "saveTimeTag: e = " + e.toString());
         } catch (IOException e) {
             e.printStackTrace();
+            Log.i(TAG, "saveTimeTag: e = " + e.toString());
         }
         return false;
     }

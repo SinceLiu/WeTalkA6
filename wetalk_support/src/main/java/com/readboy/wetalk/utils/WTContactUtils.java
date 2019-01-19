@@ -202,8 +202,13 @@ public class WTContactUtils {
             values.put(Data.MIMETYPE, StructuredPostal.CONTENT_ITEM_TYPE);
             values.put(StructuredPostal.TYPE, StructuredPostal.TYPE_WORK);
             values.put("data6", pre);
-            return context.getContentResolver().update(Data.CONTENT_URI, values, "data8 = ?",
+            int result = context.getContentResolver().update(Data.CONTENT_URI, values, "data8 = ?",
                     new String[]{uuid});
+            if (result <= 0) {
+                Log.i(TAG, "updateUnreadCount: update fail. result = " + result);
+            }
+        } else {
+            Log.w(TAG, "updateUnreadCount: query unread count false.");
         }
         return 0;
     }
@@ -240,6 +245,8 @@ public class WTContactUtils {
                 count += num;
             } while (c.moveToNext());
             c.close();
+        } else {
+            Log.w(TAG, "getAllContactsUnreadCount: query fail, cursor = " + c);
         }
         return count;
     }
@@ -270,16 +277,14 @@ public class WTContactUtils {
 
     private static boolean deleteContactsByRawId(Context context, String rawId) {
         Log.i(TAG, "deleteContactsByRawId: rawId = " + rawId);
-        String selection = Contacts.NAME_RAW_CONTACT_ID + "=?";
         try {
             Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, Long.getLong(rawId));
-            int count = context.getContentResolver().delete(uri, null, null);
-            Log.i(TAG, "deleteContactsByRawId: RawContacts count = " + count);
+            int raw = context.getContentResolver().delete(uri, null, null);
+            Log.i(TAG, "deleteContactsByRawId: RawContacts raw = " + raw);
+            return raw > 0;
         } catch (Exception e) {
             Log.w(TAG, "deleteContactsByRawId: ", e);
         }
-        int i = context.getContentResolver().delete(Contacts.CONTENT_URI, selection, new String[]{rawId});
-        Log.i(TAG, "deleteContactsByRawId: Contacts i = " + i);
-        return i > 0;
+        return false;
     }
 }

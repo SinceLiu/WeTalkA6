@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author hwj
@@ -67,9 +68,7 @@ public class WetalkFrameLayout extends FrameLayout {
 
         @Override
         public void run() {
-            LogInfo.d(TAG, "updateFriendThread run().");
             if (!isUpdating) {
-                LogInfo.d(TAG, "contact notify");
                 if (mGetFriendTask != null) {
                     mGetFriendTask.cancel(true);
                 }
@@ -104,7 +103,6 @@ public class WetalkFrameLayout extends FrameLayout {
     public WetalkFrameLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.mContext = context;
-        Log.e(TAG, "WetalkFrameLayout: ");
         LayoutInflater.from(context).inflate(R.layout.pager_friend, this);
         initView();
         initData();
@@ -334,14 +332,12 @@ public class WetalkFrameLayout extends FrameLayout {
             mWrapperAdapter = new HeaderAndFooterWrapper(mAdapter);
         }
         mWrapperAdapter.addHeaderView(view);
-//        mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//            @Override
-//            public int getSpanSize(int i) {
-//                return i == 0 ? 2 : 1;
-//            }
-//        });
         mFriendRecyclerList.setAdapter(mWrapperAdapter);
         mWrapperAdapter.notifyDataSetChanged();
+    }
+
+    public RecyclerView getRecyclerView() {
+        return mFriendRecyclerList;
     }
 
     public void setActivity(Activity activity) {

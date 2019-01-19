@@ -2,6 +2,7 @@ package com.readboy.wetalk;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -13,13 +14,16 @@ import android.view.ViewGroup;
 import com.readboy.bean.Constant;
 import com.readboy.bean.GroupInfo;
 import com.readboy.bean.GroupInfoManager;
+import com.readboy.utils.FriendNameUtil;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.view.ConversationView;
 import com.readboy.view.GroupMembersView;
 import com.readboy.widget.ImageIndication;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author oubin
@@ -27,11 +31,16 @@ import java.util.List;
  */
 public class ConversationActivity extends BaseActivity implements GroupInfoManager.CallBack {
 
+    private static final int DELAY_LOAD_TIME = 1000;
+
     private ViewPager mViewPager;
     private List<View> mViewList = new ArrayList<>();
     private boolean isGroup = false;
+    private GroupInfo mGroup;
     private GroupMembersView mMembersView;
     private ConversationView mConversationView;
+    private Handler mHandler = new Handler();
+    private Runnable mGroupRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +50,41 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
         Intent intent = getIntent();
         Friend friend = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
         Log.i(TAG, "onCreate: friend = " + friend.toString());
-        if (friend.members != null && friend.members.size() > 0 || friend.relation == 200) {
+        final String uuid = friend.uuid;
+        if (friend.isFriendGroup()) {
             isGroup = true;
+            Log.i(TAG, "onCreate:  1  >> ");
+            GroupInfo info = GroupInfoManager.getDataFormDatabase(this, uuid);
+            Log.i(TAG, "onCreate:  2  >> ");
+            if (info != null && info.getFriends() != null) {
+                updateMembersMap(info);
+            }
+            Log.i(TAG, "onCreate:  3  >> ");
         }
         Log.i(TAG, "onCreate: isFriendGroup = " + isGroup);
 
         initView();
         initData();
+        if (isGroup) {
+            mGroupRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    GroupInfoManager.getGroupInfoFromNet(ConversationActivity.this,
+                            uuid, ConversationActivity.this);
+                }
+            };
+            mHandler.post(mGroupRunnable);
+        }
+    }
+
+    private void updateMembersMap(GroupInfo info) {
+        Log.i(TAG, "updateMembersMap: ");
+        mGroup = info;
+        Map<String, Friend> map = new HashMap<>(info.getMembers().size());
+        for (Friend f : info.getFriends()) {
+            map.put(f.uuid, f);
+        }
+        FriendNameUtil.mMembersMap = map;
     }
 
     @Override
@@ -61,7 +98,7 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
 
     private void assignView() {
         LayoutInflater inflater = LayoutInflater.from(this);
-        mConversationView = (ConversationView) inflater.inflate(R.layout.activity_square_conversation, null);
+        mConversationView = (ConversationView) inflater.inflate(R.layout.page_conversation, null);
         mConversationView.setActivity(this);
         mViewList.add(mConversationView);
         mViewPager = findViewById(R.id.conversation_view_pager);
@@ -69,6 +106,9 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
         if (isGroup) {
             mMembersView = (GroupMembersView) inflater.inflate(R.layout.page_group_members, null);
             mMembersView.setActivity(this);
+            if (mGroup != null) {
+                mMembersView.updateGroupInfo(mGroup);
+            }
             mViewList.add(mMembersView);
             indication.setViewPager(mViewPager);
         } else {
@@ -111,6 +151,10 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
     protected void onDestroy() {
         super.onDestroy();
         mConversationView.onDestroy();
+        FriendNameUtil.clear();
+        if (mGroupRunnable != null) {
+            mHandler.removeCallbacks(mGroupRunnable);
+        }
     }
 
     @Override
@@ -132,11 +176,17 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
 
     @Override
     public void onSuccess(GroupInfo info) {
-        Log.i(TAG, "onSuccess: ");
+        Log.i(TAG, "onSuccess: " + Thread.currentThread().getName());
+        if (info != null) {
+            updateMembersMap(info);
+            mMembersView.updateGroupInfo(info);
+        }
     }
 
     @Override
     public void onFailure(Exception exception) {
-        Log.i(TAG, "onFailure: ");
+        Log.i(TAG, "onFailure: " + exception.toString());
     }
+
+
 }

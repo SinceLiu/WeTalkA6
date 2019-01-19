@@ -1,7 +1,9 @@
 package com.readboy.recyclerview.wrapper;
 
+import android.provider.ContactsContract;
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;

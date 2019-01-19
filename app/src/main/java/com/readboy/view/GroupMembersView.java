@@ -3,11 +3,13 @@ package com.readboy.view;
 import android.app.Activity;
 import android.app.readboy.IReadboyWearListener;
 import android.app.readboy.PersonalInfo;
+import android.app.readboy.ReadboyWearManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -16,11 +18,11 @@ import android.widget.TextView;
 
 import com.readboy.adapter.BaseAdapter;
 import com.readboy.adapter.BaseViewHolder;
-import com.readboy.bean.FriendGroup;
 import com.readboy.bean.GroupInfo;
 import com.readboy.bean.GroupInfoManager;
 import com.readboy.adapter.GroupMembersAdapter;
 import com.readboy.bean.Constant;
+import com.readboy.utils.JsonMapper;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.dialog.AddFriendDialog;
 import com.readboy.dialog.CommonDialog;
@@ -52,8 +54,8 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     private View mProgressBar;
     private TextView mMessageTv;
     private GroupMembersAdapter mAdapter;
-    private FriendGroup mGroup = new FriendGroup();
-    private Friend mCurrentFriend;
+    private GroupInfo mGroupInfo;
+    private Friend mGroup;
     private final List<Friend> mMemberList = new ArrayList<>();
     private Context mContext;
     private Activity mActivity;
@@ -75,8 +77,8 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
     private void initView() {
         mProgressBar = findViewById(R.id.progress_bar);
-        mMessageTv = findViewById(R.id.message);
-        mGroupRv = findViewById(R.id.group_recycler_view);
+        mMessageTv = (TextView) findViewById(R.id.message);
+        mGroupRv = (RecyclerView) findViewById(R.id.group_recycler_view);
         GridLayoutManager layoutManager = new GridLayoutManager(mContext, 2);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
@@ -91,18 +93,19 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     }
 
     public void setData(Intent intent) {
-        Friend friend = mGroup.friend = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
+        Friend friend = mGroup = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
+        mAdapter.setOwnerState(isOwner());
         List<Friend> friends = friend.members;
         if (friends == null || friends.size() <= 0) {
             Log.w(TAG, "setData: members is null or size is o.");
-            GroupInfoManager.getGroupInfo(mContext, friend.uuid, this);
+//            GroupInfoManager.getGroupInfo(mContext, friend.uuid, this);
             return;
         }
         for (Friend f : friends) {
             if (WTContactUtils.isContacts(mContext, f.uuid)) {
                 f.addVisibility = View.GONE;
             } else {
-                f.addVisibility = View.GONE;
+                f.addVisibility = View.VISIBLE;
             }
         }
         setData(friends);
@@ -112,9 +115,9 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     public void setData(List<Friend> data) {
         mMemberList.clear();
         if (data != null) {
+            Log.i(TAG, "setData: data size = " + data.size());
             mMemberList.addAll(data);
         }
-        mAdapter.setOwnerState(isOwner());
         mAdapter.setData(data);
         mAdapter.notifyDataSetChanged();
     }
@@ -216,7 +219,12 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         }
         CommonDialog.Builder builder = new CommonDialog.Builder();
         builder.content(content)
-                .leftButtonListener(v -> leaveGroup());
+                .leftButtonListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        leaveGroup();
+                    }
+                });
         CommonDialog dialog = builder.build(mContext);
         dialog.show();
 
@@ -225,7 +233,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     private void leaveGroup() {
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("id", mGroup.getUuid());
+            jsonObject.put("id", mGroup.uuid);
             String data = jsonObject.toString();
             WearManagerProxy.groupAction(mContext, WearManagerProxy.Command.LEAVE_GROUP, data, new IReadboyWearListener.Stub() {
                 @Override
@@ -233,7 +241,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                     Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                     if (code == 0) {
                         //这过程中可能已经收到notify_contact，正在更新联系人了。
-//                        WTContactUtils.deleteContactsByUuid(mContext, mGroup.getUuid());
+//                        WTContactUtils.deleteContactsByUuid(mContext, mGroupInfo.getUuid());
                     }
                     mHandler.post(new Runnable() {
                         @Override
@@ -257,7 +265,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                     Log.i(TAG, "pushFail() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", errorMsg = " + errorMsg + "");
                     mHandler.post(new Runnable() {
                         @Override
-                        public void run()  {
+                        public void run() {
                             ToastUtils.show(mContext, "失败：" + errorMsg);
                         }
                     });
@@ -271,11 +279,11 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
     private boolean isOwner() {
         PersonalInfo info = WearManagerProxy.getManager(mContext).getPersonalInfo();
-        if (info == null || mGroup.owner == null) {
-            Log.w(TAG, "isOwner: info = " + info + ", owner = " + mGroup.owner);
+        if (info == null || mGroupInfo == null || TextUtils.isEmpty(mGroupInfo.getOwner())) {
+            Log.w(TAG, "isOwner: info = " + info + ", owner = " + mGroupInfo);
             return false;
         }
-        return mGroup.owner.equals(info.getUuid());
+        return mGroupInfo.getOwner().equals(info.getUuid());
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -287,20 +295,31 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         try {
             JSONObject object = new JSONObject(response);
             String id = object.optString("id");
-            if (id != null && id.equals(mGroup.getUuid())) {
-                if (requestCode == REQUEST_CODE_REMOVE) {
-                    handleRemoveResult(data);
-                } else {
-                    handleAddResult(data);
-                }
+            if (id != null && id.equals(mGroup.uuid)) {
+                handleActivityResult(data);
+//                if (requestCode == REQUEST_CODE_REMOVE) {
+//                    handleRemoveResult(data);
+//                } else {
+//                    handleAddResult(data);
+//                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void handleAddResult(Intent intent) {
+    private void handleActivityResult(Intent intent) {
+        String data = intent.getStringExtra(FriendSelectorActivity.EXTRA_DATA);
+        if (!TextUtils.isEmpty(data)) {
+            GroupInfo info = JsonMapper.fromJson(data, GroupInfo.class);
+            if (info != null && info.getFriends() != null) {
+                updateGroupInfo(info);
+            }
+        }
+    }
 
+    private void handleAddResult(Intent intent) {
+        String data = intent.getStringExtra(FriendSelectorActivity.EXTRA_DATA);
     }
 
     private void handleRemoveResult(Intent intent) {
@@ -310,26 +329,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     @Override
     public void onSuccess(GroupInfo info) {
         Log.i(TAG, "onSuccess: thread = " + Thread.currentThread().getName());
-        mGroup.owner = info.getOwner();
-        mGroup.friend.members = info.getFriends();
-        if (mGroup.friend.members != null) {
-            for (Friend member : mGroup.friend.members) {
-                if (WTContactUtils.isContacts(mContext, member.uuid)) {
-                    member.addVisibility = View.GONE;
-                } else {
-                    member.addVisibility = View.GONE;
-                }
-            }
-        }
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mMessageTv.setVisibility(GONE);
-                mProgressBar.setVisibility(GONE);
-                mGroupRv.setVisibility(VISIBLE);
-                setData(mGroup.friend.members);
-            }
-        });
+        updateGroupInfo(info);
     }
 
     @Override
@@ -352,6 +352,36 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
             }
         }
         mAdapter.notifyDataSetChanged();
+    }
+
+    public void updateGroupInfo(GroupInfo info) {
+        Log.i(TAG, "updateGroupInfo: ");
+        String myUuid = WearManagerProxy.getMyUuid(mContext);
+        this.mGroupInfo = info;
+        if (mGroupInfo.getFriends() != null) {
+            for (Friend member : mGroupInfo.getFriends()) {
+                member.updateAddVisibility(mContext, myUuid);
+            }
+        }
+        updateView();
+    }
+
+    private void updateView() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                setData(mGroupInfo.getFriends());
+                mProgressBar.setVisibility(GONE);
+                if (mMemberList.size() > 0) {
+                    mMessageTv.setVisibility(GONE);
+                    mGroupRv.setVisibility(VISIBLE);
+                } else {
+                    Log.i(TAG, "run: size = 0.");
+                    mMessageTv.setVisibility(VISIBLE);
+                    mGroupRv.setVisibility(GONE);
+                }
+            }
+        });
     }
 
 }

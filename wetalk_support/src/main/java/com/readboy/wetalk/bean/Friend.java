@@ -1,10 +1,13 @@
 package com.readboy.wetalk.bean;
 
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
 import android.view.View;
+
+import com.readboy.wetalk.utils.WTContactUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -87,6 +90,14 @@ public class Friend implements Parcelable {
 
     public boolean isSupportGroup() {
         return uuid != null && uuid.startsWith("D");
+    }
+
+    /**
+     * 耗时操作，不要频繁更新
+     */
+    public void updateAddVisibility(Context context, String myUuid) {
+        boolean can = !uuid.equals(myUuid) && !WTContactUtils.isContacts(context, uuid);
+        addVisibility = can ? View.VISIBLE : View.GONE;
     }
 
     @Override

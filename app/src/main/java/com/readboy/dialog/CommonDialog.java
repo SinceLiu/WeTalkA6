@@ -58,7 +58,12 @@ public class CommonDialog extends Dialog {
         if (mRightButtonListener != null) {
             mRightButton.setOnClickListener(mRightButtonListener);
         } else {
-            mRightButton.setOnClickListener(v -> dismiss());
+            mRightButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
         }
     }
 

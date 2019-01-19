@@ -53,4 +53,6 @@ dependencies {
     implementation project(':baseadapter-recyclerview')
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation project(':wetalk_support')
+    implementation files('libs/okio-1.14.0.jar')
+    implementation files('libs/okhttp-3.11.0.jar')
 }

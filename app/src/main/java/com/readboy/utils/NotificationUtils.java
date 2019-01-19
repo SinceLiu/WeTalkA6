@@ -64,6 +64,7 @@ public class NotificationUtils {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //在联系人信息界面或者
         if (isSilent) {
+            Log.i(TAG, "notification: notify silent notification.");
             manager.notify(NOTIFY_ID, getSilentNotification(context));
         } else if (!TaskUtils.isBackground(context)) {
             Log.e(TAG, "notification: normal. only vibrate.");
@@ -182,6 +183,7 @@ public class NotificationUtils {
     }
 
     public static void sendContactNotification(Context context, Profile profile) {
+        Log.i(TAG, "sendContactNotification: uuid = " + profile.uuid);
         NotificationCompat.Builder builder = getBaseBuilder(context);
         builder.setSmallIcon(R.drawable.icon_findfriend);
         builder.setContentTitle("新好友");
@@ -191,24 +193,33 @@ public class NotificationUtils {
         PendingIntent pendingIntent = PendingIntent.getActivity(context,
                 profile.uuid.hashCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
+        Notification notification = builder.build();
+        notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(profile.uuid.hashCode(), builder.build());
+        manager.notify(profile.uuid.hashCode(), notification);
         Log.i(TAG, "sendContactNotification: profile = " + profile.getName());
     }
 
-    public static NotificationCompat.Builder getBaseBuilder(Context context) {
+    private static NotificationCompat.Builder getBaseBuilder(Context context) {
+        return getBaseBuilder(context, Chancel.FLOAT);
+    }
+
+    private static NotificationCompat.Builder getBaseBuilder(Context context, Chancel chancel) {
         Bundle bundle = new Bundle();
         bundle.putString("extra_type", "readboy");
         NotificationCompat.Builder builder;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder = new NotificationCompat.Builder(context, Chancel.NORMAL.id);
-            createChannel(context, Chancel.NORMAL);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && chancel != null) {
+            builder = new NotificationCompat.Builder(context, chancel.id);
+            createChannel(context, chancel);
         } else {
             builder = new NotificationCompat.Builder(context);
         }
         builder.setExtras(bundle);
+        builder.setAutoCancel(false);
+        builder.setContentTitle("微聊");
+        builder.setSmallIcon(R.drawable.wetalk_icon);
         builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
-        builder.setPriority(Notification.PRIORITY_HIGH);
+        builder.setPriority(Notification.PRIORITY_MAX);
         return builder;
     }
 
@@ -218,19 +229,14 @@ public class NotificationUtils {
      */
     public static void sendNotification(Context context) {
         //在聊天界面的用户不是发送用户,就更新未读信息数
-        String classState = Settings.Global.getString(context.getContentResolver(), "class_disabled");
-        LogInfo.i("hwj", "classState = " + classState);
-        if (!TextUtils.isEmpty(classState)) {
-            //未开启上课禁用, 不用处理，NotificationManager统一处理。
+        //未开启上课禁用, 不用处理，NotificationManager统一处理。
 //            if (!isTimeEnable(context, classState)) {
-            Log.e(TAG, "sendNotification: ");
-            notification(context);
+        Log.e(TAG, "sendNotification: ");
+        notification(context);
 //            } else {
 //                notification(false, context);
 //            }
-        } else {
-            notification(context);
-        }
+
     }
 
     /**
@@ -312,6 +318,11 @@ public class NotificationUtils {
         } catch (SQLiteException e) {
             CrashReport.postCatchedException(e);
         }
+    }
+
+    public static void cancelNotification(Context context, int id) {
+        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(id);
     }
 
     /**

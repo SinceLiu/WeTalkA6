@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.readboy.wetalk"
     coreApp="true"
+    package="com.readboy.wetalk"
     android:sharedUserId="com.android.systemui"
-    android:versionCode="181221001"
-    android:versionName="1.2.0">
+    android:versionCode="190119001"
+    android:versionName="1.2.1">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
 
@@ -102,14 +102,14 @@
             android:screenOrientation="portrait" />
 
         <service android:name=".UpdateContactPhotoService" />
+        <service android:name="com.readboy.receiver.MessageService" />
 
         <activity android:name="com.readboy.activity.GifActivity" />
         <activity
             android:name="com.readboy.activity.RequestFriendActivity"
             android:screenOrientation="portrait" />
-
         <activity android:name="com.readboy.activity.FriendSelectorActivity" />
-
+        <activity android:name="com.readboy.activity.VideoActivity" />
     </application>
 
 </manifest>

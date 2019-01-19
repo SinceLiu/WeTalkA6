@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +45,9 @@ import android.app.readboy.IReadboyWearListener;
 import android.util.Log;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.message.BasicHeader;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 /**
  * @author 1-PC
@@ -61,8 +65,10 @@ public class NetWorkUtils {
      * 正式服务器
      */
     private static final String HOST = "http://wear.readboy.com";
+    private static final String UPLOAD_AVATAR_URL = HOST + "/put/avatar";
     private static final String UPLOAD_IMAGE_URL = HOST + "/put/image";
     private static final String UPLOAD_AUDIO_URL = HOST + "/put/audio";
+    private static final String UPLOAD_VIDEO_URL = HOST + "/put/video";
 
     /**
      * 服务器响应Key
@@ -96,6 +102,7 @@ public class NetWorkUtils {
     public static final String SEND_MSG_ID = "sendmsgId";
     private static final String IMAGE_TYPE = "image/jpeg";
     private static final String AUDIO_TYPE = "audio/amr";
+    private static final String VIDEO_TYPE = "video/mp4";
     public static final int UPLOAD_SUCCEED = 0x90;
     public static final int UPLOAD_FAIL = 0x71;
 
@@ -180,7 +187,7 @@ public class NetWorkUtils {
             getClient().post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                    LogInfo.i("hwj", "upload file: onSuccess " + response);
+                    LogInfo.i("hwj", "uploadFile file: onSuccess " + response);
                     int status = response.optInt(STATUS);
                     if (status == 200 && handler != null) {
                         String url = response.optString(SRC_NAME);
@@ -219,7 +226,7 @@ public class NetWorkUtils {
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                    LogInfo.i("hwj", "upload file: onFailure" + errorResponse);
+                    LogInfo.i("hwj", "uploadFile file: onFailure" + errorResponse);
                     if (handler != null) {
                         handler.obtainMessage(UPLOAD_FAIL).sendToTarget();
                         if (file.exists() && file.getName().contains("readboy_security")) {
@@ -230,7 +237,7 @@ public class NetWorkUtils {
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                    LogInfo.i("hwj", "upload file onFailure :" + responseString);
+                    LogInfo.i("hwj", "uploadFile file onFailure :" + responseString);
                     if (handler != null) {
                         handler.obtainMessage(UPLOAD_FAIL).sendToTarget();
                         if (file.exists() && file.getName().contains("readboy_security")) {
@@ -240,7 +247,7 @@ public class NetWorkUtils {
                 }
 
                 public void onFailure(Throwable throwable, JSONObject respon) {
-                    LogInfo.i("hwj", "upload file onFailure :" + respon);
+                    LogInfo.i("hwj", "uploadFile file onFailure :" + respon);
                     if (handler != null) {
                         handler.obtainMessage(UPLOAD_FAIL).sendToTarget();
                         if (file.exists() && file.getName().contains("readboy_security")) {
@@ -273,100 +280,158 @@ public class NetWorkUtils {
         switch (type) {
             //发送图片
             case Constant.SEND_IMAGE:
-                try {
-                    File image = new File(conversation.imageLocalPath);
-                    params.put(IMAGE, image, IMAGE_TYPE);
-                    Log.i(TAG, "uploadFile: params = " + params.toString());
-                    AsyncHttpClient client = getClient();
-                    client.setLoggingLevel(2);
-                    RequestHandle handle = client.post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            for (Header header : headers) {
-                                Log.i(TAG, "onSuccess: header " + header.getName() + ":" + header.getValue());
-                            }
-                            LogInfo.i("hwj", "upload image file: onSuccess " + response);
-                            int status = response.optInt(STATUS);
-                            if (status == 200 && handler != null) {
-                                conversation.imageUrl = response.optString(SRC_NAME);
-                                conversation.thumbImageUrl = response.optString(FILE_NAME);
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_SUCCEED));
-                            } else if (status != 200 && handler != null) {
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            LogInfo.i("hwj", "upload image file: onFailure 1 :" + errorResponse);
-                            if (handler != null) {
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            LogInfo.i("hwj", "upload file onFailure 2 :" + responseString);
-                            if (handler != null) {
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                            }
-                        }
-                    });
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "uploadFile: e = " + e.toString());
-                    handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                }
+                uploadImage(conversation, handler, params);
                 break;
             //发送语音
             case Constant.SEND_VOICE:
-                try {
-                    File audio = new File(conversation.voiceLocalPath);
-                    params.put(AUDIO, audio, AUDIO_TYPE);
-                    getClient().post(UPLOAD_AUDIO_URL, params, new JsonHttpResponseHandler() {
-                        @Override
-                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                            LogInfo.i("hwj", "upload voice file: onSuccess " + response);
-                            int status = response.optInt(STATUS);
-                            if (status == 200 && handler != null) {
-                                conversation.voiceUrl = response.optString(FILE_NAME);
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_SUCCEED));
-                            } else if (status != 200 && handler != null) {
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
-                            Log.i(TAG, "upload voice file onFailure() called with: statusCode = " + statusCode +
-                                    ", headers = " + headers + ", throwable = " + throwable +
-                                    ", errorResponse = " + errorResponse + "");
-                            if (handler != null) {
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                            Log.i(TAG, "uploadFile onFailure() called with: statusCode = " + statusCode +
-                                    ", headers = " + headers + ", responseString = " + responseString +
-                                    ", throwable = " + throwable + "");
-                            if (handler != null) {
-                                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                            }
-                        }
-                    });
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "uploadFile: e = " + e.toString());
-                    if (handler != null) {
-                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
-                    }
-                }
+                uploadVoice(conversation, handler, params);
+                break;
+            case Constant.SEND_VIDEO:
+                uploadVideo(conversation, handler, params);
                 break;
             default:
                 conversation.isSending = Constant.FALSE;
                 Log.e(TAG, "uploadFile: default type = " + conversation.type);
+        }
+    }
+
+    private void uploadVoice(Conversation conversation, Handler handler, RequestParams params) {
+        try {
+            File audio = new File(conversation.voiceLocalPath);
+            params.put(AUDIO, audio, AUDIO_TYPE);
+            getClient().post(UPLOAD_AUDIO_URL, params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    LogInfo.i("hwj", "uploadFile voice file: onSuccess " + response);
+                    int status = response.optInt(STATUS);
+                    if (status == 200 && handler != null) {
+                        conversation.voiceUrl = response.optString(FILE_NAME);
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_SUCCEED));
+                    } else if (status != 200 && handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.i(TAG, "uploadFile voice file onFailure() called with: statusCode = " + statusCode +
+                            ", headers = " + headers + ", throwable = " + throwable +
+                            ", errorResponse = " + errorResponse + "");
+                    if (handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Log.i(TAG, "uploadFile onFailure() called with: statusCode = " + statusCode +
+                            ", headers = " + headers + ", responseString = " + responseString +
+                            ", throwable = " + throwable + "");
+                    if (handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e(TAG, "uploadFile: e = " + e.toString());
+            if (handler != null) {
+                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+            }
+        }
+    }
+
+    private void uploadImage(Conversation conversation, Handler handler, RequestParams params) {
+        try {
+            File image = new File(conversation.imageLocalPath);
+            params.put(IMAGE, image, IMAGE_TYPE);
+            Log.i(TAG, "uploadFile: params = " + params.toString());
+            AsyncHttpClient client = getClient();
+            client.setLoggingLevel(2);
+            RequestHandle handle = client.post(UPLOAD_IMAGE_URL, params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    for (Header header : headers) {
+                        Log.i(TAG, "onSuccess: header " + header.getName() + ":" + header.getValue());
+                    }
+                    LogInfo.i("hwj", "uploadFile image file: onSuccess " + response);
+                    int status = response.optInt(STATUS);
+                    if (status == 200 && handler != null) {
+                        conversation.imageUrl = response.optString(SRC_NAME);
+                        conversation.thumbImageUrl = response.optString(FILE_NAME);
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_SUCCEED));
+                    } else if (status != 200 && handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    LogInfo.i("hwj", "uploadFile image file: onFailure 1 :" + errorResponse);
+                    if (handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    LogInfo.i("hwj", "uploadFile file onFailure 2 :" + responseString);
+                    if (handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e(TAG, "uploadFile: e = " + e.toString());
+            handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+        }
+    }
+
+    private void uploadVideo(Conversation conversation, Handler handler, RequestParams params) {
+        try {
+            File audio = new File(conversation.voiceLocalPath);
+            params.put(VIDEO, audio, VIDEO_TYPE);
+            Log.i(TAG, "uploadVideo: request = " + params.toString());
+            getClient().post(UPLOAD_VIDEO_URL, params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    LogInfo.i("hwj", "uploadVideo video file: onSuccess " + response);
+                    int status = response.optInt(STATUS);
+                    if (status == 200 && handler != null) {
+                        conversation.voiceUrl = response.optString(FILE_NAME);
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_SUCCEED));
+                    } else if (status != 200 && handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                    Log.i(TAG, "uploadVideo voice file onFailure() called with: statusCode = " + statusCode +
+                            ", headers = " + headers + ", throwable = " + throwable +
+                            ", errorResponse = " + errorResponse + "");
+                    if (handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    Log.i(TAG, "uploadVideo onFailure() called with: statusCode = " + statusCode +
+                            ", headers = " + Arrays.toString(headers) + ", responseString = " + responseString +
+                            ", throwable = " + throwable + "");
+                    if (handler != null) {
+                        handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+                    }
+                }
+            });
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.e(TAG, "uploadVideo: e = " + e.toString());
+            if (handler != null) {
+                handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
+            }
         }
     }
 
@@ -396,25 +461,29 @@ public class NetWorkUtils {
     }
 
     //指定语音文件类型
-    private String[] allowedContentTypes = new String[]{".*"};
+    private static String[] allowedContentTypes = new String[]{".*"};
 
     /**
      * 只需下载语音文件
      *
      * @param conversation 语音文件的url
      */
-    public void downLoadVoiceFile(final Context context, final Conversation conversation) {
-        Log.e(TAG, "downLoadVoiceFile: thread = " + Thread.currentThread().getName());
+    public static void downloadFile(final Context context, final Conversation conversation) {
+        Log.e(TAG, "downloadFile: thread = " + Thread.currentThread().getName());
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
         String url = conversation.voiceUrl;
-        LogInfo.i("hwj", "download voice url : " + url);
-        String name = url.substring(url.indexOf("a/") + 2, url.length() - 4);
+        LogInfo.i(TAG, "download voice url : " + url);
+        Uri uri = Uri.parse(url);
+//        String name = url.substring(url.indexOf("a/") + 2, url.length() - 4);
+        String name = uri.getLastPathSegment();
+        Log.i(TAG, "downloadFile: name = " + name);
         //下载完成,保存语音文件
         File dir = new File(Constant.getDownloadPath(context));
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (!dir.exists() && !dir.mkdirs()) {
+            Log.w(TAG, "downloadFile: create file fail. " + dir.getAbsolutePath());
+            return;
         }
         final File file = new File(dir, name);
         //文件不存在才下载
@@ -435,16 +504,21 @@ public class NetWorkUtils {
                             if (uri != null) {
                                 WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
                                 NotificationUtils.sendNotification(context);
+                            } else {
+                                Log.i(TAG, "onSuccess: insert fail.");
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                    } else {
+                        Log.i(TAG, "onSuccess: status = " + status);
+                        Log.i(TAG, "onSuccess: header = " + getHeadersString(headers));
                     }
                 }
 
                 @Override
                 public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
-
+                    Log.i(TAG, "onFailure: headers, " + getHeadersString(headers));
                 }
 
                 @Override
@@ -455,14 +529,14 @@ public class NetWorkUtils {
         }
     }
 
-    public AsyncHttpClient getClient() {
-        if (Looper.myLooper() == null) {
-            Log.e(TAG, "getClient: SyncHttpClient.");
-            return new SyncHttpClient();
-        } else {
+    private static AsyncHttpClient getClient() {
+//        if (Looper.myLooper() == null) {
+//            Log.e(TAG, "getClient: SyncHttpClient.");
+//            return new SyncHttpClient();
+//        } else {
             Log.e(TAG, "getClient: AsyncHttpClient.");
             return new AsyncHttpClient();
-        }
+//        }
     }
 
     public ReadboyWearManager getRBManager(Context context) {
@@ -616,6 +690,11 @@ public class NetWorkUtils {
                 length = conversation.lastTime;
                 url = conversation.voiceUrl;
                 break;
+            case Constant.SEND_VIDEO:
+                type = VIDEO;
+                length = conversation.lastTime;
+                url = conversation.voiceUrl;
+                break;
         }
         if (mManager == null) {
             return;
@@ -669,6 +748,15 @@ public class NetWorkUtils {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm == null ? null : cm.getActiveNetworkInfo();
         return info != null && info.getType() == ConnectivityManager.TYPE_WIFI;
+    }
+
+    private static String getHeadersString(Header[] headers) {
+        StringBuilder builder = new StringBuilder();
+        for (Header header : headers) {
+            builder.append(header.getName()).append(":").append(header.getValue());
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 
 }

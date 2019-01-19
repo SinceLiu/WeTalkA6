@@ -63,22 +63,26 @@ public class AddFriendDialog extends AlertDialog implements View.OnClickListener
             public void pushSuc(String cmd, String serial, int code, String data, String result) throws RemoteException {
                 Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                 Log.i(TAG, "pushSuc: Thread = " + Thread.currentThread().getName());
-                mHandler.post(() -> {
-                    ToastUtils.show(mContext, "好友请求已发送");
-                    dismiss();
-                });
+                mHandler.post(getToastRunnable("好友请求已发送" ));
             }
 
             @Override
             public void pushFail(String cmd, String serial, int code, String errorMsg) throws RemoteException {
                 Log.e(TAG, "pushFail() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", errorMsg = " + errorMsg + "");
-                mHandler.post(() -> {
-                    ToastUtils.show(mContext, "发送失败：" + errorMsg);
-                    dismiss();
-                });
+                mHandler.post(getToastRunnable("发送失败：" + errorMsg));
             }
         });
         dismiss();
+    }
+
+    private Runnable getToastRunnable(String message) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                ToastUtils.show(mContext, message);
+                dismiss();
+            }
+        };
     }
 
     @Override

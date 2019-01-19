@@ -40,7 +40,7 @@
     <string name="cancel">取消</string>
     <string name="confirm">确定</string>
     <string name="warning_disband_group">确定解散该群吗</string>
-    <string name="warning_leave_group" >确定退出该群吗</string>
+    <string name="warning_leave_group">确定退出该群吗</string>
     <string name="load_failure">加载失败</string>
 
 </resources>

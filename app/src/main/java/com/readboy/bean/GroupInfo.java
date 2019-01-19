@@ -1,8 +1,16 @@
 package com.readboy.bean;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.readboy.provider.WeTalkContract.GroupColumns;
+import com.readboy.utils.JsonMapper;
 import com.readboy.wetalk.bean.Friend;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +34,7 @@ public class GroupInfo {
     private String owner;
     private String name;
     private int v;
+    private String membersJsonStr;
     private List<String> members;
     private List<Friend> friends;
 
@@ -81,7 +90,26 @@ public class GroupInfo {
         return friends;
     }
 
+    private void parseMembersJson() {
+        if(TextUtils.isEmpty(membersJsonStr)) {
+            return;
+        }
+        try {
+            JSONArray jsonArray = new JSONArray(membersJsonStr);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        members = JsonMapper.fromJsonArray(membersJsonStr, String.class);
+    }
+
     private void parseMembers() {
+        if (members == null) {
+            parseMembersJson();
+        }
+        if (members == null) {
+            return;
+        }
         friends = new ArrayList<>();
         for (String member : members) {
             String[] array = member.split("\\|");
@@ -100,6 +128,40 @@ public class GroupInfo {
                 friends.add(friend);
             }
         }
+    }
+
+    public static GroupInfo createGroupInfo(Cursor cursor) {
+        if (cursor == null) {
+            Log.w(TAG, "createGroupInfo: cursor == null.");
+            return null;
+        }
+        GroupInfo info = new GroupInfo();
+        info.id = cursor.getString(GroupColumns.INDEX_UUID);
+        info.owner = cursor.getString(GroupColumns.INDEX_OWNER);
+        info.name = cursor.getString(GroupColumns.INDEX_NAME);
+        info.membersJsonStr = cursor.getString(GroupColumns.INDEX_MEMBERS);
+        info.v = cursor.getInt(GroupColumns.INDEX_VERSION);
+        return info;
+    }
+
+    public static GroupInfo createGroupInfo(ContentValues values) {
+        GroupInfo info = new GroupInfo();
+        info.id = values.getAsString(GroupColumns.UUID);
+        return info;
+    }
+
+    public ContentValues createContentValues() {
+        ContentValues values = new ContentValues();
+        values.put(GroupColumns.UUID, id);
+        values.put(GroupColumns.OWNER, owner);
+        values.put(GroupColumns.NAME, name);
+        if (TextUtils.isEmpty(membersJsonStr)) {
+            membersJsonStr = JsonMapper.toJson(members);
+            Log.i(TAG, "createContentValues: membersJsonStr = " + membersJsonStr);
+        }
+        values.put(GroupColumns.MEMBERS, membersJsonStr);
+        values.put(GroupColumns.VERSION, v);
+        return values;
     }
 
 }

@@ -1,8 +1,11 @@
 package com.readboy.wetalk;
 
 import android.app.ActivityManager;
+import android.app.readboy.ReadboyWearManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.readboy.utils.AudioUtils;
@@ -25,7 +28,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         AudioUtils.requestAudioFocus(this);
-        WetalkFrameLayout layout = new WetalkFrameLayout(this);
+
     }
 
     @Override
@@ -33,9 +36,6 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         mParent = findViewById(R.id.wetalk_parent);
         mParent.setActivity(this);
 
-        Log.i(TAG, "initView: start");
-//        WTContactUtils.deleteContactsByUuid(this, "G05C334556006292");
-        Log.i(TAG, "initView: end.");
     }
 
     @Override

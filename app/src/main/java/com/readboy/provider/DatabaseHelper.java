@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.readboy.provider.WeTalkContract.ProfileColumns;
+import com.readboy.provider.WeTalkContract.GroupColumns;
 
 /**
  * Created by 1-PC on 2016/10/8.
@@ -15,22 +16,30 @@ import com.readboy.provider.WeTalkContract.ProfileColumns;
 class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "hwj_DatabaseHelper";
 
-    //数据库名
+    /**
+     * 数据库名
+     */
     private static final String DATABASE_NAME = "wetalk";
     /**
      * 初始版本
      */
     private static final int VERSION_2 = 2;
     /**
-     * 新添{@link ProfileColumns#PROFILE_TABLE_NAME}表,
+     * 新添{@link ProfileColumns#TABLE_NAME}表,
+     *
      * @date 20180201
      */
     private static final int VERSION_3 = 3;
 
-    static final String CONVERSATION_TABLE_NAME = "conversation";
+    /**
+     * 添加Group表，保存群成员信息。
+     */
+    private static final int VERSION_4 = 4;
+
+    static final String CONVERSATION_TABLE_NAME = Conversations.Conversation.TABLE_NAME;
 
     DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, VERSION_3);
+        super(context, DATABASE_NAME, null, VERSION_4);
     }
 
     @Override
@@ -61,11 +70,12 @@ class DatabaseHelper extends SQLiteOpenHelper {
                 + Conversations.Conversation.IS_PLAYING + " INTEGER)");
 
         createProfileTable(sqLiteDatabase);
+        createGroupTable(sqLiteDatabase);
     }
 
     private void createProfileTable(SQLiteDatabase db) {
         Log.e(TAG, "createProfileTable: ");
-        db.execSQL("CREATE TABLE IF NOT EXISTS " + ProfileColumns.PROFILE_TABLE_NAME + "("
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + ProfileColumns.TABLE_NAME + " ("
                 + ProfileColumns._ID + " INTEGER PRIMARY KEY,"
                 + ProfileColumns.UUID + " TEXT,"
                 + ProfileColumns.IMEI + " TEXT,"
@@ -76,14 +86,30 @@ class DatabaseHelper extends SQLiteOpenHelper {
                 + ProfileColumns.DATA + " TEXT);");
     }
 
+    private void createGroupTable(SQLiteDatabase db) {
+        Log.i(TAG, "createGroupTable: create");
+        db.execSQL("DROP TABLE IF EXISTS " + GroupColumns.TABLE_NAME);
+        db.execSQL("CREATE TABLE " + GroupColumns.TABLE_NAME + " ("
+                + GroupColumns._ID + " INTEGER PRIMARY KEY,"
+                + GroupColumns.UUID + " TEXT,"
+                + GroupColumns.OWNER + " TEXT,"
+                + GroupColumns.NAME + " TEXT,"
+                + GroupColumns.MEMBERS + " TEXT,"
+                + GroupColumns.VERSION + " INTEGER)");
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         Log.e(TAG, "onUpgrade: old = " + oldVersion + ", new = " + newVersion);
-        if (oldVersion == VERSION_2 && newVersion >= VERSION_3){
+        if (oldVersion == VERSION_2 && newVersion >= VERSION_3) {
             createProfileTable(sqLiteDatabase);
         }
+
+        if (newVersion >= VERSION_4) {
+            createGroupTable(sqLiteDatabase);
+        }
 //        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CONVERSATION_TABLE_NAME);
-//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ProfileColumns.PROFILE_TABLE_NAME);
+//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ProfileColumns.TABLE_NAME);
 //        onCreate(sqLiteDatabase);
     }
 }

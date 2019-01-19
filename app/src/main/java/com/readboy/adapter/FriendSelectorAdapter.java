@@ -44,13 +44,16 @@ public class FriendSelectorAdapter extends BaseCheckAdapter<Friend, FriendSelect
 
         ViewHolder(View itemView) {
             super(itemView);
-            itemView.setOnClickListener(v -> {
-                mCheckBox.setChecked(!mCheckBox.isChecked());
-                handleCheckedChangeEvent();
-                handlerInnerItemClickEvent();
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCheckBox.setChecked(!mCheckBox.isChecked());
+                    handleCheckedChangeEvent();
+                    handlerInnerItemClickEvent();
+                }
             });
-            mIcon = itemView.findViewById(R.id.group_action_icon);
-            mName = itemView.findViewById(R.id.group_action_name);
+            mIcon = (ImageView) itemView.findViewById(R.id.group_action_icon);
+            mName = (TextView) itemView.findViewById(R.id.group_action_name);
         }
 
         @Override

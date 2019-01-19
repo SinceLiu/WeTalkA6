@@ -48,7 +48,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
 
     private RecyclerView mRecyclerView;
     private FriendSelectorAdapter mAdapter;
-    private FriendGroup mGroup;
+    private Friend mGroup;
     private final List<Friend> mFriends = new ArrayList<>();
     private Button mBtnConfirm;
     private View mProgressBarParent;
@@ -175,7 +175,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         JSONObject jsonObject = new JSONObject();
         try {
             if (mGroup != null) {
-                jsonObject.put("id", mGroup.friend.uuid);
+                jsonObject.put("id", mGroup.uuid);
             }
             JSONArray jsonArray = new JSONArray();
             for (Integer i : mAdapter.getSelectedPosition()) {

@@ -18,7 +18,7 @@ public final class Constant {
     //能否切换测试服务器,正式apk不允许切换
     public static final boolean CAN_CHANGE_TO_TEST_SERVER = true;
     /**
-     * 消息类型
+     * 消息类型， 确保双数为发送，单数为接收
      */
     public static final int SEND_VOICE = 0;
     public static final int REC_VOICE = 1;
@@ -27,8 +27,8 @@ public final class Constant {
     public static final int SEND_EMOJI = 4;
     public static final int REC_EMOJI = 5;
     public static final int REC_TEXT = 6;
-    public static final int SEND_VIDEO = 7;
-    public static final int REC_VIDEO = 8;
+    public static final int SEND_VIDEO = 8;
+    public static final int REC_VIDEO = 9;
 
     public static final String EMPTY = "";
 
@@ -133,6 +133,10 @@ public final class Constant {
 
     public static String getDownloadPath(Context context) {
         return getExternalFileDirectory(context) + "/download/";
+    }
+
+    public static String getVideoPath(Context context) {
+        return getExternalFileDirectory(context) + File.separator + "video" + File.separator;
     }
 
     public static String getAvatarPath(Context context) {

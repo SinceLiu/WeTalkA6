@@ -234,7 +234,7 @@ public abstract class AbstractCheckAdapter<D, VH extends AbstractCheckAdapter.Ab
 
         public AbstractCheckViewHolder(View itemView) {
             super(itemView);
-            mCheckBox = itemView.findViewById(getCheckBarId());
+            mCheckBox = (CheckBox) itemView.findViewById(getCheckBarId());
         }
 
         @Override

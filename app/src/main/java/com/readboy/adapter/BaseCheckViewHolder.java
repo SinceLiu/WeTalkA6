@@ -15,8 +15,13 @@ public abstract class BaseCheckViewHolder<D> extends BaseViewHolder<D> {
 
     BaseCheckViewHolder(View itemView) {
         super(itemView);
-        mCheckBox = itemView.findViewById(getCheckBoxId());
-        mCheckBox.setOnClickListener(v -> handleCheckedChangeEvent());
+        mCheckBox = (CheckBox) itemView.findViewById(getCheckBoxId());
+        mCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleCheckedChangeEvent();
+            }
+        });
     }
 
     public void bindView(int position, boolean isChecked, D d) {

@@ -23,8 +23,7 @@ public class ListUtils {
         return result;
     }
 
-    @FunctionalInterface
-    public interface Predicate<T> {
+    public static abstract class Predicate<T> {
 
         /**
          * Evaluates this predicate on the given argument.
@@ -33,7 +32,7 @@ public class ListUtils {
          * @return {@code true} if the input argument matches the predicate,
          * otherwise {@code false}
          */
-        boolean test(T t);
+        abstract boolean test(T t);
 
         /**
          * Returns a composed predicate that represents a short-circuiting logical
@@ -51,9 +50,14 @@ public class ListUtils {
          * AND of this predicate and the {@code other} predicate
          * @throws NullPointerException if other is null
          */
-        default Predicate<T> and(Predicate<? super T> other) {
+        public Predicate<T> and(Predicate<? super T> other) {
             Objects.requireNonNull(other);
-            return (t) -> test(t) && other.test(t);
+            return new Predicate<T>() {
+                @Override
+                public boolean test(T t) {
+                    return Predicate.this.test(t) && other.test(t);
+                }
+            };
         }
 
         /**
@@ -63,8 +67,13 @@ public class ListUtils {
          * @return a predicate that represents the logical negation of this
          * predicate
          */
-        default Predicate<T> negate() {
-            return (t) -> !test(t);
+        public Predicate<T> negate() {
+            return new Predicate<T>() {
+                @Override
+                public boolean test(T t) {
+                    return !Predicate.this.test(t);
+                }
+            };
         }
 
         /**
@@ -83,9 +92,14 @@ public class ListUtils {
          * OR of this predicate and the {@code other} predicate
          * @throws NullPointerException if other is null
          */
-        default Predicate<T> or(Predicate<? super T> other) {
+        public Predicate<T> or(Predicate<? super T> other) {
             Objects.requireNonNull(other);
-            return (t) -> test(t) || other.test(t);
+            return new Predicate<T>() {
+                @Override
+                public boolean test(T t) {
+                    return Predicate.this.test(t) || other.test(t);
+                }
+            };
         }
 
         /**
@@ -98,10 +112,16 @@ public class ListUtils {
          * @return a predicate that tests if two arguments are equal according
          * to {@link Objects#equals(Object, Object)}
          */
-        static <T> Predicate<T> isEqual(Object targetRef) {
+        public static <T> Predicate<T> isEqual(Object targetRef) {
             return (null == targetRef)
                     ? null
-                    : object -> targetRef.equals(object);
+                    : new Predicate<T>() {
+                @Override
+                boolean test(T t) {
+                    return targetRef.equals(t);
+                }
+            };
+
         }
     }
 }
