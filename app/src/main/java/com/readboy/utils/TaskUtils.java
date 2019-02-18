@@ -33,24 +33,37 @@ public class TaskUtils {
 //        Log.e(TAG, "isBackground: foregroundApp = " + foregroundApp);
 //        getTopApp(context);
 //        Log.e(TAG, "isBackground: processs = " + isProcess(context));
-        return isProcess(context);
+        return isBackgroundProcess(context);
 //        return !context.getPackageName().equalsIgnoreCase(foregroundApp);
 
     }
 
-    private static boolean isProcess(Context context){
+    private static boolean isBackgroundProcess(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+        ActivityManager.RunningAppProcessInfo processInfo = appProcesses.get(0);
+        Log.i(TAG, "isBackgroundProcess: " + processInfo.processName + ", " + processInfo.importance);
+        if (context.getPackageName().equals(processInfo.processName)) {
+            return processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+        } else {
+            return true;
+        }
+    }
+
+    private static boolean isProcess(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            Log.i(TAG, "isProcess: " + appProcess.processName + ", " + appProcess.importance);
             if (appProcess.processName.equals(context.getPackageName())) {
                 for (String s : appProcess.pkgList) {
-//                    Log.e(TAG, "isBackground: pkg = " + s);
+                    Log.e(TAG, "isBackground: pkg = " + s);
                 }
                 if (appProcess.importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
-                    LogInfo.i("hwj", "background --- " + appProcess.processName);
+                    LogInfo.i(TAG, "background --- " + appProcess.processName);
                     return true;
                 } else {
-                    LogInfo.i("hwj", "foregraound --- " + appProcess.processName);
+                    LogInfo.i(TAG, "foregraound --- " + appProcess.processName);
                     return false;
                 }
             }
@@ -79,7 +92,7 @@ public class TaskUtils {
                     }
                     topActivity = stats.get(j).getPackageName();
                 }
-                Log.i(TAG, "top running app is : "+topActivity);
+                Log.i(TAG, "top running app is : " + topActivity);
             }
         }
     }

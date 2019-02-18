@@ -277,8 +277,6 @@ public class IOs {
      */
     public static boolean saveTimeTag(Context context, String content) {
         try {
-            Log.e(TAG, "saveTimeTag() called with: content = " + content + "");
-
             File file = new File(fileName);
             if (!file.exists()) {
                 if (!file.createNewFile()) {
@@ -324,7 +322,7 @@ public class IOs {
             Pattern p = Pattern.compile(regEx);
             Matcher m = p.matcher(content);
             content = m.replaceAll("").trim();
-            Log.i("hwj", "time tag : " + content);
+//            Log.i("hwj", "time tag : " + content);
             return content;
         } catch (IOException e) {
             e.printStackTrace();

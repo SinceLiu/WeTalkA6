@@ -1,13 +1,17 @@
 package com.readboy.view;
 
-import android.animation.ValueAnimator;
+import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.OperationApplicationException;
+import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
@@ -18,9 +22,11 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -58,23 +64,20 @@ import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.utils.NotificationUtils;
 import com.readboy.utils.ToastUtils;
-import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.wetalk.EmojiActivity;
 import com.readboy.wetalk.GetImageActivity;
 import com.readboy.wetalk.R;
 import com.tencent.bugly.crashreport.CrashReport;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
@@ -146,12 +149,10 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         @Override
         public void onChange(boolean selfChange) {
             //获取最新的消息集合
-            Log.e(TAG, "onChange() called with: selfChange = " + selfChange + "");
-//            Log.d(TAG, "onChange: friend name = " + WTContactUtils.getNameById(mContext, mCurrentFriend.uuid));
+            Log.e(TAG, "conversation onChange() called with: selfChange = " + selfChange + "");
             List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
             if (conversations == null || conversations.size() <= mConversations.size()) {
                 if (conversations != null) {
-                    Log.e(TAG, "onChange: old size = " + conversations.size() + ", size = " + mConversations.size());
                 }
                 CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于现有的conversations, " +
                         "new size = " + (conversations != null ? conversations.size() : 0) + ", old size = " + mConversations.size()));
@@ -262,8 +263,11 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     }
 
     private void registerContentObserver() {
-        mContactsObserver = new ContactsObserver(new Handler());
-        mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED) {
+            mContactsObserver = new ContactsObserver(new Handler());
+            mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
+        }
         mResolver.registerContentObserver(Conversations.Conversation.CONVERSATION_URI, true, mObserver);
     }
 
@@ -341,7 +345,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
      * 初始化好友数据
      */
     private void initFriendData(Intent intent) {
-        Log.e(TAG, "initFriendData() called");
         //获取传递参数(用户Id)
         Intent fromIntent = intent;
         if (fromIntent != null) {
@@ -645,6 +648,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         video.lastTime = videoInfo.duration;
         video.imageLocalPath = path;
         video.voiceLocalPath = path;
+        video.content = path;
         if (new File(path).exists()) {
             saveConversationToLocal(video);
             mNetWorkUtils.uploadFile(video, mUploadFileHandler);
@@ -1157,7 +1161,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     public void onPause() {
         LogInfo.i("ConversationActivity --- onPause");
         //用户未读信息数清零
-        NotificationUtils.clearFriendUnreadCount(mContext, mCurrentFriend.uuid);
+//        NotificationUtils.cancelMessageNotification(mContext);
+//        clearUnreadCount(mContext, mCurrentFriend.uuid);
         if (mAdapter != null) {
             mAdapter.stopPlaying();
         }

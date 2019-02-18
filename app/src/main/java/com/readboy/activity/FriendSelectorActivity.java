@@ -66,6 +66,12 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         initView();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ToastUtils.cancel();
+    }
+
     public void initView() {
         mRecyclerView = findViewById(R.id.friend_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
@@ -79,6 +85,8 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         mBtnConfirm.setBackgroundResource(mType.resId);
         mBtnConfirm.setOnClickListener(this);
         mProgressBarParent = findViewById(R.id.progress_bar_parent);
+        mProgressBarParent.setOnClickListener(v -> {
+        });
         mProgressBar = findViewById(R.id.progress_bar);
     }
 
@@ -133,8 +141,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         WearManagerProxy.groupAction(mContext, mType.command, getActionRequest(), new IReadboyWearListener.Stub() {
             @Override
             public void pushSuc(String cmd, String serial, int code, String data, String result) {
-                Log.i(TAG, "pushSuc: thread = " + Thread.currentThread().getName());
-                Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
+                Log.i(TAG, mType.command + " pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

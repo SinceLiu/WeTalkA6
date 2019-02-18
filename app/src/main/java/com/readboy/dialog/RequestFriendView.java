@@ -85,8 +85,7 @@ public class RequestFriendView extends FrameLayout implements View.OnClickListen
         WearManagerProxy.addFriend(mContext, mFriend.uuid, new IReadboyWearListener.Stub() {
             @Override
             public void pushSuc(String cmd, String serial, int code, String data, String result) {
-                Log.e(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
-                Log.i(TAG, "pushSuc: Thread = " + Thread.currentThread().getName());
+                Log.e(TAG, "addFriend pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                 gotoConversationActivity();
             }
 

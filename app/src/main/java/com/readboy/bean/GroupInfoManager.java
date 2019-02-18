@@ -48,6 +48,7 @@ public class GroupInfoManager {
     }
 
     public static GroupInfo getDataFormDatabase(Context context, String uuid) {
+        Log.i(TAG, "getDataFormDatabase: uuid = " + uuid);
         String selection = GroupColumns.UUID + "=?";
         try (Cursor cursor = context.getContentResolver().query(CONTENT_URI, null, selection,
                 new String[]{uuid}, null)) {
@@ -62,7 +63,9 @@ public class GroupInfoManager {
     private static Uri saveGroupInfoToDatabase(Context context, GroupInfo info) {
         ContentValues values = info.createContentValues();
         Uri result = context.getContentResolver().insert(CONTENT_URI, values);
-        Log.i(TAG, "saveGroupInfoToDatabase: result = " + result);
+        if (result == null) {
+            Log.i(TAG, "saveGroupInfoToDatabase: save fail, result = " + result);
+        }
         return result;
     }
 
@@ -78,7 +81,7 @@ public class GroupInfoManager {
     public static void getGroupInfo(Context context, String uuid, final CallBack callBack) {
 //        GroupInfo data = getDataFromPreferences(context, uuid);
         GroupInfo data = getDataFormDatabase(context, uuid);
-        if (data != null && false) {
+        if (data != null) {
             callBack.onSuccess(data);
         } else {
             JSONObject jsonObject = new JSONObject();
@@ -88,7 +91,7 @@ public class GroupInfoManager {
                         jsonObject.toString(), new IReadboyWearListener.Stub() {
                             @Override
                             public void pushSuc(String cmd, String serial, int code, String data, String result) {
-                                Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
+                                Log.i(TAG, "get group pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                                 if (code == 0) {
                                     GroupInfo info = JsonMapper.fromJson(data, GroupInfo.class);
                                     saveGroupInfo(context, JsonMapper.fromJson(data, GroupInfo.class));
@@ -119,8 +122,7 @@ public class GroupInfoManager {
                     jsonObject.toString(), new IReadboyWearListener.Stub() {
                         @Override
                         public void pushSuc(String cmd, String serial, int code, String data, String result) {
-                            Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
-                            Log.i(TAG, "pushSuc: thread " + Thread.currentThread());
+                            Log.i(TAG, "GET_GROUP pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                             if (code == 0) {
                                 GroupInfo info = JsonMapper.fromJson(data, GroupInfo.class);
                                 saveGroupInfo(context, JsonMapper.fromJson(data, GroupInfo.class));

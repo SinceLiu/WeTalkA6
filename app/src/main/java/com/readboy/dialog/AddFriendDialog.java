@@ -61,8 +61,7 @@ public class AddFriendDialog extends AlertDialog implements View.OnClickListener
         WearManagerProxy.requestAddFriend(mContext, mFriend.uuid, new IReadboyWearListener.Stub() {
             @Override
             public void pushSuc(String cmd, String serial, int code, String data, String result) throws RemoteException {
-                Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
-                Log.i(TAG, "pushSuc: Thread = " + Thread.currentThread().getName());
+                Log.i(TAG, "add friend pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                 mHandler.post(getToastRunnable("好友请求已发送" ));
             }
 

@@ -94,7 +94,6 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
     public void setData(Intent intent) {
         Friend friend = mGroup = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
-        mAdapter.setOwnerState(isOwner());
         List<Friend> friends = friend.members;
         if (friends == null || friends.size() <= 0) {
             Log.w(TAG, "setData: members is null or size is o.");
@@ -238,7 +237,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
             WearManagerProxy.groupAction(mContext, WearManagerProxy.Command.LEAVE_GROUP, data, new IReadboyWearListener.Stub() {
                 @Override
                 public void pushSuc(String cmd, String serial, int code, String data, String result) {
-                    Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
+                    Log.i(TAG, "leave pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
                     if (code == 0) {
                         //这过程中可能已经收到notify_contact，正在更新联系人了。
 //                        WTContactUtils.deleteContactsByUuid(mContext, mGroupInfo.getUuid());
@@ -280,28 +279,30 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     private boolean isOwner() {
         PersonalInfo info = WearManagerProxy.getManager(mContext).getPersonalInfo();
         if (info == null || mGroupInfo == null || TextUtils.isEmpty(mGroupInfo.getOwner())) {
-            Log.w(TAG, "isOwner: info = " + info + ", owner = " + mGroupInfo);
+            Log.w(TAG, "isOwner: owner = " + mGroupInfo);
             return false;
         }
         return mGroupInfo.getOwner().equals(info.getUuid());
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null || resultCode == Activity.RESULT_OK) {
+        if (data == null || resultCode != Activity.RESULT_OK) {
             Log.i(TAG, "onActivityResult() called with: requestCode = " + requestCode + ", resultCode = " + resultCode + ", data = " + data + "");
             return;
         }
         String response = data.getStringExtra(FriendSelectorActivity.EXTRA_DATA);
         try {
             JSONObject object = new JSONObject(response);
-            String id = object.optString("id");
-            if (id != null && id.equals(mGroup.uuid)) {
-                handleActivityResult(data);
-//                if (requestCode == REQUEST_CODE_REMOVE) {
-//                    handleRemoveResult(data);
-//                } else {
-//                    handleAddResult(data);
-//                }
+            if (requestCode == REQUEST_CODE_REMOVE) {
+                GroupInfoManager.getGroupInfoFromNet(mContext, mGroup.uuid, this);
+            } else if (requestCode == REQUEST_CODE_ADD) {
+                String id = object.optString("id");
+                if (id != null && id.equals(mGroup.uuid)) {
+                    handleActivityResult(data);
+                } else {
+                    GroupInfoManager.getGroupInfoFromNet(mContext, mGroup.uuid, this);
+                    Log.i(TAG, "onActivityResult: uuid = " + id);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -328,7 +329,6 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
     @Override
     public void onSuccess(GroupInfo info) {
-        Log.i(TAG, "onSuccess: thread = " + Thread.currentThread().getName());
         updateGroupInfo(info);
     }
 
@@ -358,6 +358,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         Log.i(TAG, "updateGroupInfo: ");
         String myUuid = WearManagerProxy.getMyUuid(mContext);
         this.mGroupInfo = info;
+        mAdapter.setOwnerState(isOwner());
         if (mGroupInfo.getFriends() != null) {
             for (Friend member : mGroupInfo.getFriends()) {
                 member.updateAddVisibility(mContext, myUuid);

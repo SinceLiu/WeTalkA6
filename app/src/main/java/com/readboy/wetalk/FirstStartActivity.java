@@ -32,7 +32,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
     private NetWorkUtils mNetWorkUtils;
 
     private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
-    private static final int UPDATE_CYCLE = 0;
+    private static final int UPDATE_CYCLE = 60 * 60_000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +99,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
             if (!TextUtils.isEmpty(id)) {
                 intent.putExtra(Constant.EXTRA_FRIEND_ID, id);
                 intent.putExtra(Constant.EXTRA_FRIEND_NAME, WTContactUtils.getNameById(this, id));
-                intent.putExtra(Constant.FRIEND_UNREAD_COUNT, WTContactUtils.getFriendUnreadCount(this, id));
+                intent.putExtra(Constant.FRIEND_UNREAD_COUNT, WTContactUtils.getUnreadMessageCount(this, id));
             }
         }
         startActivity(intent);
@@ -132,7 +132,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
                 finish();
             }
         } else {
-            initIntentData(FriendActivity.class);
+            initIntentData(FriendFragmentActivity.class);
         }
     }
 

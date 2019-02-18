@@ -8,9 +8,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,12 +31,12 @@ import com.readboy.wetalk.bean.Friend;
 import com.readboy.wetalk.support.R;
 import com.readboy.wetalk.utils.LogInfo;
 import com.readboy.wetalk.utils.WTContactUtils;
+import com.readboy.wetalk.utils.WeTalkConstant;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @author hwj
@@ -48,6 +50,9 @@ public class WetalkFrameLayout extends FrameLayout {
     private static final String CLASS_NAME_FRIEND_SELECTOR = "com.readboy.activity.FriendSelectorActivity";
 
     public static final int MAX_MESSAGE_COUNT = 100;
+    private static final int MESSAGE_UPDATE_CONTACT = 10;
+    private static final int MESSAGE_UPDATE_UNREAD_COUNT = 20;
+    private static final int DELAY_UPDATE_MILLIS_TIME = 100;
 
     private List<Friend> mFriends;
 
@@ -58,11 +63,39 @@ public class WetalkFrameLayout extends FrameLayout {
     private HeaderAndFooterWrapper mWrapperAdapter;
     private View mLoading;
     private boolean isUpdating = false;
-    private Handler mHandler = new Handler();
     private boolean hasRegisterObserver = false;
     private int successCount;
     private Context mContext;
     private Activity mActivity;
+
+    private ContentObserver mConversationObserver;
+    private boolean isShowing = false;
+    private boolean unreadCountChange = false;
+
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_UPDATE_CONTACT:
+                    if (!isUpdating) {
+                        if (mGetFriendTask != null) {
+                            mGetFriendTask.cancel(true);
+                        }
+                        mGetFriendTask = new GetFriendTask();
+                        mGetFriendTask.execute();
+                    } else {
+                        Log.w(TAG, "handleMessage: udpate contact, but is getting contacts.");
+                    }
+                    break;
+                case MESSAGE_UPDATE_UNREAD_COUNT:
+                    updateUnreadCount();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     private Runnable mUpdateFriendThread = new Runnable() {
 
@@ -84,9 +117,9 @@ public class WetalkFrameLayout extends FrameLayout {
     private ContentObserver mObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
-            mHandler.removeCallbacks(mUpdateFriendThread);
+            mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
             if (!isUpdating) {
-                mHandler.post(mUpdateFriendThread);
+                mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
             }
         }
 
@@ -113,7 +146,21 @@ public class WetalkFrameLayout extends FrameLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
         Log.i(TAG, "onFinishInflate: ");
+    }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.i(TAG, "onAttachedToWindow: ");
+        isShowing = true;
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.i(TAG, "onDetachedFromWindow: ");
+        isShowing = false;
+        unreadCountChange = false;
     }
 
     protected void initView() {
@@ -139,7 +186,25 @@ public class WetalkFrameLayout extends FrameLayout {
                     true, mObserver);
             hasRegisterObserver = true;
         }
+        if (getActivity() != null && mConversationObserver == null) {
+            mConversationObserver = new ConversationObserver(new Handler());
+            getActivity().getContentResolver().registerContentObserver(WeTalkConstant.CONVERSATION_URI,
+                    true, mConversationObserver);
+        }
 
+    }
+
+    public void onResume() {
+        isShowing = true;
+        if (unreadCountChange) {
+            updateUnreadCount();
+            unreadCountChange = false;
+        }
+    }
+
+    public void onPause() {
+        isShowing = false;
+        unreadCountChange = false;
     }
 
     public void onDestroy() {
@@ -147,6 +212,10 @@ public class WetalkFrameLayout extends FrameLayout {
         if (hasRegisterObserver) {
             getActivity().getContentResolver().unregisterContentObserver(mObserver);
             hasRegisterObserver = false;
+        }
+        if (mConversationObserver != null) {
+            getActivity().getContentResolver().unregisterContentObserver(mConversationObserver);
+            mConversationObserver = null;
         }
     }
 
@@ -168,7 +237,11 @@ public class WetalkFrameLayout extends FrameLayout {
         protected void onPostExecute(List<Friend> friends) {
 //        	clearImageDiskCache();
             if (mLoading != null) {
-                hideLoading();
+//                hideLoading();
+                mLoading.setVisibility(GONE);
+            }
+            if (friends != null && friends.size() > 0) {
+                friends.add(new CreateGroup());
             }
             updateFriendData(friends);
             mAdapter.notifyDataSetChanged();
@@ -286,6 +359,12 @@ public class WetalkFrameLayout extends FrameLayout {
 //                }
             }
         }
+        sortFriends();
+        // 防止多次加入，确保之前清掉了，因为可能会多次获取联系人数据
+//        mFriends.add(new CreateGroup());
+    }
+
+    private void sortFriends() {
         Collections.sort(mFriends, new Comparator<Friend>() {
 
             @Override
@@ -304,8 +383,12 @@ public class WetalkFrameLayout extends FrameLayout {
             mFriends.remove(homeGroupPos);
             mFriends.add(0, homeGroup);
         }
-        // 防止多次加入，确保之前清掉了，因为可能会多次获取联系人数据
-        mFriends.add(new CreateGroup());
+        for (Friend friend : mFriends) {
+            if (friend.type == Friend.TYPE_CREATE_GROUP) {
+                mFriends.remove(friend);
+                mFriends.add(friend);
+            }
+        }
     }
 
     private void gotoFriendSelector() {
@@ -357,9 +440,32 @@ public class WetalkFrameLayout extends FrameLayout {
         return getResources().getString(resId);
     }
 
+    private void gotoConversation(Friend friend) {
+        Intent intent = new Intent();
+        intent.setClassName(PACKAGE_NAME, CLASS_NAME_CONVERSATION);
+        intent.putExtra(EXTRA_FRIEND, friend);
+        startActivity(intent);
+    }
+
+    private void updateUnreadCount() {
+        Log.i(TAG, "updateUnreadCount: 1  >> " + Thread.currentThread().getName());
+        if (mFriends == null || mFriends.size() <= 0) {
+            Log.i(TAG, "updateUnreadCount: mFriends = " + mFriends);
+            return;
+        }
+        List<Friend> friends = new ArrayList<>(mFriends);
+        if (friends.size() > 0) {
+            for (Friend friend : friends) {
+                friend.unreadCount = WTContactUtils.getUnreadMessageCount(mContext, friend.uuid);
+            }
+        }
+        updateFriendData(friends);
+        mAdapter.notifyDataSetChanged();
+        Log.i(TAG, "updateUnreadCount: 2  >> ");
+    }
+
     private class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAdapter.ViewHolder> {
         class ViewHolder extends RecyclerView.ViewHolder {
-
             FriendGridItem item;
 
             ViewHolder(View itemView) {
@@ -439,11 +545,23 @@ public class WetalkFrameLayout extends FrameLayout {
         }
     }
 
-    private void gotoConversation(Friend friend) {
-        Intent intent = new Intent();
-        intent.setClassName(PACKAGE_NAME, CLASS_NAME_CONVERSATION);
-        intent.putExtra(EXTRA_FRIEND, friend);
-        startActivity(intent);
+    private class ConversationObserver extends ContentObserver {
+
+        public ConversationObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            super.onChange(selfChange, uri);
+            Log.i(TAG, "onChange: ");
+            if (isShowing) {
+                mHandler.removeMessages(MESSAGE_UPDATE_UNREAD_COUNT);
+                mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_UNREAD_COUNT, 200);
+            } else {
+                unreadCountChange = true;
+            }
+        }
     }
 
 

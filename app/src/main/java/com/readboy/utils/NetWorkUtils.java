@@ -16,6 +16,7 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -167,7 +168,6 @@ public class NetWorkUtils {
     }
 
     public void uploadCaptureFile(final ArrayList<String> ids, String path, final Handler handler) {
-        Log.e(TAG, "uploadCaptureFile() called with: path = " + path + ", Thread = " + Thread.currentThread().getName());
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -400,6 +400,7 @@ public class NetWorkUtils {
                     int status = response.optInt(STATUS);
                     if (status == 200 && handler != null) {
                         conversation.voiceUrl = response.optString(FILE_NAME);
+                        conversation.extra = response.optString(FILE_NAME);
                         handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_SUCCEED));
                     } else if (status != 200 && handler != null) {
                         handler.sendMessage(getUploadResultMessage(conversation, UPLOAD_FAIL));
@@ -469,7 +470,6 @@ public class NetWorkUtils {
      * @param conversation 语音文件的url
      */
     public static void downloadFile(final Context context, final Conversation conversation) {
-        Log.e(TAG, "downloadFile: thread = " + Thread.currentThread().getName());
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -502,13 +502,14 @@ public class NetWorkUtils {
                             Uri uri = context.getContentResolver().insert(Conversations.Conversation.CONVERSATION_URI,
                                     ConversationProvider.getContentValue(conversation, true));
                             if (uri != null) {
-                                WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
+//                                WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
                                 NotificationUtils.sendNotification(context);
                             } else {
                                 Log.i(TAG, "onSuccess: insert fail.");
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
+                            Log.i(TAG, "onSuccess: e = " + e.toString());
                         }
                     } else {
                         Log.i(TAG, "onSuccess: status = " + status);
@@ -530,13 +531,13 @@ public class NetWorkUtils {
     }
 
     private static AsyncHttpClient getClient() {
-//        if (Looper.myLooper() == null) {
-//            Log.e(TAG, "getClient: SyncHttpClient.");
-//            return new SyncHttpClient();
-//        } else {
+        if (Looper.myLooper() == null) {
+            Log.e(TAG, "getClient: SyncHttpClient.");
+            return new SyncHttpClient();
+        } else {
             Log.e(TAG, "getClient: AsyncHttpClient.");
             return new AsyncHttpClient();
-//        }
+        }
     }
 
     public ReadboyWearManager getRBManager(Context context) {
@@ -694,6 +695,13 @@ public class NetWorkUtils {
                 type = VIDEO;
                 length = conversation.lastTime;
                 url = conversation.voiceUrl;
+                int[] size = MediaUtils.getVideoSize(conversation.content);
+                if (size != null && size.length >= 2){
+                    width = size[0];
+                    height = size[1];
+                }
+                break;
+            default:
                 break;
         }
         if (mManager == null) {

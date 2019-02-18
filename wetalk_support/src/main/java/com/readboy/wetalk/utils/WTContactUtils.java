@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class WTContactUtils {
     private static final String TAG = "hwj_WTContactUtils";
+    public static final Uri CONVERSATION_URI = Uri.parse("content://com.readboy.wetalk.provider.Conversation/conversation");
 
     /**
      * 根据Id获取用户头像
@@ -143,8 +144,8 @@ public class WTContactUtils {
                         if (contact.uuid.startsWith("G")) {
                             contact.icon = R.drawable.ic_friend_group;
                         }
-//				    contact.unreadCount = mPrefs.getUserUnreadCount(contact.uuid);
-                        contact.unreadCount = cursor.getInt(cursor.getColumnIndex("data6"));
+//                        contact.unreadCount = cursor.getInt(cursor.getColumnIndex("data6"));
+                        contact.unreadCount = getUnreadMessageCount(context, contact.uuid);
                         contact.relation = cursor.getInt(cursor.getColumnIndex("data9"));
                     }
                     break;
@@ -187,6 +188,7 @@ public class WTContactUtils {
      * @param uuid
      * @param count   增量  +-n
      * @return 受影响行数
+     * @deprecated 直接读取微聊消息数据库字段
      */
     public static int updateUnreadCount(Context context, String uuid, int count) {
         Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
@@ -213,12 +215,17 @@ public class WTContactUtils {
         return 0;
     }
 
+    public void updateUnreadCount2(Context context, String uuid, int count) {
+
+    }
+
     /**
      * 获取联系人未读信息数
      *
      * @param context
      * @param uuid
      * @return
+     * @deprecated 不通过该方式读取未读消息数，使用{@link #getUnreadMessageCount(Context, String)}
      */
     public static int getFriendUnreadCount(Context context, String uuid) {
         try (Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
@@ -232,6 +239,39 @@ public class WTContactUtils {
         }
     }
 
+    /**
+     * 返回所有微聊未读数
+     */
+    public static int getUnreadMessageCount(Context context) {
+        int result = 0;
+        String selection = "unread=1";
+        try (Cursor cursor = context.getContentResolver().query(CONVERSATION_URI, null,
+                selection, null, null)) {
+            if (cursor != null) {
+                result = cursor.getCount();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @return 未读数
+     */
+    public static int getUnreadMessageCount(Context context, String uuid) {
+        int result = 0;
+        String selection = "unread = 1 AND send_id = ?";
+        try (Cursor cursor = context.getContentResolver().query(CONVERSATION_URI, null,
+                selection, new String[] {uuid}, null)) {
+            if (cursor != null) {
+                result = cursor.getCount();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @deprecated use {@link #getUnreadMessageCount(Context)}
+     */
     public static int getAllContactsUnreadCount(Context context) {
         Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
                 new String[]{"data6", Data.RAW_CONTACT_ID},

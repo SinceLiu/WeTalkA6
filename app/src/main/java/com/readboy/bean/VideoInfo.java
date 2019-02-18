@@ -17,7 +17,8 @@ public class VideoInfo {
     public String title;
     public String mimeType;
     public String miniThumbMagic;
-
+    public int width;
+    public int height;
 
     private VideoInfo() {
 
@@ -34,6 +35,8 @@ public class VideoInfo {
         info.displayName = cursor.getString(cursor.getColumnIndex(VideoColumns.DISPLAY_NAME));
         info.mimeType = cursor.getString(cursor.getColumnIndex(VideoColumns.MIME_TYPE));
         info.miniThumbMagic = cursor.getString(cursor.getColumnIndex(VideoColumns.MINI_THUMB_MAGIC));
+        info.width = cursor.getInt(cursor.getColumnIndex(VideoColumns.WIDTH));
+        info.height = cursor.getInt(cursor.getColumnIndex(VideoColumns.HEIGHT));
         return info;
     }
 

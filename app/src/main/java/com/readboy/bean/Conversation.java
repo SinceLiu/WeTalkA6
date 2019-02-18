@@ -4,13 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- *
  * @author 1-PC
  * @date 2016/9/21
  * 消息
  * 音频和视频共享多个字段。
+ * @date 2019/2/14
+ * 对字段调整，简化内容，可能和数据库字段不对应
  */
-public class Conversation implements Parcelable{
+public class Conversation implements Parcelable {
 
     //消息类型
     public int type;
@@ -32,19 +33,47 @@ public class Conversation implements Parcelable{
     public int emojiId;
     //接收到的表情编码
     public String emojiCode;
-    //发送图片的本地路径
+    /**
+     * 发送图片的本地路径
+     *
+     * @deprecated use {@link #content}
+     */
     public String imageLocalPath;
-    //接收图片的缩略图url
+    /**
+     * 接收图片的缩略图url
+     *
+     * @deprecated use {@link #preview}
+     */
     public String thumbImageUrl;
-    //接收图片的原图url
+    /**
+     * 接收图片的原图url
+     *
+     * @deprecated use {@link #extra}
+     */
     public String imageUrl;
-    //接收的文本内容
+    /**
+     * 接收的文本内容
+     *
+     * @deprecated use {@link #content}
+     */
     public String textContent;
-    //发送语音保存的本地路径
+    /**
+     * 发送语音保存的本地路径
+     *
+     * @deprecated use {@link #content}
+     */
     public String voiceLocalPath;
-    //接收语音文件的url
+    /**
+     * 接收语音文件的url
+     *
+     * @deprecated use {@link #extra}
+     */
     public String voiceUrl;
-    //语音时长
+    /**
+     * 语音时长
+     *
+     * @deprecated use {@link #preview}
+     */
     public int lastTime;
     //语音播放标识(是否显示小红点)
     public int isUnPlay;
@@ -56,6 +85,24 @@ public class Conversation implements Parcelable{
     public String time;
     //是否正在播放语音(语音项特有)
     public int isPlaying;
+
+    /** 2.0版本新字段  */
+    /**
+     * 数据内容，要显示的内容，文件则为本地路径path
+     */
+    public String content;
+    /**
+     * 预览图之类的
+     */
+    public String preview;
+    /**
+     * 网络链接之类的
+     */
+    public String extra;
+    /**
+     * 更多信息
+     */
+    public String extra2;
 
     @Override
     public int describeContents() {

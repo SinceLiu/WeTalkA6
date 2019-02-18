@@ -4,22 +4,28 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentProviderClient;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteException;
+import android.media.AudioAttributes;
 import android.net.ParseException;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.readboy.activity.RequestFriendActivity;
+import com.readboy.bean.Conversation;
+import com.readboy.provider.Conversations;
 import com.readboy.provider.Profile;
+import com.readboy.provider.WeTalkContract;
 import com.readboy.wetalk.FriendActivity;
 import com.readboy.wetalk.R;
 import com.readboy.wetalk.utils.WTContactUtils;
@@ -30,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -49,8 +56,9 @@ public class NotificationUtils {
     private static final int MAX_MESSAGE_COUNT = 100;
 
     public static final int NOTIFY_ID = "wetlak".hashCode();
-    private static final String CHANCEL_ID_NORMAL = "normal";
-    private static final String CHANCEL_ID_FLOAT = "float";
+    private static final String CHANCEL_ID_NORMAL = "normal8";
+    private static final String CHANCEL_ID_FLOAT = "float8";
+    private static final String CHANCEL_ID_SILENT = "silent";
 
     //"normal_wetalk".hashCode();
     public static final int NORMAL_NOTIFY_ID = "wetlak".hashCode();
@@ -79,27 +87,27 @@ public class NotificationUtils {
      * sound and vibrate
      */
     private static Notification getFloatingNotification(Context context) {
-        PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0, new Intent(context, FriendActivity.class), 0);
+        PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0,
+                getFriendsIntent(context), 0);
         Bundle bundle = new Bundle();
         bundle.putString("extra_type", "readboy");
         NotificationCompat.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder = new NotificationCompat.Builder(context, Chancel.FLOAT.id);
-            createChannel(context, Chancel.FLOAT);
+            createChannel(context, Channel.FLOAT);
+            builder = new NotificationCompat.Builder(context, Channel.FLOAT.id);
         } else {
             builder = new NotificationCompat.Builder(context);
         }
         builder.setSmallIcon(R.drawable.wetalk_icon);
-        builder.setAutoCancel(false);
+        builder.setAutoCancel(true);
         builder.setContentTitle("微聊");
-        builder.setChannelId(CHANCEL_ID_FLOAT);
         builder.setExtras(bundle);
-        int count = WTContactUtils.getAllContactsUnreadCount(context);
+        int count = WTContactUtils.getUnreadMessageCount(context);
         Log.e(TAG, "getFloatingNotification: count = " + count);
         if (count >= MAX_MESSAGE_COUNT) {
             builder.setContentText("收到99+条新消息");
         } else if (count > 0) {
-            builder.setContentText("收到" + WTContactUtils.getAllContactsUnreadCount(context) + "条新消息");
+            builder.setContentText("收到" + count + "条新消息");
         } else {
             builder.setContentText("收到新消息");
         }
@@ -113,13 +121,14 @@ public class NotificationUtils {
      * only vibrate.
      */
     private static Notification getNotification(Context context) {
-        PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0, new Intent(context, FriendActivity.class), 0);
+        PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0,
+                getFriendsIntent(context), 0);
         Bundle bundle = new Bundle();
         bundle.putString("extra_type", "readboy");
         NotificationCompat.Builder builder;
         if (Build.VERSION.SDK_INT >= 24) {
-            builder = new NotificationCompat.Builder(context, Chancel.NORMAL.id);
-            createChannel(context, Chancel.NORMAL);
+            createChannel(context, Channel.NORMAL);
+            builder = new NotificationCompat.Builder(context, Channel.NORMAL.id);
         } else {
             builder = new NotificationCompat.Builder(context);
         }
@@ -128,14 +137,15 @@ public class NotificationUtils {
         builder.setContentTitle("微聊");
         builder.setChannelId(CHANCEL_ID_NORMAL);
         builder.setExtras(bundle);
-        int count = WTContactUtils.getAllContactsUnreadCount(context);
+        int count = WTContactUtils.getUnreadMessageCount(context);
         if (count >= MAX_MESSAGE_COUNT) {
             builder.setContentText("收到99+条新消息");
         } else if (count > 0) {
-            builder.setContentText("收到" + WTContactUtils.getAllContactsUnreadCount(context) + "条新消息");
+            builder.setContentText("收到" + count + "条新消息");
         } else {
             builder.setContentText("收到新消息");
         }
+        builder.setSound(null);
         builder.setDefaults(Notification.DEFAULT_VIBRATE);
         builder.setContentIntent(pendingIntent3);
         return builder.build();
@@ -145,13 +155,14 @@ public class NotificationUtils {
      * 针对上课禁用类型，静默，无振动，无响铃，无弹窗，只更新通知栏
      */
     private static Notification getSilentNotification(Context context) {
-        PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0, new Intent(context, FriendActivity.class), 0);
+        PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0,
+                getFriendsIntent(context), 0);
         Bundle bundle = new Bundle();
         bundle.putString("extra_type", "readboy");
         NotificationCompat.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            builder = new NotificationCompat.Builder(context, Chancel.SILENT.id);
-            createChannel(context, Chancel.SILENT);
+            createChannel(context, Channel.SILENT);
+            builder = new NotificationCompat.Builder(context, Channel.SILENT.id);
         } else {
             builder = new NotificationCompat.Builder(context);
         }
@@ -159,11 +170,11 @@ public class NotificationUtils {
         builder.setAutoCancel(false);
         builder.setContentTitle("微聊");
         builder.setExtras(bundle);
-        int count = WTContactUtils.getAllContactsUnreadCount(context);
+        int count = WTContactUtils.getUnreadMessageCount(context);
         if (count >= MAX_MESSAGE_COUNT) {
             builder.setContentText("收到99+条新消息");
         } else if (count > 0) {
-            builder.setContentText("收到" + WTContactUtils.getAllContactsUnreadCount(context) + "条新消息");
+            builder.setContentText("收到" + count + "条新消息");
         } else {
             builder.setContentText("收到新消息");
         }
@@ -173,13 +184,22 @@ public class NotificationUtils {
         return builder.build();
     }
 
-    private static void createChannel(Context context, Chancel chancel) {
+    /**
+     * 相同id创建一次后，不支持修改
+     */
+    private static void createChannel(Context context, Channel channel) {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
             return;
         }
-        NotificationChannel channel = new NotificationChannel(chancel.id, chancel.name, chancel.importance);
+        NotificationChannel c = new NotificationChannel(channel.id, channel.name, channel.importance);
+        c.setShowBadge(true);
+        c.enableLights(true);
+        c.enableVibration(true);
+        if (channel == Channel.NORMAL) {
+            c.setSound(null, null);
+        }
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.createNotificationChannel(channel);
+        manager.createNotificationChannel(c);
     }
 
     public static void sendContactNotification(Context context, Profile profile) {
@@ -201,10 +221,10 @@ public class NotificationUtils {
     }
 
     private static NotificationCompat.Builder getBaseBuilder(Context context) {
-        return getBaseBuilder(context, Chancel.FLOAT);
+        return getBaseBuilder(context, Channel.FLOAT);
     }
 
-    private static NotificationCompat.Builder getBaseBuilder(Context context, Chancel chancel) {
+    private static NotificationCompat.Builder getBaseBuilder(Context context, Channel chancel) {
         Bundle bundle = new Bundle();
         bundle.putString("extra_type", "readboy");
         NotificationCompat.Builder builder;
@@ -218,10 +238,18 @@ public class NotificationUtils {
         builder.setAutoCancel(false);
         builder.setContentTitle("微聊");
         builder.setSmallIcon(R.drawable.wetalk_icon);
-        builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
+        builder.setDefaults(Notification.DEFAULT_ALL);
         builder.setPriority(Notification.PRIORITY_MAX);
         return builder;
     }
+
+    private static Intent getFriendsIntent(Context context) {
+        Intent intent = new Intent();
+        intent.setPackage(context.getPackageName());
+        intent.setAction(Intent.ACTION_MAIN);
+        return intent;
+    }
+
 
     /**
      * 不用判断是否在上课禁用期间，SystemUI统一处理，
@@ -298,26 +326,10 @@ public class NotificationUtils {
         return ds1.equals(ds2);
     }
 
-    /**
-     * 更新联系人未读信息数
-     *
-     * @param uuid
-     * @return 受影响行数
-     */
-    public static void clearFriendUnreadCount(final Context context, final String uuid) {
+    public static void cancelMessageNotification(Context context) {
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(NotificationUtils.NOTIFY_ID);
         manager.cancel(NotificationUtils.NORMAL_NOTIFY_ID);
-        ContentValues values = new ContentValues();
-        values.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE);
-        values.put(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK);
-        values.put("data6", 0);
-        try {
-            context.getContentResolver().update(ContactsContract.Data.CONTENT_URI, values, "data8 = ?",
-                    new String[]{uuid});
-        } catch (SQLiteException e) {
-            CrashReport.postCatchedException(e);
-        }
     }
 
     public static void cancelNotification(Context context, int id) {
@@ -329,22 +341,42 @@ public class NotificationUtils {
      * NotificationChancel
      */
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private enum Chancel {
+    private enum Channel {
         /**
          * 通用
          */
-        NORMAL("normal", "通用", NotificationManager.IMPORTANCE_DEFAULT),
-        FLOAT("float", "弹窗", NotificationManager.IMPORTANCE_HIGH),
-        SILENT("silent", "静默", NotificationManager.IMPORTANCE_LOW);
+        NORMAL(CHANCEL_ID_NORMAL, "normalName", NotificationManager.IMPORTANCE_DEFAULT),
+        FLOAT(CHANCEL_ID_FLOAT, "floatName", NotificationManager.IMPORTANCE_HIGH),
+        SILENT(CHANCEL_ID_SILENT, "silentName", NotificationManager.IMPORTANCE_LOW);
         public String id;
         public String name;
         public int importance;
 
-        Chancel(String id, String name, int importance) {
+        Channel(String id, String name, int importance) {
             this.id = id;
             this.name = name;
             this.importance = importance;
         }
+    }
+
+    private class NormalChannel implements IChannel {
+
+        @Override
+        public NotificationChannel create() {
+            return null;
+        }
+    }
+
+    /**
+     * TODO 枚举，泛型哪种更合理。
+     */
+    private interface IChannel {
+        /**
+         * 创建channel
+         *
+         * @return 自定义通道
+         */
+        NotificationChannel create();
     }
 
 }

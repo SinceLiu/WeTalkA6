@@ -41,10 +41,29 @@ public class MediaUtils {
         return time;
     }
 
+    public static int[] getVideoSize(String path) {
+        int[] result = new int[2];
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(path);
+        String width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        String height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        try {
+            result[0] = Integer.valueOf(width);
+            result[1] = Integer.valueOf(height);
+        } catch (Exception e) {
+            Log.i(TAG, "getVideoSize: " + e.toString());
+        }
+        retriever.release();
+        return result;
+    }
+
     public static void getVideo(Context context, Uri uri) {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(context, uri);
-        String path = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        String width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        String height = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        retriever.release();
+        Log.i(TAG, "getVideo: width = " + width + ", height = " + height);
     }
 
     public static String getImagePath(final Context context, final Uri uri) {
@@ -77,9 +96,6 @@ public class MediaUtils {
         return data;
     }
 
-    /**
-     * @return
-     */
     public static VideoInfo getVideoInfo(Context context, final Uri uri) {
         if (null == uri) {
             return null;
@@ -91,17 +107,23 @@ public class MediaUtils {
         } else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             data = uri.getPath();
         } else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
-            String[] projection = new String[]{
-                    VideoColumns.DATA,
-                    VideoColumns.DURATION,
-                    VideoColumns.MINI_THUMB_MAGIC
-            };
             try (Cursor cursor = context.getContentResolver().query(uri, null, null,
                     null, null)) {
                 if (null != cursor) {
                     if (cursor.moveToFirst()) {
-                        String[] temp1 = cursor.getColumnNames();
-                        return VideoInfo.createVideoInfo(cursor);
+                        VideoInfo info = VideoInfo.createVideoInfo(cursor);
+//                        if (info != null && (info.width <= 0 || info.height <= 0)) {
+//                            try {
+//                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+//                                retriever.setDataSource(context, uri);
+//                                info.width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+//                                info.height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+//                                retriever.release();
+//                            } catch (Exception e) {
+//                                Log.e(TAG, "getVideoInfo: e = " + e.toString());
+//                            }
+//                        }
+                        return info;
                     }
                 }
             } catch (Exception e) {

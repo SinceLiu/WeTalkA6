@@ -113,12 +113,12 @@ public class GroupInfo {
         friends = new ArrayList<>();
         for (String member : members) {
             String[] array = member.split("\\|");
-            if (array != null && array.length == 2) {
+            if (array.length == 2) {
                 Friend friend = new Friend();
                 friend.uuid = array[0];
                 friend.name = array[1];
                 friends.add(friend);
-            } else if (array != null && array.length == 1) {
+            } else if (array.length == 1) {
                 Friend friend = new Friend();
                 friend.uuid = array[0];
                 friends.add(friend);

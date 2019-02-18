@@ -36,6 +36,7 @@ import android.util.Log;
  * @author hwwjian
  * @date 2016/12/14
  * 获取消息
+ * TODO 如果被删除的联系人有未读数，发送通知时，未读数的获取有误，需要修改校验
  */
 
 public class MessageReceiver extends BroadcastReceiver {
@@ -64,6 +65,10 @@ public class MessageReceiver extends BroadcastReceiver {
      */
     private static boolean isGettingMessage = false;
     private static boolean requestAgain = false;
+    /**
+     * 和requestAgain搭配使用，因为可能从新获取到的数据为空，
+     */
+    private static boolean notifyNewMessage = false;
 
     private static Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -135,12 +140,17 @@ public class MessageReceiver extends BroadcastReceiver {
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
                                     String response) {
-                LogInfo.e(TAG, "pushSucceed() called with: type = " + type + ", s1 = " + s1 +
+                LogInfo.d(TAG, "pushSucceed() called with: type = " + type + ", s1 = " + s1 +
                         ", code = " + code + ", s = " + s + ", response = " + response + "");
-                Log.i(TAG, "pushSucceed: thread = " + Thread.currentThread().getName());
                 int count = parseMessage(response, context);
-                if (count > 0 && !requestAgain) {
-                    NotificationUtils.sendNotification(context);
+                if (notifyNewMessage || (count > 0 && !requestAgain)) {
+                    notifyNewMessage = false;
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            NotificationUtils.sendNotification(context);
+                        }
+                    });
                 } else {
                     Log.i(TAG, "pushSucceed: do not notify, count = " + count + ", requestAgain = " + requestAgain);
                 }
@@ -164,6 +174,7 @@ public class MessageReceiver extends BroadcastReceiver {
         JSONArray array;
         try {
             jsonObject = new JSONObject(response);
+            // TODO，需解决后续内容解析可能出错，是否应该存该tag。
             MPrefs.setMessageTag(context, jsonObject.optString(NetWorkUtils.TIME));
             array = jsonObject.getJSONArray(NetWorkUtils.DATA);
         } catch (JSONException e) {
@@ -172,7 +183,6 @@ public class MessageReceiver extends BroadcastReceiver {
         }
         int count = array.length();
         int result = count;
-        Log.e(TAG, "pushSucceed: response count = " + count);
         if (count >= MAX_COUNT_SINGLE_RESPONSE) {
             requestAgain = true;
         }
@@ -249,7 +259,6 @@ public class MessageReceiver extends BroadcastReceiver {
         String content = data.optString(NetWorkUtils.MESSAGE);
         //表情，可能会收到旧编码，来自W5.
         int emojiId = EmojiUtils.getEmojiIdContainOldCode(content);
-        Log.e(TAG, "pushSucceed: emojiId = " + emojiId);
         if (emojiId != -1) {
             conversation.emojiCode = content;
             conversation.emojiId = emojiId;
@@ -266,7 +275,15 @@ public class MessageReceiver extends BroadcastReceiver {
         Log.i(TAG, "parseVideoMessage: ");
         conversation.type = Constant.REC_VIDEO;
         conversation.voiceUrl = data.optString(NetWorkUtils.MESSAGE);
-        NetWorkUtils.downloadFile(context, conversation);
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // 需要在主线程，防止
+                // java.lang.IllegalArgumentException: Synchronous ResponseHandler used in AsyncHttpClient.
+                // You should create your response handler in a looper thread or use SyncHttpClient instead.
+                NetWorkUtils.downloadFile(context, conversation);
+            }
+        });
 //        addToDatabase(context, conversation);
     }
 
@@ -301,21 +318,20 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     private static void addToDatabase(Context context, Conversation conversation) {
-        Log.i(TAG, "addToDatabase:  1 >> ");
-        //插入数据库
+        //插入数据库, 200ms
         Uri uri = context.getContentResolver().insert(Conversations.Conversation.CONVERSATION_URI,
                 ConversationProvider.getContentValue(conversation, true));
         if (uri != null) {
-            WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
+//            WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
         } else {
             Log.i(TAG, "addToDatabase: insert fail, conversation = " + conversation.toString());
         }
-        Log.i(TAG, "addToDatabase:  2 >> ");
     }
 
     private static void tryRequestAgain(Context context) {
         //两种情况会再次获取
         if (requestAgain) {
+            notifyNewMessage = true;
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {

@@ -10,7 +10,7 @@ import android.provider.BaseColumns;
 
 public class Conversations {
 
-    static final String AUTHORITY = "com.readboy.wetalk.provider.Conversation";
+    public static final String AUTHORITY = "com.readboy.wetalk.provider.Conversation";
 
     private Conversations() {
     }

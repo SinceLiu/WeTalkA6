@@ -1,8 +1,10 @@
 package com.readboy.wetalk.view;
 
 import android.content.Context;
+import android.support.v4.widget.TextViewCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -55,6 +57,8 @@ public class FriendGridItem extends RelativeLayout {
         mFriendUnread = (TextView) findViewById(R.id.friend_pager_item_unread);
         mFriendUnread.setActivated(false);
         mFriendName = (TextView) findViewById(R.id.friend_pager_item_name);
+        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(mFriendName, 16,
+                20, 2, TypedValue.COMPLEX_UNIT_PX);
         mAvatar = findViewById(R.id.avatar);
     }
 

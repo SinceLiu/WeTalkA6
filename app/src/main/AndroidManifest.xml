@@ -4,8 +4,8 @@
     coreApp="true"
     package="com.readboy.wetalk"
     android:sharedUserId="com.android.systemui"
-    android:versionCode="190119001"
-    android:versionName="1.2.1">
+    android:versionCode="190218001"
+    android:versionName="1.2.2">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
 
@@ -62,15 +62,18 @@
         </receiver>
 
         <activity
-            android:name=".FirstStartActivity"
+            android:name=".FriendFragmentActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="readboy.intent.action.wetalk" />
 
-                <category android:name="android.readboy.WATCH.FLAG" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.readboy.WATCH.FLAG" />
             </intent-filter>
         </activity>
         <activity

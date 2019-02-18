@@ -18,7 +18,6 @@ public class WearManagerProxy {
     public static final String ACTION_REFUSE = "readboy.action.NOTIFY_FRIEND_REFUSE";
 
     private WearManagerProxy(Context context) {
-
     }
 
     public static ReadboyWearManager getManager(Context context) {

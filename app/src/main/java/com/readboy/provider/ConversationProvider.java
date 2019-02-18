@@ -11,6 +11,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -59,22 +61,42 @@ public class ConversationProvider extends ContentProvider {
     /**
      * 获取邮件数量
      *
-     * @param uri        uri
-     * @param projection 查询的列
-     * @param where      查询条件
-     * @param whereArgs  匹配条件参数
-     * @param sortOrder  排序条件
+     * @param uri           uri
+     * @param projection    查询的列
+     * @param selection     查询条件
+     * @param selectionArgs 匹配条件参数
+     * @param sortOrder     排序条件
      * @return 查询结果
      */
     @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, String[] projection, String where, String[] whereArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor cursor = null;
-        Table table = Table.valueOf(sUriMatcher.match(uri));
-        if (table != null) {
-            cursor = mHelper.getWritableDatabase()
-                    .query(table.tableName, projection, where, whereArgs, null, null, sortOrder);
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+        int code = sUriMatcher.match(uri);
+        switch (code) {
+            case CODE_CONVERSATION:
+            case CODE_PROFILE:
+            case CODE_GROUP:
+                Table table = Table.valueOf(sUriMatcher.match(uri));
+                if (table != null) {
+                    qb.setTables(table.tableName);
+                    cursor = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+                } else {
+                    Log.w(TAG, "query: table is null, " + code);
+                }
+                break;
+            case CODE_GROUP_ID:
+                qb.setTables(GroupColumns.TABLE_NAME);
+                qb.appendWhere(GroupColumns._ID + "=");
+                qb.appendWhere(uri.getLastPathSegment());
+                cursor = qb.query(db, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            default:
+                break;
         }
+
         return cursor;
     }
 
@@ -110,7 +132,7 @@ public class ConversationProvider extends ContentProvider {
                             Uri conUri = ContentUris.withAppendedId(
                                     Conversations.Conversation.CONVERSATION_URI, rawId);
                             if (isReceive && getContext() != null) {
-                                getContext().getContentResolver().notifyChange(conUri, null);
+                                notifyChange(conUri);
                             }
                             return conUri;
                         } else {
@@ -129,24 +151,25 @@ public class ConversationProvider extends ContentProvider {
                 }
                 break;
             case CODE_GROUP:
-                long count = mHelper.getWritableDatabase().replace(GroupColumns.TABLE_NAME, null, contentValues);
-                if (count <= 0) {
-                    Log.w(TAG, "insert: group table, replace fail.");
-                    return null;
-                }
                 String uuid = contentValues.getAsString(GroupColumns.UUID);
                 if (TextUtils.isEmpty(uuid)) {
                     return null;
                 }
+                int id = -1;
                 try (Cursor cursor = mHelper.getWritableDatabase().query(GroupColumns.TABLE_NAME,
                         null, GroupColumns.UUID + "=?", new String[]{uuid},
                         null, null, null)) {
                     if (cursor != null && cursor.moveToFirst()) {
-                        int _id = cursor.getInt(cursor.getColumnIndex(GroupColumns._ID));
-                        return ContentUris.withAppendedId(GroupColumns.CONTENT_URI, _id);
+                        id = cursor.getInt(cursor.getColumnIndex(GroupColumns._ID));
                     }
                 }
-                return insertCommon(contentValues, Table.GROUP);
+                contentValues.put(GroupColumns._ID, id);
+                long row = mHelper.getWritableDatabase().replace(GroupColumns.TABLE_NAME, null, contentValues);
+                if (row <= 0) {
+                    Log.w(TAG, "insert: group table, replace fail.");
+                    return null;
+                }
+                return ContentUris.withAppendedId(GroupColumns.CONTENT_URI, row);
             default:
                 Log.e(TAG, "insert: default : " + uri);
         }
@@ -171,6 +194,8 @@ public class ConversationProvider extends ContentProvider {
                 String where = "id=?";
                 count = mHelper.getWritableDatabase().delete(GroupColumns.TABLE_NAME, where, new String[]{id});
                 break;
+            default:
+                break;
         }
         return count;
     }
@@ -181,6 +206,9 @@ public class ConversationProvider extends ContentProvider {
         Table table = Table.valueOf(sUriMatcher.match(uri));
         if (table != null) {
             count = mHelper.getWritableDatabase().update(table.tableName, contentValues, selection, args);
+        }
+        if (count > 0) {
+            notifyChange(uri);
         }
         return count;
     }
@@ -307,6 +335,13 @@ public class ConversationProvider extends ContentProvider {
     }
 
     /**
+     * 最好做到精确定位到哪个联系人应该更新了
+     */
+    private void notifyUnreadCountChange(String uuid) {
+        notifyChange(WeTalkContract.CONVERSATION_UNREAD_URI);
+    }
+
+    /**
      * Notify affected URIs of changes.
      */
     private void notifyChange(Uri uri) {
@@ -358,7 +393,7 @@ public class ConversationProvider extends ContentProvider {
          * 枚举，方便统一处理，便于维护
          */
         CONVERSATION(Conversations.Conversation.TABLE_NAME, Conversations.Conversation.CONVERSATION_URI, CODE_CONVERSATION),
-        PROFILE(ProfileColumns.TABLE_NAME, ProfileColumns.CONTENT_URI, CODE_GROUP),
+        PROFILE(ProfileColumns.TABLE_NAME, ProfileColumns.CONTENT_URI, CODE_PROFILE),
         GROUP(GroupColumns.TABLE_NAME, GroupColumns.CONTENT_URI, CODE_GROUP);
 
         String tableName;

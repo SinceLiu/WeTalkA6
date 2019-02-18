@@ -1,67 +1,71 @@
 package com.readboy.wetalk;
 
 import android.app.ActivityManager;
-import android.app.readboy.ReadboyWearManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-
-import android.support.v4.content.LocalBroadcastManager;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import com.readboy.utils.AudioUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
-import com.readboy.wetalk.utils.WTContactUtils;
-import com.readboy.wetalk.view.WetalkFrameLayout;
+import com.readboy.wetalk.support.WetalkFragment;
 
 /**
- * @author hwj
+ * @author oubin
+ * @date 2019/02/18
  */
-public class FriendActivity extends BaseRequestPermissionActivity {
+public class FriendFragmentActivity extends BaseFragmentActivity {
     private static final String TAG = "hwj_FriendActivity";
 
-    private WetalkFrameLayout mParent;
-
     @Override
-    protected void onCreate(android.os.Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         LogInfo.i(TAG, " --- onCreate()");
-        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_fragment_friend);
+        initFragment();
+//        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_wetalk);
+//        if (fragment != null) {
+//            Bundle bundle = new Bundle();
+//            bundle.putBoolean(WetalkFragment.KEY_HAD_TITLE, false);
+//            fragment.setArguments(bundle);
+//        } else {
+//            Log.i(TAG, "onCreate: fragment = null.");
+//        }
+    }
+
+    private void initFragment() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        WetalkFragment fragment = WetalkFragment.newInstance(false);
+        transaction.replace(R.id.fragment_wetalk, fragment);
+        transaction.commit();
+    }
+
+    @Override
+    public void onEnterAnimationComplete() {
+        super.onEnterAnimationComplete();
+        Log.i(TAG, "onEnterAnimationComplete: ");
         AudioUtils.requestAudioFocus(this);
-
-    }
-
-    @Override
-    protected void initView() {
-        mParent = findViewById(R.id.wetalk_parent);
-        mParent.setActivity(this);
-
-    }
-
-    @Override
-    protected void initData() {
-        Log.e(TAG, "initData: ");
     }
 
     @Override
     protected void onResume() {
         LogInfo.i(TAG, " FriendActivity --- onResume()");
         super.onResume();
-        mParent.onResume();
     }
 
     @Override
     protected void onPause() {
         LogInfo.i(TAG, " FriendActivity --- onPause()");
         super.onPause();
-        mParent.onPause();
     }
 
     @Override
     protected void onDestroy() {
         LogInfo.i(TAG, " FriendActivity --- onDestroy()");
         super.onDestroy();
-        mParent.onDestroy();
         MPrefs.setNotificationType(this, true);
         AudioUtils.abandonAudioFocus(this);
         killBackgroundProcesses();
@@ -80,8 +84,6 @@ public class FriendActivity extends BaseRequestPermissionActivity {
 
     @Override
     protected void initContent() {
-        setContentView(R.layout.activity_friend);
         MPrefs.setNotificationType(this, false);
-        initView();
     }
 }

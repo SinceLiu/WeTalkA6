@@ -13,6 +13,7 @@ import android.provider.BaseColumns;
 public class WeTalkContract {
 
     public static final String AUTHORITY = "com.readboy.wetalk.provider.Conversation";
+    public static final Uri CONVERSATION_UNREAD_URI = Uri.parse("content://" + AUTHORITY + "/unread");
 
     /**
      * uuid : DA59F29B4E001B63

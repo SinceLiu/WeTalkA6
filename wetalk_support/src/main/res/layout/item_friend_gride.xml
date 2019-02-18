@@ -44,9 +44,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/avatar"
         android:layout_centerHorizontal="true"
-        android:ellipsize="end"
+        android:ellipsize="middle"
         android:maxWidth="120px"
-        android:maxLines="1"
+        android:singleLine="true"
         android:textColor="@android:color/white"
         android:textSize="20px" />
 </com.readboy.wetalk.view.FriendGridItem>
