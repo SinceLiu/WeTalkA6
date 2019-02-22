@@ -33,6 +33,9 @@ import com.readboy.bean.Constant;
 import com.readboy.wetalk.utils.IOs;
 import com.readboy.utils.NetWorkUtils;
 
+/**
+ * @author hwj
+ */
 public class GetImageActivity extends BaseActivity {
     private static final String TAG = "hwj_GetImageActivity";
 
@@ -44,7 +47,6 @@ public class GetImageActivity extends BaseActivity {
 
     private String cameraPath = "";
 
-    //监拍图片路径
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

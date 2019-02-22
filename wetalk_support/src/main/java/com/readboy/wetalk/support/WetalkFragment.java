@@ -1,6 +1,5 @@
 package com.readboy.wetalk.support;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -73,7 +72,9 @@ public class WetalkFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mParent.onDestroy();
+        if (mParent != null) {
+            mParent.onDestroy();
+        }
     }
 
     @Override
@@ -87,9 +88,13 @@ public class WetalkFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         Log.i(TAG, "setUserVisibleHint() called with: isVisibleToUser = " + isVisibleToUser + "");
         if (isVisibleToUser) {
-            mParent.onResume();
+            if (mParent != null) {
+                mParent.onResume();
+            }
         } else {
-            mParent.onPause();
+            if (mParent != null) {
+                mParent.onPause();
+            }
         }
     }
 
@@ -100,7 +105,7 @@ public class WetalkFragment extends Fragment {
     }
 
     public RecyclerView getRecyclerView() {
-        return mParent.getRecyclerView();
+        return mParent == null ? null : mParent.getRecyclerView();
     }
 
 }

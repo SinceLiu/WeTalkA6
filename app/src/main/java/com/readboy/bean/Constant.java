@@ -18,7 +18,7 @@ public final class Constant {
     //能否切换测试服务器,正式apk不允许切换
     public static final boolean CAN_CHANGE_TO_TEST_SERVER = true;
     /**
-     * 消息类型， 确保双数为发送，单数为接收
+     * 消息类型，为了便于统一处理，扩展，确保双数为发送，单数为接收
      */
     public static final int SEND_VOICE = 0;
     public static final int REC_VOICE = 1;
@@ -29,6 +29,7 @@ public final class Constant {
     public static final int REC_TEXT = 6;
     public static final int SEND_VIDEO = 8;
     public static final int REC_VIDEO = 9;
+    public static final int REC_SYSTEM = 11;
 
     public static final String EMPTY = "";
 

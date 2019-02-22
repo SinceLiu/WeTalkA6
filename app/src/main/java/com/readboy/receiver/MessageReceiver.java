@@ -1,8 +1,6 @@
 package com.readboy.receiver;
 
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +23,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -55,6 +52,8 @@ public class MessageReceiver extends BroadcastReceiver {
     public static final String ACTION_NOTIFY_FRIEND_REFUSE = "readboy.action.NOTIFY_FRIEND_REFUSE";
     public static final String ACTION_NOTIFY_FRIEND_REQUEST = "readboy.action.NOTIFY_FRIEND_REQUEST";
     private static final int DOWNLOAD_MSG = 0x13;
+
+    private static final String SYSTEM_NOTIFICATION = "SYSTEM";
 
     private static final int MAX_COUNT_SINGLE_RESPONSE = 10;
 
@@ -167,6 +166,9 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     /**
+     * 系统消息：{"h":"S0SYSTEM|G05C6A127600AD7E|text|1550649865117","m":"Hwj-A6 离开群"}
+     * 群消息：{"h":"D05C2C78D500413C|G05C3421220092AB|text|1550649953645","m":"\/emoji_8"}
+     *
      * @return count，解析是否有数据，是否需要发通知，如果解析需要下载文件，基数也会减一
      */
     private static int parseMessage(String response, Context context) {
@@ -205,6 +207,11 @@ public class MessageReceiver extends BroadcastReceiver {
                 result--;
                 break;
             }
+
+            if (SYSTEM_NOTIFICATION.equalsIgnoreCase(messageInfo[0])) {
+                parseSystemMessage(context, data, conversation);
+                break;
+            }
             switch (messageInfo[2]) {
                 case NetWorkUtils.TEXT:
                     parseTextMessage(context, data, conversation);
@@ -234,6 +241,12 @@ public class MessageReceiver extends BroadcastReceiver {
             }
         }
         return result;
+    }
+
+    private static void parseSystemMessage(Context context, JSONObject data, Conversation conversation) {
+        conversation.content = data.optString(NetWorkUtils.MESSAGE);
+        conversation.type = Constant.REC_SYSTEM;
+        addToDatabase(context, conversation);
     }
 
     private static void parseAudioMessage(Context context, JSONObject data, Conversation conversation) {
@@ -302,7 +315,15 @@ public class MessageReceiver extends BroadcastReceiver {
         //是否是家庭圈的消息,根据发件人的群Id判断
         conversation.isHomeGroup = conversation.sendId.startsWith("G") ? Constant.TRUE : Constant.FALSE;
         if (conversation.isHomeGroup == Constant.TRUE) {
-            conversation.senderName = WTContactUtils.getNameById(context, conversation.realSendId);
+            String name = WTContactUtils.getNameById(context, conversation.realSendId);
+            if (TextUtils.isEmpty(name)) {
+                Profile profile = Profile.queryProfileWithUuid(context.getContentResolver(), conversation.realSendId);
+                if (profile != null) {
+                    conversation.senderName = profile.getName();
+                }
+            } else {
+                conversation.senderName = name;
+            }
         } else {
             //判断发件人是否存在通讯录中
             String name = WTContactUtils.getNameById(context, conversation.realSendId);

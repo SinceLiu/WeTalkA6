@@ -145,7 +145,6 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
 
         @Override
         public void bindView(Friend friend) {
-            Log.i(TAG, "bindView: info = " + friend.toString());
             if (!TextUtils.isEmpty(friend.photoUri)) {
                 Glide.with(mContext)
                         .load(friend.photoUri)

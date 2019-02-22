@@ -4,6 +4,7 @@ import android.app.readboy.IReadboyWearListener;
 import android.app.readboy.ReadboyWearManager;
 import android.app.readboy.PersonalInfo;
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.readboy.wetalk.bean.Friend;
 
@@ -24,6 +25,11 @@ public class WearManagerProxy {
         return (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
     }
 
+    public static boolean hadPhoneNumber(Context context) {
+        PersonalInfo info = getManager(context).getPersonalInfo();
+        return info != null && !TextUtils.isEmpty(info.getPhoneNum());
+    }
+
     public static String getMyUuid(Context context) {
         PersonalInfo info = getManager(context).getPersonalInfo();
         if (info != null) {
@@ -41,7 +47,7 @@ public class WearManagerProxy {
      * "members": ["<UUID>", "<UUID>", "..."]
      * }
      * }
-     *
+     * <p>
      * {"r":"mgroup","data":{"owner":"D05C2C75FA00413B","members":["D05C2C823C00413E","D05C2C75FA00413B","D05C2C78D500413C"],"name":"宝贝1好友群①","id":"G05C305A77006198"},"o":"5"}
      */
     public static void createGroup(Context context, String data, IReadboyWearListener listener) {

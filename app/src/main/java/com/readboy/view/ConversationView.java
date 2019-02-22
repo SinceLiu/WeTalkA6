@@ -3,14 +3,11 @@ package com.readboy.view;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
@@ -22,7 +19,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.RemoteException;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -62,7 +58,6 @@ import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
-import com.readboy.utils.NotificationUtils;
 import com.readboy.utils.ToastUtils;
 import com.readboy.wetalk.EmojiActivity;
 import com.readboy.wetalk.GetImageActivity;
@@ -72,7 +67,7 @@ import com.tencent.bugly.crashreport.CrashReport;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +82,7 @@ import okhttp3.ResponseBody;
  */
 public class ConversationView extends RelativeLayout implements OnClickListener,
         OnLongClickListener, OnTouchListener {
-    private static final String TAG = "hwj_ConversaActivity";
+    private static final String TAG = "hwj_ConversationView";
     public static final int REQUEST_CODE_IMAGE = 21;
     public static final int REQUEST_CODE_EMOJI = 22;
 
@@ -103,7 +98,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private TextView mConversationName;
     private View mHeaderView;
     private final List<Conversation> mConversations = new ArrayList<>();
-    private Map<String, Friend> mMemberMap;
+    @Deprecated
+    private Map<String, Friend> mMemberMap = new HashMap<>();
     private ConversationListAdapterSimple mAdapter;
     private Friend mCurrentFriend = null;
     private ContentResolver mResolver;
@@ -442,8 +438,9 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     }
 
     public void updateMembers(Map<String, Friend> map) {
-        mMemberMap = map;
-        mAdapter.notifyDataSetChanged();
+        mMemberMap.clear();
+        mMemberMap.putAll(map);
+        post(() -> mAdapter.notifyDataSetChanged());
     }
 
     @Override

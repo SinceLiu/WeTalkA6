@@ -7,17 +7,22 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.readboy.wetalk.bean.Friend;
 import com.readboy.utils.NetWorkUtils;
+import com.readboy.wetalk.bean.Friend;
+import com.readboy.provider.WeTalkContract.ProfileColumns;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.UnknownServiceException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 联系人的简略信息，通过服务器获取。
@@ -26,9 +31,10 @@ import java.net.UnknownServiceException;
  * @date 2018/1/30
  */
 
-public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
+public class Profile implements ProfileColumns, Parcelable {
     private static final String TAG = "hwj_Profile";
 
+    private static final List<String> OLD_DEVICE_MODE_LIST = new ArrayList<>(Arrays.asList("W2S", "W2T", "W3T", "W5"));
 
     /**
      * uuid : DA59F29B4E001B63
@@ -40,14 +46,14 @@ public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
      */
 
     private static final String[] QUERY_COLUMNS = {
-            _ID,
-            UUID,
-            IMEI,
-            NAME,
-            TYPE,
-            SEX,
-            GRADE,
-            DATA
+            BaseColumns._ID,
+            ProfileColumns.UUID,
+            ProfileColumns.IMEI,
+            ProfileColumns.NAME,
+            ProfileColumns.TYPE,
+            ProfileColumns.SEX,
+            ProfileColumns.GRADE,
+            ProfileColumns.DATA
     };
 
     public String uuid;
@@ -74,47 +80,58 @@ public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
         try {
             JSONObject object = new JSONObject(jsonStr);
             this.uuid = object.optString("id");
-            this.imei = object.optString(IMEI);
-            this.name = object.optString(NAME);
-            this.type = object.optString(TYPE);
-            this.sex = object.optInt(SEX);
-            this.grade = object.optInt(GRADE);
+            this.imei = object.optString(ProfileColumns.IMEI);
+            this.name = object.optString(ProfileColumns.NAME);
+            this.type = object.optString(ProfileColumns.TYPE);
+            this.sex = object.optInt(ProfileColumns.SEX);
+            this.grade = object.optInt(ProfileColumns.GRADE);
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e(TAG, "Profile: e = " + e.toString());
         }
     }
 
+    /**
+     * 小系统设备
+     */
+    public boolean isOldDevice() {
+        if (TextUtils.isEmpty(type)) {
+            Log.i(TAG, "isOldDevice: type = " + type);
+            return false;
+        }
+        return OLD_DEVICE_MODE_LIST.contains(type);
+    }
+
     public static Profile createProfile(Cursor cursor) {
         Profile profile = new Profile();
-        profile.uuid = cursor.getString(cursor.getColumnIndex(UUID));
-        profile.imei = cursor.getString(cursor.getColumnIndex(IMEI));
-        profile.name = cursor.getString(cursor.getColumnIndex(NAME));
-        profile.type = cursor.getString(cursor.getColumnIndex(TYPE));
-        profile.sex = cursor.getInt(cursor.getColumnIndex(SEX));
-        profile.grade = cursor.getInt(cursor.getColumnIndex(GRADE));
+        profile.uuid = cursor.getString(cursor.getColumnIndex(ProfileColumns.UUID));
+        profile.imei = cursor.getString(cursor.getColumnIndex(ProfileColumns.IMEI));
+        profile.name = cursor.getString(cursor.getColumnIndex(ProfileColumns.NAME));
+        profile.type = cursor.getString(cursor.getColumnIndex(ProfileColumns.TYPE));
+        profile.sex = cursor.getInt(cursor.getColumnIndex(ProfileColumns.SEX));
+        profile.grade = cursor.getInt(cursor.getColumnIndex(ProfileColumns.GRADE));
         return profile;
     }
 
     public static Profile createProfile(ContentValues values) {
         Profile profile = new Profile();
-        profile.uuid = values.getAsString(UUID);
-        profile.imei = values.getAsString(IMEI);
-        profile.name = values.getAsString(NAME);
-        profile.type = values.getAsString(TYPE);
-        profile.sex = values.getAsInteger(SEX);
-        profile.grade = values.getAsInteger(GRADE);
+        profile.uuid = values.getAsString(ProfileColumns.UUID);
+        profile.imei = values.getAsString(ProfileColumns.IMEI);
+        profile.name = values.getAsString(ProfileColumns.NAME);
+        profile.type = values.getAsString(ProfileColumns.TYPE);
+        profile.sex = values.getAsInteger(ProfileColumns.SEX);
+        profile.grade = values.getAsInteger(ProfileColumns.GRADE);
         return profile;
     }
 
     public ContentValues createContentValues() {
         ContentValues values = new ContentValues();
-        values.put(UUID, uuid);
-        values.put(IMEI, imei);
-        values.put(NAME, name);
-        values.put(TYPE, type);
-        values.put(SEX, sex);
-        values.put(GRADE, grade);
+        values.put(ProfileColumns.UUID, uuid);
+        values.put(ProfileColumns.IMEI, imei);
+        values.put(ProfileColumns.NAME, name);
+        values.put(ProfileColumns.TYPE, type);
+        values.put(ProfileColumns.SEX, sex);
+        values.put(ProfileColumns.GRADE, grade);
         return values;
     }
 
@@ -167,12 +184,12 @@ public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
             Log.e(TAG, "insert: delete old profile, uuid = " + profile.uuid);
             delete(resolver, profile.uuid);
         }
-        return resolver.insert(CONTENT_URI, values);
+        return resolver.insert(ProfileColumns.CONTENT_URI, values);
     }
 
     public static int delete(ContentResolver resolver, String uuid) {
-        String where = UUID + "=?";
-        return resolver.delete(CONTENT_URI, where, new String[]{uuid});
+        String where = ProfileColumns.UUID + "=?";
+        return resolver.delete(ProfileColumns.CONTENT_URI, where, new String[]{uuid});
     }
 
     public String getUuid() {
@@ -234,11 +251,15 @@ public class Profile implements WeTalkContract.ProfileColumns, Parcelable {
     public interface CallBack {
         /**
          * 获取Profile成功回调，可能是通过数据库或者网络获取的。
+         *
+         * @param profile 结果
          */
         void onResponse(Profile profile);
 
         /**
          * 失败
+         *
+         * @param e 失败情况
          */
         void onFail(Exception e);
     }

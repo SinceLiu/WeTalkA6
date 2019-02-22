@@ -151,20 +151,33 @@ public class ConversationProvider extends ContentProvider {
                 }
                 break;
             case CODE_GROUP:
+                // replace接口有问题，慎用
                 String uuid = contentValues.getAsString(GroupColumns.UUID);
                 if (TextUtils.isEmpty(uuid)) {
+                    Log.i(TAG, "insert: uuid is null.");
                     return null;
                 }
                 int id = -1;
+                Log.i(TAG, "insert: uuid = " + uuid);
                 try (Cursor cursor = mHelper.getWritableDatabase().query(GroupColumns.TABLE_NAME,
                         null, GroupColumns.UUID + "=?", new String[]{uuid},
                         null, null, null)) {
                     if (cursor != null && cursor.moveToFirst()) {
                         id = cursor.getInt(cursor.getColumnIndex(GroupColumns._ID));
+                        Log.i(TAG, "insert: id = " + id);
                     }
                 }
-                contentValues.put(GroupColumns._ID, id);
-                long row = mHelper.getWritableDatabase().replace(GroupColumns.TABLE_NAME, null, contentValues);
+                long row = -1;
+                if (id > 0) {
+                    contentValues.put(GroupColumns._ID, id);
+                    row = mHelper.getWritableDatabase().update(GroupColumns.TABLE_NAME, contentValues,
+                            null, new String[]{});
+                } else {
+                    row = mHelper.getWritableDatabase().insert(GroupColumns.TABLE_NAME,
+                            null, contentValues);
+                }
+                Log.i(TAG, "insert: contentValues = " + contentValues.toString());
+
                 if (row <= 0) {
                     Log.w(TAG, "insert: group table, replace fail.");
                     return null;

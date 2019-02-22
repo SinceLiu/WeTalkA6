@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.telecom.Call;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -62,10 +61,12 @@ public class GroupInfoManager {
 
     private static Uri saveGroupInfoToDatabase(Context context, GroupInfo info) {
         ContentValues values = info.createContentValues();
+        Log.i(TAG, "saveGroupInfoToDatabase: values = " + values.toString());
         Uri result = context.getContentResolver().insert(CONTENT_URI, values);
         if (result == null) {
-            Log.i(TAG, "saveGroupInfoToDatabase: save fail, result = " + result);
+            Log.w(TAG, "saveGroupInfoToDatabase: save fail, result = " + result);
         }
+        Log.i(TAG, "saveGroupInfoToDatabase: result = " + result);
         return result;
     }
 

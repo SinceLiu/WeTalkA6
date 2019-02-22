@@ -85,7 +85,9 @@ public class Friend implements Parcelable {
     public int addVisibility = View.VISIBLE;
 
     public boolean isFriendGroup() {
-        return members != null && members.size() > 0 || relation == 200;
+        return (members != null && members.size() > 0)
+                || relation == 200
+                || (!"家庭圈".equals(name) && uuid.startsWith("G"));
     }
 
     public boolean isSupportGroup() {

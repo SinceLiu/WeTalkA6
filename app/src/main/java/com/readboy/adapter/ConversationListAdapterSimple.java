@@ -3,7 +3,9 @@ package com.readboy.adapter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.jar.Attributes;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -109,16 +111,23 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         TextItemHolder textItemHolder = null;
         //表情项(收,发)
         EmojiItemHolder emojiItemHolder = null;
-        VideoItemHolder videoItemHolder = null;
+//        VideoItemHolder videoItemHolder = null;
+        Holder commonHolder = null;
         final Conversation conversation = mConversations.get(position);
         int type = conversation.type;
         if (view == null) {
             if (type == Constant.SEND_VIDEO) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_video_right, viewGroup, false);
-                videoItemHolder = new VideoItemHolder(view);
+                commonHolder = new VideoItemHolder(view);
+                view.setTag(commonHolder);
             } else if (type == Constant.REC_VIDEO) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_video_left, viewGroup, false);
-                videoItemHolder = new VideoItemHolder(view);
+                commonHolder = new VideoItemHolder(view);
+                view.setTag(commonHolder);
+            } else if (type == Constant.REC_SYSTEM) {
+                view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_system, viewGroup, false);
+                commonHolder = new SystemItemHolder(view);
+                view.setTag(commonHolder);
             } else {
                 view = LayoutInflater.from(mContext).inflate(R.layout.conversation_item_simple, viewGroup, false);
                 switch (type) {
@@ -212,13 +221,13 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     textItemHolder = (TextItemHolder) view.getTag();
                     break;
                 case Constant.SEND_VIDEO:
-                    videoItemHolder = (VideoItemHolder) view.getTag();
-                    break;
                 case Constant.REC_VIDEO:
-                    videoItemHolder = (VideoItemHolder) view.getTag();
+                case Constant.REC_SYSTEM:
+                    commonHolder = (Holder) view.getTag();
                     break;
                 default:
                     Log.i(TAG, "getView: default type.");
+                    break;
             }
         }
         //设置显示的数据
@@ -296,7 +305,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 break;
             case Constant.SEND_VIDEO:
             case Constant.REC_VIDEO:
-                videoItemHolder.bindView(position, conversation);
+            case Constant.REC_SYSTEM:
+                commonHolder.bindView(position, conversation);
                 break;
             default:
                 Log.e(TAG, "getView: other type = " + type);
@@ -306,6 +316,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
     private void updateName(Holder holder, Conversation conversation) {
         if (conversation.isHomeGroup == Constant.TRUE) {
+            String name = FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName);
+            Log.i(TAG, "updateName: senderName = " + conversation.senderName + ", name = " + name);
             holder.userName.setText(FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName));
             //WTContactUtils.getNameById(mContext,conversation.realSendId));
         } else {
@@ -660,6 +672,9 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
         Holder(View view) {
         }
+
+        void bindView(int position, Conversation conversation) {
+        }
     }
 
     /**
@@ -670,7 +685,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         ImageView content;
 
         ImageItemHolder() {
-            
+
         }
 
         ImageItemHolder(View view) {
@@ -760,6 +775,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             });
         }
 
+        @Override
         void bindView(int position, Conversation conversation) {
             this.mConversation = conversation;
             updateName(this, conversation);
@@ -781,6 +797,20 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
             showUploadFileProgressOrResend(conversation, this);
             showReceiveOrSendTime(conversation, position, this);
+        }
+    }
+
+    private class SystemItemHolder extends Holder {
+        private TextView mContentTv;
+
+        public SystemItemHolder(View view) {
+            mContentTv = view.findViewById(R.id.item_conversation_system_content);
+        }
+
+        @Override
+        void bindView(int position, Conversation conversation) {
+            super.bindView(position, conversation);
+            mContentTv.setText(conversation.content);
         }
     }
 
@@ -823,6 +853,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     /**
      * 文件上传Handler.
      */
+    @SuppressLint("HandlerLeak")
     private Handler mReUploadFileHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {

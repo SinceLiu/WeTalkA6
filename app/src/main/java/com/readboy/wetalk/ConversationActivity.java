@@ -1,5 +1,6 @@
 package com.readboy.wetalk;
 
+import android.app.readboy.IReadboyWearListener;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentValues;
@@ -22,6 +23,7 @@ import com.readboy.bean.GroupInfoManager;
 import com.readboy.provider.Conversations;
 import com.readboy.utils.FriendNameUtil;
 import com.readboy.utils.NotificationUtils;
+import com.readboy.utils.WearManagerProxy;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.view.ConversationView;
 import com.readboy.view.GroupMembersView;
@@ -38,6 +40,7 @@ import java.util.Map;
  * @date 2018/12/28
  */
 public class ConversationActivity extends BaseActivity implements GroupInfoManager.CallBack {
+    private static final String TAG = "hwj-ConversationAct";
 
     private static final int DELAY_LOAD_TIME = 1000;
 
@@ -66,6 +69,8 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
             GroupInfo info = GroupInfoManager.getDataFormDatabase(this, uuid);
             if (info != null && info.getFriends() != null) {
                 updateMembersMap(info);
+            } else {
+                Log.w(TAG, "onCreate: info = " + info);
             }
         }
         Log.i(TAG, "onCreate: isFriendGroup = " + isGroup);
@@ -95,7 +100,10 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
         for (Friend f : info.getFriends()) {
             map.put(f.uuid, f);
         }
-        FriendNameUtil.mMembersMap = map;
+        FriendNameUtil.updateMembersMap(map);
+        if (mConversationView != null) {
+//            mConversationView.updateMembers(map);
+        }
     }
 
     @Override

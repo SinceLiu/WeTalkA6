@@ -22,6 +22,7 @@ import com.readboy.bean.GroupInfo;
 import com.readboy.bean.GroupInfoManager;
 import com.readboy.adapter.GroupMembersAdapter;
 import com.readboy.bean.Constant;
+import com.readboy.dialog.NoPhoneNumDialog;
 import com.readboy.utils.JsonMapper;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.dialog.AddFriendDialog;
@@ -36,9 +37,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author oubin
@@ -114,11 +118,31 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     public void setData(List<Friend> data) {
         mMemberList.clear();
         if (data != null) {
+            sortMember(data);
             Log.i(TAG, "setData: data size = " + data.size());
             mMemberList.addAll(data);
         }
         mAdapter.setData(data);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void sortMember(List<Friend> members) {
+        if (mGroupInfo == null) {
+            Log.i(TAG, "sortMember: mGroupInfo = null.");
+            return;
+        }
+        Collections.sort(members, new Comparator<Friend>() {
+            @Override
+            public int compare(Friend f1, Friend f2) {
+                if (f1.uuid.equals(mGroupInfo.getOwner())) {
+                    return -1;
+                } else if (f2.uuid.equals(mGroupInfo.getOwner())) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
     }
 
     public void setActivity(Activity activity) {
@@ -164,9 +188,14 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
     private void addFriend(Friend member) {
         Log.i(TAG, "addFriend: ");
-        AddFriendDialog dialog = new AddFriendDialog(mContext);
-        dialog.show();
-        dialog.setFriend(member);
+        if (WearManagerProxy.hadPhoneNumber(mContext)) {
+            AddFriendDialog dialog = new AddFriendDialog(mContext);
+            dialog.show();
+            dialog.setFriend(member);
+        } else {
+            NoPhoneNumDialog dialog = new NoPhoneNumDialog(mContext);
+            dialog.show();
+        }
     }
 
     private void removeAction() {
@@ -292,10 +321,10 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         }
         String response = data.getStringExtra(FriendSelectorActivity.EXTRA_DATA);
         try {
-            JSONObject object = new JSONObject(response);
             if (requestCode == REQUEST_CODE_REMOVE) {
                 GroupInfoManager.getGroupInfoFromNet(mContext, mGroup.uuid, this);
             } else if (requestCode == REQUEST_CODE_ADD) {
+                JSONObject object = new JSONObject(response);
                 String id = object.optString("id");
                 if (id != null && id.equals(mGroup.uuid)) {
                     handleActivityResult(data);
@@ -305,7 +334,9 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                 }
             }
         } catch (JSONException e) {
+            Log.i(TAG, "onActivityResult: response = " + response);
             e.printStackTrace();
+            GroupInfoManager.getGroupInfoFromNet(mContext, mGroup.uuid, this);
         }
     }
 

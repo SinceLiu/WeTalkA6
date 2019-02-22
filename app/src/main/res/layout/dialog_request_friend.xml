@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_orange_dark"
     tools:parentTag="com.readboy.dialog.RequestFriendView">
 
     <TextView
@@ -57,5 +56,11 @@
         android:layout_gravity="center"
         android:src="@drawable/loading_animator"
         android:visibility="gone" />
+
+    <ViewStub
+        android:id="@+id/stub_no_phone_number"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/dialog_no_phone_number" />
 
 </merge>

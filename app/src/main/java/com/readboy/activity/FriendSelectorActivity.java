@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.app.readboy.IReadboyWearListener;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import com.readboy.adapter.BaseCheckAdapter;
 import com.readboy.adapter.FriendSelectorAdapter;
 import com.readboy.bean.Constant;
 import com.readboy.bean.FriendGroup;
+import com.readboy.provider.Profile;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.recyclerview.wrapper.HeaderAndFooterWrapper;
 import com.readboy.utils.ToastUtils;
@@ -32,7 +35,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author oubin
@@ -50,6 +56,10 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     private FriendSelectorAdapter mAdapter;
     private Friend mGroup;
     private final List<Friend> mFriends = new ArrayList<>();
+    /**
+     * 用于通过机型过滤条件，key为uuid
+     */
+    private HashMap<String, Profile> mProfileMap = new HashMap<>();
     private Button mBtnConfirm;
     private View mProgressBarParent;
     private ProgressBar mProgressBar;
@@ -64,6 +74,25 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         setContentView(R.layout.activity_friend_selector);
         initData();
         initView();
+
+        if (mType == Type.CREATE || mType == Type.ADD) {
+//            initProfiles(mFriends);
+            asyncInitProfiles();
+        } else {
+            hideProgressBar();
+        }
+    }
+
+    @Override
+    public void onEnterAnimationComplete() {
+        super.onEnterAnimationComplete();
+        Log.i(TAG, "onEnterAnimationComplete: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "onResume: ");
     }
 
     @Override
@@ -100,9 +129,10 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
             int ordinal = intent.getIntExtra(EXTRA_TYPE_ORDINAL, 0);
             mType = Type.valueOf(ordinal);
         }
-        if (mAdapter != null) {
-            mAdapter.notifyDataSetChanged();
-        }
+
+//        if (mAdapter != null) {
+//            mAdapter.notifyDataSetChanged();
+//        }
     }
 
     public void setData(List<Friend> data) {
@@ -115,8 +145,54 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         }
     }
 
-    private void getContacts() {
+    private void asyncInitProfiles() {
+        Log.i(TAG, "asyncInitProfiles: ");
+        AsyncTask<List<Friend>, Void, Void> asyncTask = new AsyncTask<List<Friend>, Void, Void>() {
+            @Override
+            protected Void doInBackground(List<Friend>... lists) {
+                initProfiles(lists[0]);
+                return null;
+            }
+        };
+        asyncTask.execute(mFriends);
+    }
 
+    private void initProfiles(List<Friend> friends) {
+        final int size = friends.size();
+        for (Friend friend : friends) {
+            final String uuid = friend.uuid;
+            Profile.getProfile(this, uuid, new Profile.CallBack() {
+                @Override
+                public void onResponse(Profile profile) {
+                    mProfileMap.put(uuid, profile);
+                    if (mProfileMap.size() >= size) {
+                        filterFriends();
+                    }
+                }
+
+                @Override
+                public void onFail(Exception e) {
+                    mProfileMap.put(uuid, null);
+                    if (mProfileMap.size() >= size) {
+                        filterFriends();
+                    }
+                }
+            });
+        }
+    }
+
+    private void filterFriends() {
+        List<Friend> list = new ArrayList<>(mFriends);
+        for (Friend friend : list) {
+            Profile profile = mProfileMap.get(friend.uuid);
+            if (profile == null || profile.isOldDevice()) {
+                mFriends.remove(friend);
+            }
+        }
+        mHandler.post(() -> {
+            hideProgressBar();
+            mAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override
@@ -154,7 +230,11 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
                             }
                         } else {
                             Intent intent = new Intent();
-                            intent.putExtra(EXTRA_DATA, data);
+                            if (!TextUtils.isEmpty(data)) {
+                                intent.putExtra(EXTRA_DATA, data);
+                            } else {
+                                intent.putExtra(EXTRA_DATA, result);
+                            }
                             setResult(RESULT_OK, intent);
                         }
                         finish();
@@ -213,13 +293,17 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     }
 
     private void hideProgressBar() {
-        mProgressBarParent.setVisibility(View.GONE);
-        mProgressBar.setVisibility(View.GONE);
+        if (mProgressBarParent != null) {
+            mProgressBarParent.setVisibility(View.GONE);
+            mProgressBar.setVisibility(View.GONE);
+        }
     }
 
     private void gotoConversation(Friend friend) {
+        Log.i(TAG, "gotoConversation: ");
         Intent intent = new Intent(mContext, ConversationActivity.class);
         intent.putExtra(Constant.EXTRA_FRIEND, friend);
+        startActivity(intent);
     }
 
     @Override

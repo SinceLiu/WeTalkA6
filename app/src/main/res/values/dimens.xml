@@ -66,5 +66,7 @@
     <dimen name="record_dialog_width">150px</dimen>
     <dimen name="group_members_width">120px</dimen>
     <dimen name="group_members_height">110px</dimen>
+    <dimen name="item_conversation_margin_end">6px</dimen>
+    <dimen name="item_conversation_padding_start">6px</dimen>
 
 </resources>

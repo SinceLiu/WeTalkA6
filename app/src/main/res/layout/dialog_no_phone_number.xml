@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_no_phone_number_parent"
+    android:layout_width="240px"
+    android:layout_height="240px"
+    android:background="@android:color/black">
+
+    <TextView
+        android:id="@+id/request_friend_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50px"
+        android:layout_marginStart="15px"
+        android:layout_marginEnd="15px"
+        android:lineSpacingExtra="2px"
+        android:text="@string/warning_no_phone_number"
+        android:textColor="@android:color/white"
+        android:textSize="21px" />
+
+    <Button
+        android:id="@+id/dialog_no_phone_number_confirm"
+        android:layout_width="236px"
+        android:layout_height="50px"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="5px"
+        android:background="@drawable/btn_confirm_corner_selector" />
+
+</FrameLayout>

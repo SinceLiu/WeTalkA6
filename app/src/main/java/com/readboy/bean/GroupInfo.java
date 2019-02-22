@@ -29,6 +29,19 @@ public class GroupInfo {
      * members : ["<UUID>|<name>","..."]
      * v : 123
      */
+    /**
+     * {
+     *     "owner": "D05C2C75FA00413B",
+     *     "members": [
+     *         "D05C2C75FA00413B|OB-A6",
+     *         "D05C63B49F002561|hwja6",
+     *         "D05C2C78D500413C|Hwj-A6"
+     *     ],
+     *     "name": "OB-A6好友群②",
+     *     "created_at": "2019-02-18 10:03:34.0",
+     *     "id": "G05C6A127600AD7E"
+     * }
+     */
 
     private String id;
     private String owner;

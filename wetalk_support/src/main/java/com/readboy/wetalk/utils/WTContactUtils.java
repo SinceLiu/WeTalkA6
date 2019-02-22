@@ -1,5 +1,7 @@
 package com.readboy.wetalk.utils;
 
+import android.app.readboy.PersonalInfo;
+import android.app.readboy.ReadboyWearManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,12 +17,16 @@ import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.wetalk.support.R;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -105,7 +111,6 @@ public class WTContactUtils {
             Log.i("hwj", "没有获取到联系人");
             return list;
         }
-        Log.i(TAG, "getFriendFromContacts: count = " + cursor.getCount());
         Friend contact = null;
         while (cursor.moveToNext()) {
             contactId = cursor.getInt(cursor.getColumnIndex(Data.RAW_CONTACT_ID));
@@ -141,7 +146,9 @@ public class WTContactUtils {
                 case StructuredPostal.CONTENT_ITEM_TYPE:
                     if (cursor.getInt(cursor.getColumnIndex(StructuredPostal.TYPE)) == StructuredPostal.TYPE_WORK) {
                         contact.uuid = cursor.getString(cursor.getColumnIndex("data8"));
-                        if (contact.uuid.startsWith("G")) {
+                        if ("家庭圈".equals(contact.name)) {
+                            contact.icon = R.drawable.ic_family_group;
+                        } else if (contact.uuid.startsWith("G")) {
                             contact.icon = R.drawable.ic_friend_group;
                         }
 //                        contact.unreadCount = cursor.getInt(cursor.getColumnIndex("data6"));
@@ -244,13 +251,37 @@ public class WTContactUtils {
      */
     public static int getUnreadMessageCount(Context context) {
         int result = 0;
-        String selection = "unread=1";
+        String selection = "unread = 1 AND send_id in (";
+        StringBuilder builder = new StringBuilder(selection);
+        Log.i(TAG, "getUnreadMessageCount: 1  >> ");
+        List<String> list = getAllUuid(context);
+        if (list == null || list.size() <= 0) {
+            Log.w(TAG, "getUnreadMessageCount: list = null");
+            return 0;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            if (i == 0) {
+                builder.append("\"");
+                builder.append(list.get(i));
+                builder.append("\"");
+            } else {
+                builder.append(", ");
+                builder.append("\"");
+                builder.append(list.get(i));
+                builder.append("\"");
+            }
+        }
+        builder.append(")");
+        Log.i(TAG, "getUnreadMessageCount: 2  >> " + Arrays.toString(list.toArray()));
+//        String[] args = new String[]{};
+//        args = list.toArray(args);
         try (Cursor cursor = context.getContentResolver().query(CONVERSATION_URI, null,
-                selection, null, null)) {
+                builder.toString(), null, null)) {
             if (cursor != null) {
                 result = cursor.getCount();
             }
         }
+        Log.i(TAG, "getUnreadMessageCount: 3  >> ");
         return result;
     }
 
@@ -261,7 +292,7 @@ public class WTContactUtils {
         int result = 0;
         String selection = "unread = 1 AND send_id = ?";
         try (Cursor cursor = context.getContentResolver().query(CONVERSATION_URI, null,
-                selection, new String[] {uuid}, null)) {
+                selection, new String[]{uuid}, null)) {
             if (cursor != null) {
                 result = cursor.getCount();
             }
@@ -296,6 +327,26 @@ public class WTContactUtils {
                 "data8=?", new String[]{uuid}, null)) {
             return cursor != null && cursor.getCount() > 0;
         }
+    }
+
+    public static List<String> getAllUuid(Context context) {
+        List<String> list = new ArrayList<>();
+        String data = Data.DATA8;
+        String selection = "data8 NOT LIKE \"M%\"";
+        try (Cursor cursor = context.getContentResolver().query(Data.CONTENT_URI, new String[]{data},
+                selection, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String uuid = cursor.getString(cursor.getColumnIndex(data));
+                    if (!TextUtils.isEmpty(uuid)) {
+                        list.add(uuid);
+                    } else {
+                        Log.i(TAG, "getAllUuid: uuid = " + uuid);
+                    }
+                } while (cursor.moveToNext());
+            }
+        }
+        return list;
     }
 
     public static boolean deleteContactsByUuid(Context context, String uuid) {

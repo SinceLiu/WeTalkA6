@@ -36,10 +36,15 @@ class DatabaseHelper extends SQLiteOpenHelper {
      */
     private static final int VERSION_4 = 4;
 
+    /**
+     * 创建索引
+     */
+    private static final int VERSION_5 = 5;
+
     static final String CONVERSATION_TABLE_NAME = Conversations.Conversation.TABLE_NAME;
 
     DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, VERSION_4);
+        super(context, DATABASE_NAME, null, VERSION_5);
     }
 
     @Override
@@ -71,6 +76,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
 
         createProfileTable(sqLiteDatabase);
         createGroupTable(sqLiteDatabase);
+        createGroupIndex(sqLiteDatabase);
     }
 
     private void createProfileTable(SQLiteDatabase db) {
@@ -98,6 +104,15 @@ class DatabaseHelper extends SQLiteOpenHelper {
                 + GroupColumns.VERSION + " INTEGER)");
     }
 
+    /**
+     * 在group表创建索引
+     */
+    private void createGroupIndex(SQLiteDatabase db) {
+        Log.i(TAG, "createGroupIndex: ");
+        db.execSQL("CREATE INDEX index_uuid ON " + GroupColumns.TABLE_NAME
+                + " (" + GroupColumns.UUID + ")");
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         Log.e(TAG, "onUpgrade: old = " + oldVersion + ", new = " + newVersion);
@@ -105,8 +120,12 @@ class DatabaseHelper extends SQLiteOpenHelper {
             createProfileTable(sqLiteDatabase);
         }
 
-        if (newVersion >= VERSION_4) {
+        if (newVersion >= VERSION_4 && oldVersion <= VERSION_3) {
             createGroupTable(sqLiteDatabase);
+        }
+
+        if (newVersion == VERSION_5) {
+            createGroupIndex(sqLiteDatabase);
         }
 //        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + CONVERSATION_TABLE_NAME);
 //        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ProfileColumns.TABLE_NAME);

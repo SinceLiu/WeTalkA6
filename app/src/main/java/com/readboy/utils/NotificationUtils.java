@@ -4,45 +4,34 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentProviderClient;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteException;
-import android.media.AudioAttributes;
 import android.net.ParseException;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.readboy.activity.RequestFriendActivity;
-import com.readboy.bean.Conversation;
-import com.readboy.provider.Conversations;
 import com.readboy.provider.Profile;
-import com.readboy.provider.WeTalkContract;
-import com.readboy.wetalk.FriendActivity;
 import com.readboy.wetalk.R;
 import com.readboy.wetalk.utils.WTContactUtils;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 /**
- * Created by hwwjian on 2016/12/21.
+ *
+ * @author hwwjian
+ * @date 2016/12/21
  * 发通知的情况:
  * 1.非微聊界面收到消息,正常通知(声音,震动,弹出)
  * 2.微聊好友界面(震动)

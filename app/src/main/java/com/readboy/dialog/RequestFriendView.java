@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -57,6 +58,13 @@ public class RequestFriendView extends FrameLayout implements View.OnClickListen
         findViewById(R.id.request_friend_agree).setOnClickListener(this);
         mContentTv = findViewById(R.id.request_friend_content);
         mProgressBar = findViewById(R.id.progress_bar);
+        if (!WearManagerProxy.hadPhoneNumber(mContext)) {
+            Log.i(TAG, "RequestFriendView: no have phone number.");
+            ViewStub viewStub = findViewById(R.id.stub_no_phone_number);
+            viewStub.inflate();
+            View button = findViewById(R.id.dialog_no_phone_number_confirm);
+            button.setOnClickListener(v -> handleDismissEvent());
+        }
     }
 
     public void setFriend(Profile friend) {

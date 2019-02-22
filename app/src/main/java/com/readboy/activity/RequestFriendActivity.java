@@ -1,9 +1,9 @@
 package com.readboy.activity;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.readboy.dialog.RequestFriendView;
 import com.readboy.provider.Profile;
@@ -23,6 +23,7 @@ public class RequestFriendActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate: ");
         mParent = new RequestFriendView(this);
         setContentView(mParent);
         mParent.setOnDismissListener(new DialogInterface.OnDismissListener() {

@@ -34,5 +34,14 @@
     <string name="warning_group_create">Please choose at least two friends</string>
     <string name="warning_group_add">Please choose at least one friends</string>
     <string name="warning_group_remove">Please choose at least one friends</string>
+    <string name="add_friend_content">Confirm add %s to friends？</string>
+    <string name="request_friend_content">%s request to add you as a friend，you can chat and make phone calls after adding</string>
+
+    <string name="cancel">cancel</string>
+    <string name="confirm">confirm</string>
+    <string name="warning_disband_group">Are you sure to dissolve the group?</string>
+    <string name="warning_leave_group">Are you sure you want to quit the group?</string>
+    <string name="warning_no_phone_number">In order not to affect the normal contact between friends,
+        Please add a phone number to the parent\'s device information.</string>
     <string name="load_failure">load failure</string>
 </resources>

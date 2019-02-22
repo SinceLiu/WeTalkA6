@@ -54,7 +54,7 @@ public class WetalkFrameLayout extends FrameLayout {
     private static final int MESSAGE_UPDATE_UNREAD_COUNT = 20;
     private static final int DELAY_UPDATE_MILLIS_TIME = 100;
 
-    private List<Friend> mFriends;
+    private List<Friend> mFriends = new ArrayList<>();
 
     private GetFriendTask mGetFriendTask;
     private EmptyRecyclerView mFriendRecyclerList;
@@ -240,6 +240,7 @@ public class WetalkFrameLayout extends FrameLayout {
 //                hideLoading();
                 mLoading.setVisibility(GONE);
             }
+            sortFriends(friends);
             if (friends != null && friends.size() > 0) {
                 friends.add(new CreateGroup());
             }
@@ -324,71 +325,53 @@ public class WetalkFrameLayout extends FrameLayout {
     /**
      * 更新好友列表信息(用户名和未读信息数,不更新头像)
      *
-     * @param friends 最新获取到的好友数据
+     * @param friends 最新获取到的好友数据，不包括创建群
      */
     @SuppressLint("NewApi")
     private void updateFriendData(List<Friend> friends) {
+        mFriends.clear();
         if (friends == null || friends.size() == 0) {
             return;
         }
-        if (mFriends == null) {
-            mFriends = friends;
-        } else {
-            if (mFriends.size() != friends.size()) {
-                //联系人增删了,整个重建
-                mFriends.clear();
-                mFriends = friends;
-            } else {
-                mFriends.clear();
-                mFriends.addAll(friends);
-                // TODO 为什么需要这样处理，刷新问题吗，闪屏问题？
-//                for (Friend newFriend : friends) {
-//                    for (Friend oldFriend : mFriends) {
-//                        if (oldFriend.uuid.equals(newFriend.uuid)) {
-//                            if (oldFriend.unreadCount != newFriend.unreadCount) {
-//                                //未读信息数变化
-//                                oldFriend.unreadCount = newFriend.unreadCount;
-//                            }
-//                            if (!oldFriend.name.equals(newFriend.name)) {
-//                                //用户名变化
-//                                oldFriend.name = newFriend.name;
-//                            }
-//                            oldFriend.photoUri = newFriend.photoUri;
-//                        }
-//                    }
-//                }
-            }
-        }
-        sortFriends();
-        // 防止多次加入，确保之前清掉了，因为可能会多次获取联系人数据
-//        mFriends.add(new CreateGroup());
+        mFriends.addAll(friends);
     }
 
-    private void sortFriends() {
-        Collections.sort(mFriends, new Comparator<Friend>() {
+    private void sortFriends(List<Friend> friends) {
+        Collections.sort(friends, new Comparator<Friend>() {
 
             @Override
             public int compare(Friend f1, Friend f2) {
-                if (f1.unreadCount <= f2.unreadCount) {
+                if ("家庭圈".equals(f1.name)) {
+                    return -2;
+                } else if ("家庭圈".equals(f2.name)) {
+                    return 2;
+                } else if (f1.type == Friend.TYPE_CREATE_GROUP) {
+                    return 3;
+                } else if (f2.type == Friend.TYPE_CREATE_GROUP) {
+                    return -3;
+                } else if (f1.unreadCount < f2.unreadCount) {
                     return 1;
-                } else {
+                } else if (f1.unreadCount > f2.unreadCount){
                     return -1;
+                } else {
+                    return 0;
                 }
             }
         });
-        int homeGroupPos = getFriendPosition(getString(R.string.wetalk_home_group));
-        if (homeGroupPos < mFriends.size()) {
-            Friend homeGroup = mFriends.get(homeGroupPos);
-            homeGroup.icon = R.drawable.ic_family_group;
-            mFriends.remove(homeGroupPos);
-            mFriends.add(0, homeGroup);
-        }
-        for (Friend friend : mFriends) {
-            if (friend.type == Friend.TYPE_CREATE_GROUP) {
-                mFriends.remove(friend);
-                mFriends.add(friend);
-            }
-        }
+//        int homeGroupPos = getFriendPosition(getString(R.string.wetalk_home_group));
+//        if (homeGroupPos < friends.size()) {
+//            Friend homeGroup = friends.get(homeGroupPos);
+//            homeGroup.icon = R.drawable.ic_family_group;
+//            friends.remove(homeGroupPos);
+//            friends.add(0, homeGroup);
+//        }
+//        for (Friend friend : friends) {
+//            if (friend.type == Friend.TYPE_CREATE_GROUP) {
+//                friends.remove(friend);
+//                friends.add(friend);
+//            }
+//        }
+
     }
 
     private void gotoFriendSelector() {
@@ -456,9 +439,12 @@ public class WetalkFrameLayout extends FrameLayout {
         List<Friend> friends = new ArrayList<>(mFriends);
         if (friends.size() > 0) {
             for (Friend friend : friends) {
-                friend.unreadCount = WTContactUtils.getUnreadMessageCount(mContext, friend.uuid);
+                if (friend.uuid != null && friend.type != Friend.TYPE_CREATE_GROUP) {
+                    friend.unreadCount = WTContactUtils.getUnreadMessageCount(mContext, friend.uuid);
+                }
             }
         }
+        sortFriends(friends);
         updateFriendData(friends);
         mAdapter.notifyDataSetChanged();
         Log.i(TAG, "updateUnreadCount: 2  >> ");
