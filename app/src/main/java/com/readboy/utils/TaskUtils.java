@@ -42,7 +42,6 @@ public class TaskUtils {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         ActivityManager.RunningAppProcessInfo processInfo = appProcesses.get(0);
-        Log.i(TAG, "isBackgroundProcess: " + processInfo.processName + ", " + processInfo.importance);
         if (context.getPackageName().equals(processInfo.processName)) {
             return processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
         } else {

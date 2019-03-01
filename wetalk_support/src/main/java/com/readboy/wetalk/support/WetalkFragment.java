@@ -86,7 +86,6 @@ public class WetalkFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        Log.i(TAG, "setUserVisibleHint() called with: isVisibleToUser = " + isVisibleToUser + "");
         if (isVisibleToUser) {
             if (mParent != null) {
                 mParent.onResume();

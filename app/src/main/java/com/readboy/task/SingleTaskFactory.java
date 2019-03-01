@@ -1,7 +1,6 @@
 package com.readboy.task;
 
 import android.os.Handler;
-import android.os.Looper;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -13,11 +12,15 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * TODO 未完善。如果针对数据库监听等处理，可以使用LoaderManager，而不是ContentObserver.
+ * 其他场景待考虑。
+ *
  * @author oubin
  * @date 2019/2/12
  * 1.同时只会运行一个任务，过程有任务，结束任务后，运行一次任务；
  * 2.不可见过程，不执行任务；可见后，过程有任务队列，就执行；
  * 3.可加延迟处理，防止过多的短小运行。这样处理会损失时效性；
+ * 4.对执行任务的需求，执行完会反馈给UI线程更新数据，最好有返回值给UI线程
  */
 public class SingleTaskFactory extends TaskFactory {
 

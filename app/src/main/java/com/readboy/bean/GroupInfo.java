@@ -170,11 +170,21 @@ public class GroupInfo {
         values.put(GroupColumns.NAME, name);
         if (TextUtils.isEmpty(membersJsonStr)) {
             membersJsonStr = JsonMapper.toJson(members);
-            Log.i(TAG, "createContentValues: membersJsonStr = " + membersJsonStr);
         }
         values.put(GroupColumns.MEMBERS, membersJsonStr);
         values.put(GroupColumns.VERSION, v);
         return values;
     }
 
+    @Override
+    public String toString() {
+        return "GroupInfo{" +
+                "id='" + id + '\'' +
+                ", owner='" + owner + '\'' +
+                ", name='" + name + '\'' +
+                ", v=" + v +
+                ", membersJsonStr='" + membersJsonStr + '\'' +
+                ", members=" + members +
+                '}';
+    }
 }

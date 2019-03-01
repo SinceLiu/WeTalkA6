@@ -26,6 +26,8 @@ import com.readboy.provider.WeTalkContract.ProfileColumns;
 import com.readboy.provider.WeTalkContract.GroupColumns;
 
 /**
+ * TODO，重构，不同类型内容，共享数据库字段，参考{@link Conversation}
+ *
  * @author hwwjian
  * @date 2016/12/1
  */
@@ -158,7 +160,6 @@ public class ConversationProvider extends ContentProvider {
                     return null;
                 }
                 int id = -1;
-                Log.i(TAG, "insert: uuid = " + uuid);
                 try (Cursor cursor = mHelper.getWritableDatabase().query(GroupColumns.TABLE_NAME,
                         null, GroupColumns.UUID + "=?", new String[]{uuid},
                         null, null, null)) {
@@ -169,14 +170,14 @@ public class ConversationProvider extends ContentProvider {
                 }
                 long row = -1;
                 if (id > 0) {
-                    contentValues.put(GroupColumns._ID, id);
+//                    contentValues.put(GroupColumns._ID, id);
+//                    Log.i(TAG, "insert: values = " + contentValues.toString());
                     row = mHelper.getWritableDatabase().update(GroupColumns.TABLE_NAME, contentValues,
-                            null, new String[]{});
+                            GroupColumns._ID + "=" + id, null);
                 } else {
                     row = mHelper.getWritableDatabase().insert(GroupColumns.TABLE_NAME,
                             null, contentValues);
                 }
-                Log.i(TAG, "insert: contentValues = " + contentValues.toString());
 
                 if (row <= 0) {
                     Log.w(TAG, "insert: group table, replace fail.");
@@ -327,6 +328,15 @@ public class ConversationProvider extends ContentProvider {
                 conversation.voiceUrl = cursor.getString(cursor.getColumnIndex(Conversations.Conversation.VOICE_URL));
                 conversation.time = cursor.getString(cursor.getColumnIndex(Conversations.Conversation.TIME));
                 conversation.isPlaying = cursor.getInt(cursor.getColumnIndex(Conversations.Conversation.IS_PLAYING));
+
+                //TODO 兼容策略，这里需要修改
+                switch (conversation.type) {
+                    case Constant.REC_SYSTEM:
+                        conversation.content = conversation.textContent;
+                        break;
+                    default:
+                        break;
+                }
 
                 //上次意外中断，有发送中的消息,改成
                 if (conversation.isSending == Constant.TRUE) {

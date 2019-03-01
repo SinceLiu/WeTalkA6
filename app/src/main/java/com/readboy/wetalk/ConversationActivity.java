@@ -1,14 +1,17 @@
 package com.readboy.wetalk;
 
+import android.annotation.SuppressLint;
 import android.app.readboy.IReadboyWearListener;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.MaskFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -43,6 +46,7 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
     private static final String TAG = "hwj-ConversationAct";
 
     private static final int DELAY_LOAD_TIME = 1000;
+    private static final int WHAT_UPDATE_GROUP = 10;
 
     private ViewPager mViewPager;
     private List<View> mViewList = new ArrayList<>();
@@ -51,7 +55,20 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
     private Friend mFriend;
     private GroupMembersView mMembersView;
     private ConversationView mConversationView;
-    private Handler mHandler = new Handler();
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case WHAT_UPDATE_GROUP:
+                    updateGroupInfoFromNet(mFriend.uuid);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
     private Runnable mGroupRunnable;
     private boolean hadUpdateGroupInfo;
 
@@ -67,9 +84,12 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
         if (friend.isFriendGroup()) {
             isGroup = true;
             GroupInfo info = GroupInfoManager.getDataFormDatabase(this, uuid);
+            // TODO, 不在数据库里，就马上网络获取，防止聊天列表没有名字。
             if (info != null && info.getFriends() != null) {
+                Log.i(TAG, "onCreate: info = " + info.toString());
                 updateMembersMap(info);
             } else {
+                mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_GROUP, 1000);
                 Log.w(TAG, "onCreate: info = " + info);
             }
         }
@@ -83,14 +103,8 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
 
     private void updateGroupInfoFromNet(String uuid) {
         hadUpdateGroupInfo = true;
-        mGroupRunnable = new Runnable() {
-            @Override
-            public void run() {
-                GroupInfoManager.getGroupInfoFromNet(ConversationActivity.this,
-                        uuid, ConversationActivity.this);
-            }
-        };
-        mHandler.post(mGroupRunnable);
+        GroupInfoManager.getGroupInfoFromNet(ConversationActivity.this,
+                uuid, ConversationActivity.this);
     }
 
     private void updateMembersMap(GroupInfo info) {
@@ -102,7 +116,9 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
         }
         FriendNameUtil.updateMembersMap(map);
         if (mConversationView != null) {
+            // TODO, 取舍，是静态呢方便共享数据，还是传递过去，确定内存的准确以及释放
 //            mConversationView.updateMembers(map);
+            mConversationView.notifyDataSetChanged();
         }
     }
 
@@ -117,6 +133,7 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
 
     private void assignView() {
         LayoutInflater inflater = LayoutInflater.from(this);
+        Log.e(TAG, "assignV iew: ");
         mConversationView = (ConversationView) inflater.inflate(R.layout.page_conversation, null);
         mConversationView.setActivity(this);
         mViewList.add(mConversationView);

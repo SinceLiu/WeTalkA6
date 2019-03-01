@@ -81,7 +81,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     @Override
     public int getViewTypeCount() {
         //相当于消息类型数
-        return 10;
+        return 12;
     }
 
     @Override
@@ -115,6 +115,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         Holder commonHolder = null;
         final Conversation conversation = mConversations.get(position);
         int type = conversation.type;
+        Log.i(TAG, "getView: position = " + position + " type = " + type);
         if (view == null) {
             if (type == Constant.SEND_VIDEO) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_video_right, viewGroup, false);
@@ -315,6 +316,10 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     }
 
     private void updateName(Holder holder, Conversation conversation) {
+        if (holder.userName == null) {
+            // 系统消息没有名字
+            return;
+        }
         if (conversation.isHomeGroup == Constant.TRUE) {
             String name = FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName);
             Log.i(TAG, "updateName: senderName = " + conversation.senderName + ", name = " + name);
@@ -394,7 +399,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
                 @Override
                 public void pushFail(String s, String s1, int i, String s2) {
-                    Log.i(TAG, "pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+                    Log.i(TAG, "send message pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
                     mSendMessageHandler.obtainMessage(ConversationView.SEND_MESSAGE_FAIL, conversation).sendToTarget();
                 }
             });
@@ -655,6 +660,9 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         mKeepScreenView = view;
     }
 
+    /**
+     * TODO，重构，公共部分放到Holder里
+     */
     class Holder {
         //用户名
         TextView userName;
@@ -671,14 +679,20 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         }
 
         Holder(View view) {
+            sendOrReceiveTime = view.findViewById(R.id.item_conversation_time);
+            userName = view.findViewById(R.id.item_conversation_name);
         }
 
         void bindView(int position, Conversation conversation) {
+            Log.i(TAG, "bindView: position = " + position);
+            updateName(this, conversation);
+            showReceiveOrSendTime(conversation, position, this);
         }
     }
 
     /**
      * 图片项
+     * TODO，重构，公共部分放到Holder里
      */
     protected class ImageItemHolder extends Holder {
         //内容
@@ -689,6 +703,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         }
 
         ImageItemHolder(View view) {
+            super(view);
             content = (ImageView) view.findViewById(R.id.conversation_item_send_image_content);
             item = view.findViewById(R.id.conversation_item_send_image);
             retry = (ImageView) view.findViewById(R.id.conversation_item_send_image_resend_btn);
@@ -700,6 +715,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
     /**
      * 语音项
+     * TODO，重构，公共部分放到Holder里
      */
     protected class VoiceItemHolder extends Holder {
         /**
@@ -753,6 +769,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         Conversation mConversation;
 
         VideoItemHolder(View view) {
+            super(view);
             sendOrReceiveTime = view.findViewById(R.id.item_conversation_time);
             userName = view.findViewById(R.id.item_conversation_name);
             retry = view.findViewById(R.id.item_conversation_retry);
@@ -777,8 +794,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
         @Override
         void bindView(int position, Conversation conversation) {
+            super.bindView(position, conversation);
             this.mConversation = conversation;
-            updateName(this, conversation);
             String path = conversation.thumbImageUrl;
             if (!TextUtils.isEmpty(path) && new File(path).exists()) {
                 Glide.with(mContext)
@@ -794,9 +811,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         .error(R.drawable.error)
                         .into(content);
             }
-
             showUploadFileProgressOrResend(conversation, this);
-            showReceiveOrSendTime(conversation, position, this);
         }
     }
 
@@ -804,6 +819,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         private TextView mContentTv;
 
         public SystemItemHolder(View view) {
+            super(view);
             mContentTv = view.findViewById(R.id.item_conversation_system_content);
         }
 

@@ -1,5 +1,6 @@
 package com.readboy.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.readboy.IReadboyWearListener;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +23,10 @@ import com.readboy.adapter.BaseCheckAdapter;
 import com.readboy.adapter.FriendSelectorAdapter;
 import com.readboy.bean.Constant;
 import com.readboy.bean.FriendGroup;
+import com.readboy.bean.GroupInfo;
+import com.readboy.bean.GroupInfoManager;
 import com.readboy.provider.Profile;
+import com.readboy.utils.JsonMapper;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.recyclerview.wrapper.HeaderAndFooterWrapper;
 import com.readboy.utils.ToastUtils;
@@ -51,6 +56,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     public static final String EXTRA_FRIENDS = "friends";
     public static final String EXTRA_GROUP = "group";
     public static final String EXTRA_DATA = "data";
+    public static final int WHAT_HIDE_PROGRESS_BAR = 10;
 
     private RecyclerView mRecyclerView;
     private FriendSelectorAdapter mAdapter;
@@ -65,7 +71,20 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     private ProgressBar mProgressBar;
     private Context mContext;
     private Type mType = Type.CREATE;
-    private Handler mHandler = new Handler();
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case WHAT_HIDE_PROGRESS_BAR:
+                    hideProgressBar();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +155,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     }
 
     public void setData(List<Friend> data) {
+        Log.e(TAG, "setData: thread = " + Thread.currentThread());
         mFriends.clear();
         if (data != null) {
             mFriends.addAll(data);
@@ -147,6 +167,10 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
 
     private void asyncInitProfiles() {
         Log.i(TAG, "asyncInitProfiles: ");
+        if (mFriends.size() <= 0) {
+            Log.i(TAG, "asyncInitProfiles: mFriends size is 0");
+            return;
+        }
         AsyncTask<List<Friend>, Void, Void> asyncTask = new AsyncTask<List<Friend>, Void, Void>() {
             @Override
             protected Void doInBackground(List<Friend>... lists) {
@@ -154,7 +178,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
                 return null;
             }
         };
-        asyncTask.execute(mFriends);
+        asyncTask.execute(new ArrayList<>(mFriends));
     }
 
     private void initProfiles(List<Friend> friends) {
@@ -182,6 +206,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     }
 
     private void filterFriends() {
+        Log.e(TAG, "filterFriends: ");
         List<Friend> list = new ArrayList<>(mFriends);
         for (Friend friend : list) {
             Profile profile = mProfileMap.get(friend.uuid);
@@ -203,7 +228,9 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
                     ToastUtils.show(mContext, mType.warning);
                 } else {
                     showProgressBar();
-                    groupAction();
+                    if (mProgressBar.getVisibility() == View.VISIBLE) {
+                        groupAction();
+                    }
                 }
                 break;
             default:
@@ -213,21 +240,32 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
 
     private void groupAction() {
 //        String data = mType == Type.CREATE ? getCreateGroupRequest() : getActionRequest();
-        Log.i(TAG, "hwj: groupAction: ");
+        Log.i(TAG, "hwj: groupAction: " + mType.command);
         WearManagerProxy.groupAction(mContext, mType.command, getActionRequest(), new IReadboyWearListener.Stub() {
             @Override
             public void pushSuc(String cmd, String serial, int code, String data, String result) {
-                Log.i(TAG, mType.command + " pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
+                final GroupInfo groupInfo = JsonMapper.fromJson(data, GroupInfo.class);
+                final Friend friend;
+                if (groupInfo == null) {
+                    Log.i(TAG, "pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
+                    if (Type.CREATE == mType) {
+                        toast("创建失败");
+                    }
+                    friend = mGroup;
+                } else {
+                    friend = new Friend();
+                    friend.name = groupInfo.getName();
+                    friend.uuid = groupInfo.getId();
+                    GroupInfoManager.saveGroupInfo(FriendSelectorActivity.this, groupInfo);
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.i(TAG, "run: 1 >>");
+                        Log.i(TAG, "run: 2 >>");
                         if (mType == Type.CREATE) {
-                            FriendGroup friendGroup = FriendGroup.parseData(data);
-                            if (friendGroup != null && friendGroup.friend != null) {
-                                gotoConversation(friendGroup.friend);
-                            } else {
-                                Log.w(TAG, "run: parse data fail.");
-                            }
+                            toast("创建成功");
+                            gotoConversation(friend);
                         } else {
                             Intent intent = new Intent();
                             if (!TextUtils.isEmpty(data)) {
@@ -237,6 +275,8 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
                             }
                             setResult(RESULT_OK, intent);
                         }
+                        hideProgressBar();
+                        Log.i(TAG, "run: finish.");
                         finish();
                     }
                 });
@@ -255,6 +295,10 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
             }
         });
 
+    }
+
+    private void toast(String message) {
+        runOnUiThread(() -> ToastUtils.show(mContext, message));
     }
 
     @NonNull

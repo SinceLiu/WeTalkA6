@@ -30,6 +30,7 @@ public final class Constant {
     public static final int SEND_VIDEO = 8;
     public static final int REC_VIDEO = 9;
     public static final int REC_SYSTEM = 11;
+    //增长类型，记得Adapter.getViewTypeCount也要增加
 
     public static final String EMPTY = "";
 

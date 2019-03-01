@@ -17,6 +17,7 @@ import com.readboy.utils.MPrefs;
 import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.utils.NotificationUtils;
+import com.readboy.view.GroupMembersView;
 import com.readboy.wetalk.utils.WTContactUtils;
 
 import android.content.BroadcastReceiver;
@@ -26,6 +27,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -53,7 +55,10 @@ public class MessageReceiver extends BroadcastReceiver {
     public static final String ACTION_NOTIFY_FRIEND_REQUEST = "readboy.action.NOTIFY_FRIEND_REQUEST";
     private static final int DOWNLOAD_MSG = 0x13;
 
-    private static final String SYSTEM_NOTIFICATION = "SYSTEM";
+    /**
+     * 系统消息
+     */
+    private static final String SYSTEM_NOTIFICATION = "S0SYSTEM";
 
     private static final int MAX_COUNT_SINGLE_RESPONSE = 10;
 
@@ -92,11 +97,11 @@ public class MessageReceiver extends BroadcastReceiver {
         switch (action) {
             case ACTION_NOTIFY_MESSAGE:
                 //收到消息
-                LogInfo.i("hwj", "onReceive: isGettingMessage : " + isGettingMessage);
                 //如果正在获取新消息，是否应已队列形式，排队获取。
                 if (!isGettingMessage) {
                     getAllMessage(context);
                 } else {
+                    Log.d(TAG, "onReceive: getting message. request again when finish.");
                     requestAgain = true;
                 }
                 break;
@@ -140,7 +145,7 @@ public class MessageReceiver extends BroadcastReceiver {
             public void pushSucceed(String type, String s1, int code, String s,
                                     String response) {
                 LogInfo.d(TAG, "pushSucceed() called with: type = " + type + ", s1 = " + s1 +
-                        ", code = " + code + ", s = " + s + ", response = " + response + "");
+                        ", code = " + code + ", response = " + response + "");
                 int count = parseMessage(response, context);
                 if (notifyNewMessage || (count > 0 && !requestAgain)) {
                     notifyNewMessage = false;
@@ -184,33 +189,36 @@ public class MessageReceiver extends BroadcastReceiver {
             return -1;
         }
         int count = array.length();
+        //文件类型就递减，用于判断是否发送通知。
         int result = count;
         if (count >= MAX_COUNT_SINGLE_RESPONSE) {
+            Log.d(TAG, "parseMessage: multi messages.");
             requestAgain = true;
         }
         for (int i = 0; i < count; i++) {
             JSONObject data = array.optJSONObject(i);
             String msgHeader = data.optString(NetWorkUtils.HEADER);
             if (TextUtils.isEmpty(msgHeader)) {
-                break;
+                continue;
             }
             String[] messageInfo = msgHeader.split("\\|");
             final Conversation conversation = parseBaseConversation(messageInfo, context);
             if (conversation == null) {
                 Log.i(TAG, "pushSucceed: conversation = null.");
                 result--;
-                break;
+                continue;
             }
             //消息类型,支持text、image、audio、video、link
             if (messageInfo.length < 3) {
                 Log.w(TAG, "parseMessage: h length < 3, h: " + msgHeader);
                 result--;
-                break;
+                continue;
             }
-
+            Log.i(TAG, "parseMessage: messageInfo[0] " + messageInfo[0]);
             if (SYSTEM_NOTIFICATION.equalsIgnoreCase(messageInfo[0])) {
                 parseSystemMessage(context, data, conversation);
-                break;
+                sendUpdateGroupMember(messageInfo[1], context);
+                continue;
             }
             switch (messageInfo[2]) {
                 case NetWorkUtils.TEXT:
@@ -244,7 +252,9 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     private static void parseSystemMessage(Context context, JSONObject data, Conversation conversation) {
+        Log.i(TAG, "parseSystemMessage: ");
         conversation.content = data.optString(NetWorkUtils.MESSAGE);
+        conversation.textContent = data.optString(NetWorkUtils.MESSAGE);
         conversation.type = Constant.REC_SYSTEM;
         addToDatabase(context, conversation);
     }
@@ -324,6 +334,8 @@ public class MessageReceiver extends BroadcastReceiver {
             } else {
                 conversation.senderName = name;
             }
+        } else if (SYSTEM_NOTIFICATION.equals(conversation.realSendId)) {
+
         } else {
             //判断发件人是否存在通讯录中
             String name = WTContactUtils.getNameById(context, conversation.realSendId);
@@ -384,6 +396,13 @@ public class MessageReceiver extends BroadcastReceiver {
                 Log.w(TAG, "onFail: " + e.toString(), e);
             }
         });
+    }
+
+    private static void sendUpdateGroupMember(String uuid, Context context) {
+        Intent intent = new Intent();
+        intent.setAction(GroupMembersView.ACTION_UPDATE_MEMBER);
+        intent.putExtra(GroupMembersView.EXTRA_UUID, uuid);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 }

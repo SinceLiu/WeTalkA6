@@ -137,8 +137,12 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     private float density;
 
+    /**
+     * TODO，修改为LoaderManager加载更加合理？
+     */
     private ContentObserver mContactsObserver;
     /**
+     * TODO，修改为LoaderManager加载更加合理？
      * 监听消息ContentProvider数据变化,只有收到消息时候才会回调
      */
     private ContentObserver mObserver = new ContentObserver(new Handler()) {
@@ -146,26 +150,36 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         public void onChange(boolean selfChange) {
             //获取最新的消息集合
             Log.e(TAG, "conversation onChange() called with: selfChange = " + selfChange + "");
+            // TODO，对方正在插入数据，可能会获取到多条新消息
             List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
             if (conversations == null || conversations.size() <= mConversations.size()) {
-                if (conversations != null) {
-                }
+                Log.e(TAG, "onChange: conversation = null.");
                 CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于现有的conversations, " +
                         "new size = " + (conversations != null ? conversations.size() : 0) + ", old size = " + mConversations.size()));
                 return;
             }
             int length = conversations.size();
-            for (int i = length - 1; i >= 0; i--) {
+            int current = mConversations.size();
+            boolean udpateGroupMember = false;
+            final Conversation last = mConversations.size() == 0
+                    ? null
+                    : mConversations.get(mConversations.size() - 1);
+            Log.i(TAG, "onChange: new length = " + length + ", current = " + current);
+            for (int i = length - 1; i >= current; i--) {
                 //按时间降序,获取最新的一条消息
                 Conversation conversation = conversations.get(i);
+//                if (last != null && last.conversationId.equals(conversation.conversationId)) {
+//                    Log.i(TAG, "onChange: last = " + last.conversationId);
+//                    break;
+//                }
                 if (!conversation.sendId.equals(MPrefs.getDeviceId(mContext))) {
                     //添加到显示的消息列表集合
+                    Log.i(TAG, "onChange: i = " + i + ", conversation, " + i);
                     mConversations.add(conversation);
-                    LogInfo.i(TAG, "onChange ---------- add conversation notifyDataSetChanged");
-                    break;
+                    LogInfo.e(TAG, "onChange ---------- add conversation notifyDataSetChanged");
                 }
             }
-            Log.e(TAG, "onChange: conversations size = " + mConversations.size());
+            Log.e(TAG, "onChange: current conversations size = " + mConversations.size());
             notifyAndScrollBottom();
         }
     };
@@ -440,10 +454,23 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     public void updateMembers(Map<String, Friend> map) {
         mMemberMap.clear();
         mMemberMap.putAll(map);
-        post(() -> mAdapter.notifyDataSetChanged());
+        post(() -> {
+            if (mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    public void notifyDataSetChanged() {
+        post(() -> {
+            if (mAdapter != null) {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
+
     public void onClick(final View v) {
         int id = v.getId();
         v.setEnabled(false);

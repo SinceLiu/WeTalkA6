@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:paddingStart="@dimen/item_conversation_padding_start">
 
-    <include layout="@layout/item_conversation_common" />
+    <include layout="@layout/item_conversation_header" />
 
     <TextView
         android:id="@+id/item_conversation_name"

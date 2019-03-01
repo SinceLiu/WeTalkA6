@@ -86,7 +86,7 @@ public class Conversation implements Parcelable {
     //是否正在播放语音(语音项特有)
     public int isPlaying;
 
-    // 2.0版本新字段
+    // 2.0版本新字段，不同类型数据共享变量
 
     /**
      * 数据内容，要显示的内容，文件则为本地路径path

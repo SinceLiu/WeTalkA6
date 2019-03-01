@@ -253,7 +253,6 @@ public class WTContactUtils {
         int result = 0;
         String selection = "unread = 1 AND send_id in (";
         StringBuilder builder = new StringBuilder(selection);
-        Log.i(TAG, "getUnreadMessageCount: 1  >> ");
         List<String> list = getAllUuid(context);
         if (list == null || list.size() <= 0) {
             Log.w(TAG, "getUnreadMessageCount: list = null");
@@ -272,7 +271,6 @@ public class WTContactUtils {
             }
         }
         builder.append(")");
-        Log.i(TAG, "getUnreadMessageCount: 2  >> " + Arrays.toString(list.toArray()));
 //        String[] args = new String[]{};
 //        args = list.toArray(args);
         try (Cursor cursor = context.getContentResolver().query(CONVERSATION_URI, null,
@@ -281,7 +279,6 @@ public class WTContactUtils {
                 result = cursor.getCount();
             }
         }
-        Log.i(TAG, "getUnreadMessageCount: 3  >> ");
         return result;
     }
 

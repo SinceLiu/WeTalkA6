@@ -71,7 +71,6 @@
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="readboy.intent.action.wetalk" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.readboy.WATCH.FLAG" />
             </intent-filter>

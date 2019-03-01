@@ -3,10 +3,12 @@ package com.readboy.view;
 import android.app.Activity;
 import android.app.readboy.IReadboyWearListener;
 import android.app.readboy.PersonalInfo;
-import android.app.readboy.ReadboyWearManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -42,7 +44,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author oubin
@@ -54,6 +55,9 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     public static final int REQUEST_CODE_REMOVE = 11;
     public static final int REQUEST_CODE_ADD = 12;
 
+    public static final String ACTION_UPDATE_MEMBER = "moment.action.update_member";
+    public static final String EXTRA_UUID = "uuid";
+
     private RecyclerView mGroupRv;
     private View mProgressBar;
     private TextView mMessageTv;
@@ -64,6 +68,8 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     private Context mContext;
     private Activity mActivity;
     private Handler mHandler = new Handler();
+    private PersonalInfo mPersonalInfo;
+    private BroadcastReceiver mReceiver;
 
     public GroupMembersView(Context context) {
         this(context, null);
@@ -94,6 +100,36 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         mAdapter = new GroupMembersAdapter(getContext(), false);
         mGroupRv.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        Log.i(TAG, "onAttachedToWindow: ");
+        registerBroadcast();
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        Log.i(TAG, "onDetachedFromWindow: ");
+        unRegisterBroadcast();
+    }
+
+    private void registerBroadcast() {
+        if (mReceiver == null) {
+            mReceiver = new InnerReceiver();
+            IntentFilter filter = new IntentFilter(ACTION_UPDATE_MEMBER);
+            LocalBroadcastManager manager = LocalBroadcastManager.getInstance(mContext);
+            manager.registerReceiver(mReceiver, filter);
+        }
+    }
+
+    private void unRegisterBroadcast() {
+        if (mReceiver != null) {
+            LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
     }
 
     public void setData(Intent intent) {
@@ -170,10 +206,10 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
     @Override
     public void onItemClick(int position, BaseViewHolder viewHolder) {
-        Log.i(TAG, "onItemClick: ");
         if (mAdapter.isFooterPosition(position)) {
             leaveAction();
         } else if (mAdapter.isAddActionPosition(position)) {
+            // 同步处理到联系人列表，防止服务器同步联系人慢。
             addAction();
         } else if (mAdapter.isRemoveActionPosition(position)) {
             removeAction();
@@ -203,6 +239,16 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         intent.putExtra(FriendSelectorActivity.EXTRA_GROUP, mGroup);
         intent.putExtra(FriendSelectorActivity.EXTRA_TYPE_ORDINAL, FriendSelectorActivity.Type.REMOTE.ordinal());
         ArrayList<Friend> data = new ArrayList<>(mMemberList);
+        int index = -1;
+        // 过滤掉群主
+        for (int i = 0; i < data.size(); i++) {
+            String uuid = data.get(0).uuid;
+            if (!TextUtils.isEmpty(uuid) && uuid.equals(mGroupInfo.getOwner())) {
+                index = i;
+                break;
+            }
+        }
+        data.remove(index);
         intent.putParcelableArrayListExtra(FriendSelectorActivity.EXTRA_FRIENDS, data);
         getActivity().startActivityForResult(intent, REQUEST_CODE_REMOVE);
     }
@@ -253,7 +299,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                         leaveGroup();
                     }
                 });
-        CommonDialog dialog = builder.build(mContext);
+        CommonDialog dialog = builder.build(mActivity);
         dialog.show();
 
     }
@@ -290,7 +336,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
 
                 @Override
                 public void pushFail(String cmd, String serial, int code, String errorMsg) {
-                    Log.i(TAG, "pushFail() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", errorMsg = " + errorMsg + "");
+                    Log.i(TAG, "leave pushFail() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", errorMsg = " + errorMsg + "");
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -306,15 +352,24 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     }
 
     private boolean isOwner() {
-        PersonalInfo info = WearManagerProxy.getManager(mContext).getPersonalInfo();
-        if (info == null || mGroupInfo == null || TextUtils.isEmpty(mGroupInfo.getOwner())) {
+        if (mGroupInfo == null || TextUtils.isEmpty(mGroupInfo.getOwner())) {
             Log.w(TAG, "isOwner: owner = " + mGroupInfo);
             return false;
         }
-        return mGroupInfo.getOwner().equals(info.getUuid());
+        return mGroupInfo.getOwner().equals(getMyUuid());
+    }
+
+    private String getMyUuid() {
+        if (mPersonalInfo == null) {
+            Log.i(TAG, "getMyUuid: 1 >> ");
+            mPersonalInfo = WearManagerProxy.getManager(mContext).getPersonalInfo();
+            Log.i(TAG, "getMyUuid: 2 >> ");
+        }
+        return mPersonalInfo == null ? "" : mPersonalInfo.getUuid();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "onActivityResult() called with: requestCode = " + requestCode + ", resultCode = " + resultCode + "");
         if (data == null || resultCode != Activity.RESULT_OK) {
             Log.i(TAG, "onActivityResult() called with: requestCode = " + requestCode + ", resultCode = " + resultCode + ", data = " + data + "");
             return;
@@ -414,6 +469,27 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                 }
             }
         });
+    }
+
+    private class InnerReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                return;
+            }
+            String action = intent.getAction();
+            if (TextUtils.isEmpty(action)) {
+                return;
+            }
+            Log.i(TAG, "onReceive: action = " + action);
+            if (ACTION_UPDATE_MEMBER.equals(action)) {
+                String uuid = intent.getStringExtra(EXTRA_UUID);
+                if (uuid != null && uuid.equals(mGroup.uuid)) {
+                    GroupInfoManager.getGroupInfoFromNet(mContext, mGroup.uuid, GroupMembersView.this);
+                }
+            }
+        }
     }
 
 }
