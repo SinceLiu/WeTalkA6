@@ -4,8 +4,8 @@
     coreApp="true"
     package="com.readboy.wetalk"
     android:sharedUserId="com.android.systemui"
-    android:versionCode="190222001"
-    android:versionName="1.2.3">
+    android:versionCode="1902304001"
+    android:versionName="1.2.4">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
 

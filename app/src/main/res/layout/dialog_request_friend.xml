@@ -49,12 +49,12 @@
 
     </LinearLayout>
 
-    <ImageView
+    <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@drawable/loading_animator"
+        android:indeterminateDrawable="@drawable/loading_animator"
         android:visibility="gone" />
 
     <ViewStub

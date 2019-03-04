@@ -46,6 +46,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * TODO,移除完所有成员，提示解散群，调解散接口，过程解散失败怎么办
+ * TODO，进入聊天界面就检查，提示，这时获取群成员列表，log如何。
  * @author oubin
  * @date 2018/12/22
  */

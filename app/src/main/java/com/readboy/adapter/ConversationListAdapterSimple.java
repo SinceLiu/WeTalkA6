@@ -668,6 +668,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         TextView userName;
         //重新发送
         ImageView retry;
+        // TODO, 用ProgressBar
         //进度
         ImageView progress;
         //语音项

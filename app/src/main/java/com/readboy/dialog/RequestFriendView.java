@@ -74,6 +74,9 @@ public class RequestFriendView extends FrameLayout implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
+        if (mProgressBar.getVisibility() == VISIBLE) {
+            return;
+        }
         switch (v.getId()) {
             case R.id.request_friend_refuse:
                 dismiss();
@@ -94,19 +97,16 @@ public class RequestFriendView extends FrameLayout implements View.OnClickListen
             @Override
             public void pushSuc(String cmd, String serial, int code, String data, String result) {
                 Log.e(TAG, "addFriend pushSuc() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", data = " + data + ", result = " + result + "");
-                gotoConversationActivity();
+                mHandler.post(() -> gotoConversationActivity());
             }
 
             @Override
             public void pushFail(String cmd, String serial, int code, String errorMsg) {
                 Log.e(TAG, "pushFail() called with: cmd = " + cmd + ", serial = " + serial + ", code = " + code + ", errorMsg = " + errorMsg + "");
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ToastUtils.show(mContext, errorMsg);
-                    }
+                mHandler.post(() -> {
+                    ToastUtils.show(mContext, errorMsg);
+                    dismiss();
                 });
-                dismiss();
             }
         });
     }
@@ -145,6 +145,7 @@ public class RequestFriendView extends FrameLayout implements View.OnClickListen
         friend.name = mFriend.getName();
         intent.putExtra(Constant.EXTRA_FRIEND, friend);
         mProgressBar.setVisibility(GONE);
+        // startActivity();
         dismiss();
     }
 

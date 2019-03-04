@@ -149,7 +149,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         @Override
         public void onChange(boolean selfChange) {
             //获取最新的消息集合
-            Log.e(TAG, "conversation onChange() called with: selfChange = " + selfChange + "");
             // TODO，对方正在插入数据，可能会获取到多条新消息
             List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
             if (conversations == null || conversations.size() <= mConversations.size()) {

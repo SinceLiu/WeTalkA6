@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * TODO 未完善。如果针对数据库监听等处理，可以使用LoaderManager，而不是ContentObserver.
+ * 思路，可参考{@link android.app.LoaderManager}, {@link android.content.CursorLoader}的设计思路。
  * 其他场景待考虑。
  *
  * @author oubin
