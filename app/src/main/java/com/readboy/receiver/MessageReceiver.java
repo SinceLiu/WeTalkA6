@@ -98,12 +98,7 @@ public class MessageReceiver extends BroadcastReceiver {
             case ACTION_NOTIFY_MESSAGE:
                 //收到消息
                 //如果正在获取新消息，是否应已队列形式，排队获取。
-                if (!isGettingMessage) {
-                    getAllMessage(context);
-                } else {
-                    Log.d(TAG, "onReceive: getting message. request again when finish.");
-                    requestAgain = true;
-                }
+                getAllMessage(context);
                 break;
             case ACTION_SEND_CAPTURE:
                 //发送监拍指令
@@ -135,6 +130,11 @@ public class MessageReceiver extends BroadcastReceiver {
     }
 
     public static void getAllMessage(final Context context) {
+        if (isGettingMessage) {
+            Log.i(TAG, "getAllMessage: is getting message.");
+            requestAgain = true;
+            return;
+        }
         final NetWorkUtils mNetWorkUtils = NetWorkUtils.getInstance(context);
         isGettingMessage = true;
         requestAgain = false;
