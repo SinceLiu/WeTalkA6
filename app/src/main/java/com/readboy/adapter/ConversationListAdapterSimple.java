@@ -700,7 +700,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
     /**
      * 语音项
-     * TODO，重构，公共部分放到Holder里
+     * TODO，重构，公共部分放到Holder里， 参考{@link VideoItemHolder}
      */
     protected class VoiceItemHolder extends BaseHolder {
         /**

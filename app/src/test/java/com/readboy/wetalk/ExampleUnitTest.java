@@ -49,6 +49,10 @@ public class ExampleUnitTest {
         if (b) {
 
         }
+        String mid1 = "1912001";
+        String mid2 = "0";
+        int i = mid1.compareTo(mid2);
+        b = mid1.compareTo(mid2) < 0;
 
     }
 

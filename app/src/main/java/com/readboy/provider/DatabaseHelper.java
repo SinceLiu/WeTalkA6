@@ -37,7 +37,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
     private static final int VERSION_4 = 4;
 
     /**
-     * 创建索引
+     * 创建索引， 待考量
      */
     private static final int VERSION_5 = 5;
 

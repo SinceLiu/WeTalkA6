@@ -180,8 +180,6 @@ public class MessageReceiver extends BroadcastReceiver {
         JSONArray array;
         try {
             jsonObject = new JSONObject(response);
-            // TODO，需解决后续内容解析可能出错，是否应该存该tag。
-            MPrefs.setMessageTag(context, jsonObject.optString(NetWorkUtils.TIME));
             array = jsonObject.getJSONArray(NetWorkUtils.DATA);
         } catch (JSONException e) {
             Log.w(TAG, "parseMessage: e: " + e.toString(), e);
@@ -247,6 +245,7 @@ public class MessageReceiver extends BroadcastReceiver {
                     break;
             }
         }
+        MPrefs.setMessageTag(context, jsonObject.optString(NetWorkUtils.TIME));
         return result;
     }
 

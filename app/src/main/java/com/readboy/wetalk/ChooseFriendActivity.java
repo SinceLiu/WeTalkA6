@@ -25,6 +25,9 @@ import com.readboy.utils.GlideCircleTransform;
 import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.view.CircleImageView;
 
+/**
+ * @deprecated
+ */
 public class ChooseFriendActivity extends BaseRequestPermissionActivity {
     private static final String TAG = "ChooseFriendActivity";
 

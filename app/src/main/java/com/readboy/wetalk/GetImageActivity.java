@@ -34,6 +34,7 @@ import com.readboy.wetalk.utils.IOs;
 import com.readboy.utils.NetWorkUtils;
 
 /**
+ * @deprecated 直接调图库，图库activity
  * @author hwj
  */
 public class GetImageActivity extends BaseActivity {

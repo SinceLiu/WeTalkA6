@@ -23,7 +23,7 @@ import com.readboy.wetalk.utils.WTContactUtils;
 
 /**
  * Created by hwj on 2017/3/21.
- *
+ * @deprecated
  * @author hwj
  */
 public class FirstStartActivity extends BaseRequestPermissionActivity {
