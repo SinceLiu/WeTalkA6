@@ -276,13 +276,32 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                 == PackageManager.PERMISSION_GRANTED) {
             mContactsObserver = new ContactsObserver(new Handler());
             mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
+        } else {
+            Log.e(TAG, "registerContentObserver: has not read contacts permission.");
         }
         mResolver.registerContentObserver(Conversations.Conversation.CONVERSATION_URI, true, mObserver);
     }
 
+    public void recheckContactsObserver() {
+        Log.i(TAG, "recheckContactsObserver: ");
+        if (mContactsObserver != null && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS)
+                == PackageManager.PERMISSION_GRANTED) {
+            mContactsObserver = new ContactsObserver(new Handler());
+            mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
+        }
+    }
+
     private void unregisterContentObserver() {
-        mResolver.unregisterContentObserver(mObserver);
-        mResolver.unregisterContentObserver(mContactsObserver);
+        if (mObserver != null) {
+            mResolver.unregisterContentObserver(mObserver);
+            mObserver = null;
+        }
+        if (mContactsObserver != null) {
+            mResolver.unregisterContentObserver(mContactsObserver);
+            mContactsObserver = null;
+        } else {
+            Log.w(TAG, "unregisterContentObserver: mContactsObserver is null.");
+        }
     }
 
     /**

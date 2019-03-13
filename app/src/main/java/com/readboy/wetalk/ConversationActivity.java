@@ -42,7 +42,7 @@ import java.util.Map;
  * @author oubin
  * @date 2018/12/28
  */
-public class ConversationActivity extends BaseActivity implements GroupInfoManager.CallBack {
+public class ConversationActivity extends BaseRequestPermissionActivity implements GroupInfoManager.CallBack {
     private static final String TAG = "hwj-ConversationAct";
 
     private static final int DELAY_LOAD_TIME = 1000;
@@ -71,6 +71,11 @@ public class ConversationActivity extends BaseActivity implements GroupInfoManag
     };
     private Runnable mGroupRunnable;
     private boolean hadUpdateGroupInfo;
+
+    @Override
+    protected void initContent() {
+        mConversationView.recheckContactsObserver();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
