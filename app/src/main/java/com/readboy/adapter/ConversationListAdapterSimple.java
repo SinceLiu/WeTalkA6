@@ -3,7 +3,6 @@ package com.readboy.adapter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.jar.Attributes;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
@@ -40,9 +39,7 @@ import com.readboy.utils.NetWorkUtils;
 import com.readboy.utils.NetWorkUtils.PushResultListener;
 import com.readboy.utils.ToastUtils;
 import com.readboy.view.ConversationView;
-import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.DisplayImageActivity;
-import com.readboy.wetalk.GetImageActivity;
 import com.readboy.wetalk.R;
 import com.readboy.wetalk.TextDialog;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -59,7 +56,6 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     private boolean mIsToastShow = false;
     private Handler mSendMessageHandler;
     private ContentResolver mResolver;
-    private NetWorkUtils mNetWorkUtils;
     private MediaPlayer mMediaPlayer;
     private TextDialog textDialog;
     private View mKeepScreenView;
@@ -69,7 +65,6 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         mContext = context;
         mInflater = LayoutInflater.from(mContext);
         mResolver = context.getContentResolver();
-        mNetWorkUtils = NetWorkUtils.getInstance(context);
     }
 
     @Override
@@ -103,21 +98,16 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
         //接收的消息比发送的消息会多一项发件人名字,只会在家庭圈显示
-        //图片项(收,发)
         ImageItemHolder imageItemHolder = null;
-        //语音项(收,发)
         VoiceItemHolder voiceItemHolder = null;
-        //文本项(收)
-        TextItemHolder textItemHolder = null;
-        //表情项(收,发)
         EmojiItemHolder emojiItemHolder = null;
-//        VideoItemHolder videoItemHolder = null;
-        Holder commonHolder = null;
+        BaseHolder commonHolder = null;
         final Conversation conversation = mConversations.get(position);
         int type = conversation.type;
         Log.i(TAG, "getView: position = " + position + " type = " + type);
         if (view == null) {
             if (type == Constant.SEND_VIDEO) {
+                //TODO layoutId可否抽象起来，统一处理
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_video_right, viewGroup, false);
                 commonHolder = new VideoItemHolder(view);
                 view.setTag(commonHolder);
@@ -128,6 +118,10 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             } else if (type == Constant.REC_SYSTEM) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_system, viewGroup, false);
                 commonHolder = new SystemItemHolder(view);
+                view.setTag(commonHolder);
+            } else if (type == Constant.REC_TEXT) {
+                view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_text_left, viewGroup, false);
+                commonHolder = new TextItemHolder(view);
                 view.setTag(commonHolder);
             } else {
                 view = LayoutInflater.from(mContext).inflate(R.layout.conversation_item_simple, viewGroup, false);
@@ -190,17 +184,12 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         voiceItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
                         view.setTag(voiceItemHolder);
                         break;
-                    //接收文字项
-                    case Constant.REC_TEXT:
-                        textItemHolder = new TextItemHolder();
-                        textItemHolder.content = (TextView) view.findViewById(R.id.conversation_item_rec_text_content);
-                        textItemHolder.item = view.findViewById(R.id.conversation_item_rec_text);
-                        textItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_text_user_name);
-                        textItemHolder.sendOrReceiveTime = (TextView) view.findViewById(R.id.conversation_item_time);
-                        view.setTag(textItemHolder);
-                        break;
                     default:
+                        Log.e(TAG, "getView: unknown message type, " + conversation.content);
                         CrashReport.postCatchedException(new IllegalAccessException("message send type = " + type));
+                        view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_text_left, viewGroup, false);
+                        commonHolder = new UnknownItemHolder(view);
+                        view.setTag(commonHolder);
                         break;
                 }
             }
@@ -219,12 +208,10 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                     voiceItemHolder = (VoiceItemHolder) view.getTag();
                     break;
                 case Constant.REC_TEXT:
-                    textItemHolder = (TextItemHolder) view.getTag();
-                    break;
                 case Constant.SEND_VIDEO:
                 case Constant.REC_VIDEO:
                 case Constant.REC_SYSTEM:
-                    commonHolder = (Holder) view.getTag();
+                    commonHolder = (BaseHolder) view.getTag();
                     break;
                 default:
                     Log.i(TAG, "getView: default type.");
@@ -299,23 +286,23 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 showReceiveOrSendTime(conversation, position, voiceItemHolder);
                 break;
             case Constant.REC_TEXT:
-                //接收的文字
-                updateName(textItemHolder, conversation);
-                displayTextDetail(conversation, textItemHolder);
-                showReceiveOrSendTime(conversation, position, textItemHolder);
-                break;
             case Constant.SEND_VIDEO:
             case Constant.REC_VIDEO:
             case Constant.REC_SYSTEM:
-                commonHolder.bindView(position, conversation);
+                if (commonHolder != null) {
+                    commonHolder.bindView(position, conversation);
+                }
                 break;
             default:
+                if (commonHolder != null) {
+                    commonHolder.bindView(position, conversation);
+                }
                 Log.e(TAG, "getView: other type = " + type);
         }
         return view;
     }
 
-    private void updateName(Holder holder, Conversation conversation) {
+    private static void updateName(BaseHolder holder, Conversation conversation) {
         if (holder.userName == null) {
             // 系统消息没有名字
             return;
@@ -330,7 +317,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         }
     }
 
-    private void showReceiveOrSendTime(Conversation conversation, int position, Holder holder) {
+    private void showReceiveOrSendTime(Conversation conversation, int position, BaseHolder holder) {
         if (position != 0) {
             long index = Long.parseLong(mConversations.get(position - 1).time) - Long.parseLong(conversation.time);
             //相差1分钟的就显示
@@ -361,7 +348,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             holder.retry.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (!mNetWorkUtils.isConnectingToInternet(mContext)) {
+                    if (!NetWorkUtils.isConnectingToInternet(mContext)) {
                         ToastUtils.show(mContext, R.string.internet_down);
                         return;
                     }
@@ -387,7 +374,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
     protected void sendConversationInfo(final Conversation conversation) {
         if (mSendMessageHandler != null) {
-            mNetWorkUtils.sendMessage(conversation, new PushResultListener() {
+            NetWorkUtils.sendMessage(mContext, conversation, new PushResultListener() {
 
                 @Override
                 public void pushSucceed(String type, String s1, int code, String s,
@@ -406,7 +393,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         }
     }
 
-    private void showUploadFileProgressOrResend(final Conversation conversation, final Holder holder) {
+    private void showUploadFileProgressOrResend(final Conversation conversation, final BaseHolder holder) {
         //默认不显示
         holder.retry.setVisibility(View.GONE);
         holder.progress.setVisibility(View.GONE);
@@ -424,7 +411,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             holder.retry.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (!mNetWorkUtils.isConnectingToInternet(mContext)) {
+                    if (!NetWorkUtils.isConnectingToInternet(mContext)) {
                         ToastUtils.show(mContext, R.string.internet_down);
                         return;
                     }
@@ -446,20 +433,20 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         }
                         if (TextUtils.isEmpty(conversation.imageUrl)) {
                             //文件已经上传失败,重新上传
-                            mNetWorkUtils.uploadFile(conversation, mReUploadFileHandler);
+                            NetWorkUtils.uploadFile(conversation, mReUploadFileHandler);
                         } else {
                             sendConversationInfo(conversation);
                         }
                     } else if (type == Constant.SEND_VOICE || type == Constant.SEND_VIDEO) {
                         if (TextUtils.isEmpty(conversation.voiceUrl)) {
-                            mNetWorkUtils.uploadFile(conversation, mReUploadFileHandler);
+                            NetWorkUtils.uploadFile(conversation, mReUploadFileHandler);
                         } else {
                             LogInfo.i("hwj", "showUploadFileProgressOrResend --- sendConversationInfo voice");
                             sendConversationInfo(conversation);
                         }
                     } else if (type == Constant.REC_VIDEO || type == Constant.REC_VOICE) {
                         if (!TextUtils.isEmpty(conversation.voiceUrl)) {
-                            mNetWorkUtils.downloadFile(mContext, conversation);
+                            NetWorkUtils.downloadFile(mContext, conversation);
                         } else {
                             Log.i(TAG, "showUploadFileProgressOrResend: url is null.");
                         }
@@ -663,7 +650,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     /**
      * TODO，重构，公共部分放到Holder里
      */
-    class Holder {
+    class BaseHolder {
         //用户名
         TextView userName;
         //重新发送
@@ -676,16 +663,15 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         //时间
         TextView sendOrReceiveTime;
 
-        Holder() {
+        BaseHolder() {
         }
 
-        Holder(View view) {
+        BaseHolder(View view) {
             sendOrReceiveTime = view.findViewById(R.id.item_conversation_time);
             userName = view.findViewById(R.id.item_conversation_name);
         }
 
         void bindView(int position, Conversation conversation) {
-            Log.i(TAG, "bindView: position = " + position);
             updateName(this, conversation);
             showReceiveOrSendTime(conversation, position, this);
         }
@@ -695,12 +681,11 @@ public class ConversationListAdapterSimple extends BaseAdapter {
      * 图片项
      * TODO，重构，公共部分放到Holder里
      */
-    protected class ImageItemHolder extends Holder {
+    protected class ImageItemHolder extends BaseHolder {
         //内容
         ImageView content;
 
         ImageItemHolder() {
-
         }
 
         ImageItemHolder(View view) {
@@ -718,7 +703,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
      * 语音项
      * TODO，重构，公共部分放到Holder里
      */
-    protected class VoiceItemHolder extends Holder {
+    protected class VoiceItemHolder extends BaseHolder {
         /**
          * 语音时长
          */
@@ -744,7 +729,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     /**
      * 表情项
      */
-    protected class EmojiItemHolder extends Holder {
+    protected class EmojiItemHolder extends BaseHolder {
         //内容
         ImageView content;
 
@@ -760,12 +745,44 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     /**
      * 文本项
      */
-    protected class TextItemHolder extends Holder {
-        //内容
+    protected class TextItemHolder extends BaseHolder {
         TextView content;
+        String text;
+
+        TextItemHolder(View view) {
+            super(view);
+            content = view.findViewById(R.id.item_conversation_text);
+            content.setOnClickListener(v -> {
+                if (ClickUtils.isFastMultiClick(2)) {
+                    showMessageFullScreen(text);
+                }
+            });
+        }
+
+        @Override
+        void bindView(int position, Conversation conversation) {
+            super.bindView(position, conversation);
+            this.text = conversation.textContent;
+            content.setText(conversation.textContent);
+        }
     }
 
-    protected class VideoItemHolder extends Holder {
+    class UnknownItemHolder extends TextItemHolder {
+
+        UnknownItemHolder(View view) {
+            super(view);
+            content.setText("不支持该类型消息");
+//            content.setTextColor(Color.RED);
+            content.setTextColor(0xFFFF4444);
+        }
+
+        @Override
+        void bindView(int position, Conversation conversation) {
+            updateName(this, conversation);
+        }
+    }
+
+    protected class VideoItemHolder extends BaseHolder {
         ImageView content;
         Conversation mConversation;
 
@@ -816,7 +833,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         }
     }
 
-    private class SystemItemHolder extends Holder {
+    private class SystemItemHolder extends BaseHolder {
         private TextView mContentTv;
 
         public SystemItemHolder(View view) {

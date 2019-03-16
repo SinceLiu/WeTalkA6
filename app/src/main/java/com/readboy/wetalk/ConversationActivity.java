@@ -74,7 +74,9 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
 
     @Override
     protected void initContent() {
-        mConversationView.recheckContactsObserver();
+        if (mConversationView != null) {
+            mConversationView.recheckContactsObserver();
+        }
     }
 
     @Override

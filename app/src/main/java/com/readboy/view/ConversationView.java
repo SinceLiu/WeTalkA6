@@ -103,7 +103,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private ConversationListAdapterSimple mAdapter;
     private Friend mCurrentFriend = null;
     private ContentResolver mResolver;
-    private NetWorkUtils mNetWorkUtils;
     private boolean isOnPause = false;
     private Button mSendVoiceBtn;
     private ImageView mRecordStateImg;
@@ -263,7 +262,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         mResolver = mContext.getContentResolver();
         //初始化录音对象
         mRecorder = new AudioRecorder(mContext);
-        mNetWorkUtils = NetWorkUtils.getInstance(mContext);
         mSendEmojiBtn.setOnClickListener(this);
         mSendImageBtn.setOnClickListener(this);
         mSendVoiceBtn.setOnLongClickListener(this);
@@ -672,7 +670,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         img.imageLocalPath = mCurrentImagePath;
         if (new File(img.imageLocalPath).exists()) {
             saveConversationToLocal(img);
-            mNetWorkUtils.uploadFile(img, mUploadFileHandler);
+            NetWorkUtils.uploadFile(img, mUploadFileHandler);
         } else {
             showMsg(getString(R.string.send_image_fail));
         }
@@ -693,7 +691,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         video.content = path;
         if (new File(path).exists()) {
             saveConversationToLocal(video);
-            mNetWorkUtils.uploadFile(video, mUploadFileHandler);
+            NetWorkUtils.uploadFile(video, mUploadFileHandler);
 //            HttpClient.uploadVideo(path, new Callback() {
 //                @Override
 //                public void onFailure(Call call, IOException e) {
@@ -794,7 +792,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     }
 
     private void sendConversationInfo(final Conversation conversation) {
-        mNetWorkUtils.sendMessage(conversation, new PushResultListener() {
+        NetWorkUtils.sendMessage(mContext, conversation, new PushResultListener() {
 
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
@@ -1042,7 +1040,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
             //存入数据库
             saveConversationToLocal(voice);
             //上传语音文件,上传成功之后再发送消息
-            mNetWorkUtils.uploadFile(voice, mUploadFileHandler);
+            NetWorkUtils.uploadFile(voice, mUploadFileHandler);
         } else {
             Log.d(TAG, "showVoiceMessage: voice not exists.");
             showMsg(getString(R.string.send_voice_fail));

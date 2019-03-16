@@ -68,5 +68,7 @@
     <dimen name="group_members_height">110px</dimen>
     <dimen name="item_conversation_margin_end">6px</dimen>
     <dimen name="item_conversation_padding_start">6px</dimen>
+    <dimen name="conversation_item_margin_top">2px</dimen>
+
 
 </resources>

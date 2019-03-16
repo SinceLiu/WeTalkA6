@@ -122,7 +122,7 @@ public class MessageReceiver extends BroadcastReceiver {
             Log.w(TAG, "handleSendCapture: data is null, path = " + path + ", uuid = " + ids);
             return;
         }
-        NetWorkUtils.getInstance(context).uploadCaptureFile(ids, path, mHandler);
+        NetWorkUtils.uploadCaptureFile(context, ids, path, mHandler);
     }
 
     private boolean canGetMessage(Context context) {
@@ -135,11 +135,10 @@ public class MessageReceiver extends BroadcastReceiver {
             requestAgain = true;
             return;
         }
-        final NetWorkUtils mNetWorkUtils = NetWorkUtils.getInstance(context);
         isGettingMessage = true;
         requestAgain = false;
         final String messageTag = MPrefs.getMessageTag(context);
-        mNetWorkUtils.getAllMessage(messageTag, new PushResultListener() {
+        NetWorkUtils.getAllMessage(context, messageTag, new PushResultListener() {
 
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
@@ -294,6 +293,12 @@ public class MessageReceiver extends BroadcastReceiver {
         addToDatabase(context, conversation);
     }
 
+    /**
+     * {
+     * "h": "D05C27392000694B|D05C27392000694B|video|1552640648544",
+     * "m": "http://img.readboy.com/wear/v/201903151704085c8b6a884b07a.mp4"
+     * }
+     */
     private static void parseVideoMessage(Context context, JSONObject data, Conversation conversation) {
         Log.i(TAG, "parseVideoMessage: ");
         conversation.type = Constant.REC_VIDEO;

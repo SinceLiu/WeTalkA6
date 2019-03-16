@@ -111,25 +111,23 @@ public class NetWorkUtils {
 
     private static NetWorkUtils mNetWorkUtils;
 
-    private ReadboyWearManager mManager;
-
     private NetWorkUtils(Context context) {
-        try {
-            mManager = (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
-            if (mManager == null) {
-                System.exit(1);
-            }
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
     }
 
+    /**
+     * 可能存在内存泄露
+     *
+     * @deprecated
+     */
     public static synchronized NetWorkUtils getInstance(Context context) {
         if (mNetWorkUtils == null) {
             mNetWorkUtils = new NetWorkUtils(context);
         }
         return mNetWorkUtils;
+    }
+
+    public static ReadboyWearManager getManager(Context context) {
+        return (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
     }
 
     /**
@@ -138,7 +136,7 @@ public class NetWorkUtils {
      * @param context 上下文
      * @return 状态
      */
-    public boolean isConnectingToInternet(Context context) {
+    public static boolean isConnectingToInternet(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
@@ -167,7 +165,7 @@ public class NetWorkUtils {
         return md5code;
     }
 
-    public void uploadCaptureFile(final ArrayList<String> ids, String path, final Handler handler) {
+    public static void uploadCaptureFile(Context context, final ArrayList<String> ids, String path, final Handler handler) {
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -194,7 +192,7 @@ public class NetWorkUtils {
                         String thumbUrl = response.optString(FILE_NAME);
                         for (String id : ids) {
                             LogInfo.i("hwj", "receiver capture id : " + id);
-                            sendCapture(url, thumbUrl, width, height, id, new PushResultListener() {
+                            sendCapture(context, url, thumbUrl, width, height, id, new PushResultListener() {
 
                                 @Override
                                 public void pushSucceed(String type, String s1, int code, String s,
@@ -270,7 +268,7 @@ public class NetWorkUtils {
      * @param conversation 消息
      * @param handler      {@link ConversationListAdapterSimple#mReUploadFileHandler}
      */
-    public void uploadFile(final Conversation conversation, final Handler handler) {
+    public static void uploadFile(final Conversation conversation, final Handler handler) {
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -295,7 +293,7 @@ public class NetWorkUtils {
         }
     }
 
-    private void uploadVoice(Conversation conversation, Handler handler, RequestParams params) {
+    private static void uploadVoice(Conversation conversation, Handler handler, RequestParams params) {
         try {
             File audio = new File(conversation.voiceLocalPath);
             params.put(AUDIO, audio, AUDIO_TYPE);
@@ -341,7 +339,7 @@ public class NetWorkUtils {
         }
     }
 
-    private void uploadImage(Conversation conversation, Handler handler, RequestParams params) {
+    private static void uploadImage(Conversation conversation, Handler handler, RequestParams params) {
         try {
             File image = new File(conversation.imageLocalPath);
             params.put(IMAGE, image, IMAGE_TYPE);
@@ -388,7 +386,7 @@ public class NetWorkUtils {
         }
     }
 
-    private void uploadVideo(Conversation conversation, Handler handler, RequestParams params) {
+    private static void uploadVideo(Conversation conversation, Handler handler, RequestParams params) {
         try {
             File audio = new File(conversation.voiceLocalPath);
             params.put(VIDEO, audio, VIDEO_TYPE);
@@ -436,7 +434,7 @@ public class NetWorkUtils {
         }
     }
 
-    protected Message getUploadResultMessage(Conversation conversation, int result) {
+    protected static Message getUploadResultMessage(Conversation conversation, int result) {
         Message msg = new Message();
         msg.what = result;
         msg.arg1 = conversation.type;
@@ -451,7 +449,7 @@ public class NetWorkUtils {
      *
      * @return 基本请求封装
      */
-    private RequestParams getRequestParams() {
+    private static RequestParams getRequestParams() {
         RequestParams params = new RequestParams();
         long t = System.currentTimeMillis();
         String sn = md5(Constant.PARAM_APPID + Constant.PARAM_SN + t);
@@ -540,24 +538,22 @@ public class NetWorkUtils {
         }
     }
 
-    public ReadboyWearManager getRBManager(Context context) {
-        return mManager;
-    }
-
-    public String getDeviceUuid() {
+    public static String getDeviceUuid(Context context) {
+        ReadboyWearManager manager = getManager(context);
         String uuid = "";
-        if (mManager != null && mManager.getPersonalInfo() != null) {
-            uuid = mManager.getPersonalInfo().getUuid();
+        if (manager != null && manager.getPersonalInfo() != null) {
+            uuid = manager.getPersonalInfo().getUuid();
         }
         return uuid;
     }
 
-    public String getNickName() {
+    public static String getNickName(Context context) {
+        ReadboyWearManager manager = getManager(context);
         String name = "";
         try {
-            if (mManager != null) {
-                if (mManager.getPersonalInfo() != null) {
-                    name = mManager.getPersonalInfo().getName();
+            if (manager != null) {
+                if (manager.getPersonalInfo() != null) {
+                    name = manager.getPersonalInfo().getName();
                 }
             }
         } catch (Exception e) {
@@ -566,13 +562,14 @@ public class NetWorkUtils {
         return name;
     }
 
-    public void saveMessageTag(final Context context) {
-        if (mManager == null) {
+    public static void saveMessageTag(final Context context) {
+        ReadboyWearManager manager = getManager(context);
+        if (manager == null) {
             return;
         }
         if (TextUtils.isEmpty(MPrefs.getMessageTag(context))) {
             try {
-                mManager.getAllMessage(MPrefs.getMessageTag(context), new IReadboyWearListener.Stub() {
+                manager.getAllMessage(MPrefs.getMessageTag(context), new IReadboyWearListener.Stub() {
                     @Override
                     public void pushSuc(String type, String s1, int code, String s, String response) throws RemoteException {
                         //s = mget, s1 = 119, i = 0, s2 = [], s3 = {"r":"mget","o":"119","t":"18020100229007","data":[]}
@@ -594,12 +591,10 @@ public class NetWorkUtils {
         }
     }
 
-    public void getAllMessage(String tag, final PushResultListener listener) {
-        if (mManager == null) {
-            return;
-        }
+    public static void getAllMessage(Context context, String tag, final PushResultListener listener) {
+        ReadboyWearManager manager = getManager(context);
         try {
-            mManager.getAllMessage(tag, new IReadboyWearListener.Stub() {
+            manager.getAllMessage(tag, new IReadboyWearListener.Stub() {
                 @Override
                 public void pushSuc(String type, String s1, int code, String s, String response) throws RemoteException {
                     listener.pushSucceed(type, s1, code, s, response);
@@ -630,14 +625,15 @@ public class NetWorkUtils {
      * @param uuid     uuid
      * @param listener 回调
      */
-    private void sendCapture(String url, String thumbUrl, int width, int height, String uuid,
+    private static void sendCapture(Context context, String url, String thumbUrl, int width, int height, String uuid,
                              final PushResultListener listener) {
-        if (mManager == null) {
+        ReadboyWearManager manager = getManager(context);
+        if (manager == null) {
             return;
         }
         LogInfo.i("hwj", "send capture:url = " + url + " thumb = " + thumbUrl);
         try {
-            mManager.putDeviceCapture(uuid, width, height, thumbUrl, url, new IReadboyWearListener.Stub() {
+            manager.putDeviceCapture(uuid, width, height, thumbUrl, url, new IReadboyWearListener.Stub() {
                 @Override
                 public void pushSuc(String type, String s1, int code, String s2, String response) throws RemoteException {
                     listener.pushSucceed(type, s1, code, s2, response);
@@ -657,7 +653,7 @@ public class NetWorkUtils {
     /**
      * 通过CorePush发送信息给家长端
      */
-    public void sendMessage(Conversation conversation, final PushResultListener listener) {
+    public static void sendMessage(Context context, Conversation conversation, final PushResultListener listener) {
         String recId = conversation.recId;
         String type = null;
         int length = 0;
@@ -696,7 +692,7 @@ public class NetWorkUtils {
                 length = conversation.lastTime;
                 url = conversation.voiceUrl;
                 int[] size = MediaUtils.getVideoSize(conversation.content);
-                if (size != null && size.length >= 2){
+                if (size != null && size.length >= 2) {
                     width = size[0];
                     height = size[1];
                 }
@@ -704,11 +700,12 @@ public class NetWorkUtils {
             default:
                 break;
         }
-        if (mManager == null) {
+        ReadboyWearManager manager = getManager(context);
+        if (manager == null) {
             return;
         }
         try {
-            mManager.sendChatMessage(conversation.recId, type, length, width, height, thumbUrl, url, new IReadboyWearListener.Stub() {
+            manager.sendChatMessage(conversation.recId, type, length, width, height, thumbUrl, url, new IReadboyWearListener.Stub() {
                 @Override
                 public void pushSuc(String type, String s1, int code, String s2, String response) throws RemoteException {
                     listener.pushSucceed(type, s1, code, s2, response);
@@ -730,8 +727,7 @@ public class NetWorkUtils {
     }
 
     private static void getInfoWithKeyAndData(Context context, String key, String data, final PushResultListener listener) {
-        ReadboyWearManager wearManager = (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
-        wearManager.getInfoWithKeyAndData(key, data, new IReadboyWearListener.Stub() {
+        getManager(context).getInfoWithKeyAndData(key, data, new IReadboyWearListener.Stub() {
             @Override
             public void pushSuc(String type, String s1, int code, String s2, String response) throws RemoteException {
                 listener.pushSucceed(type, s1, code, s2, response);

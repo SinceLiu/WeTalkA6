@@ -29,8 +29,6 @@ import com.readboy.wetalk.utils.WTContactUtils;
 public class FirstStartActivity extends BaseRequestPermissionActivity {
     private static final String TAG = "hwj_FirstStartActivity";
 
-    private NetWorkUtils mNetWorkUtils;
-
     private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
     private static final int UPDATE_CYCLE = 60 * 60_000;
 
@@ -77,9 +75,9 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
                 TextUtils.isEmpty(MPrefs.getNickName(this)) ||
                 TextUtils.isEmpty(MPrefs.getMessageTag(this))) {
             //获取手表设备信息
-            MPrefs.setDeviceId(this, mNetWorkUtils.getDeviceUuid());
-            MPrefs.setNickName(this, mNetWorkUtils.getNickName());
-            mNetWorkUtils.saveMessageTag(this);
+            MPrefs.setDeviceId(this, NetWorkUtils.getDeviceUuid(this));
+            MPrefs.setNickName(this, NetWorkUtils.getNickName(this));
+            NetWorkUtils.saveMessageTag(this);
         }
     }
 
@@ -112,7 +110,6 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
         startUpdateContactService();
 
         MPrefs.setNotificationType(this, false);
-        mNetWorkUtils = NetWorkUtils.getInstance(this);
         MessageReceiver.getAllMessage(this);
         initDeviceInfo();
         Intent intent = getIntent();

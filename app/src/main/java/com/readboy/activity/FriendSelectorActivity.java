@@ -27,6 +27,7 @@ import com.readboy.bean.GroupInfo;
 import com.readboy.bean.GroupInfoManager;
 import com.readboy.provider.Profile;
 import com.readboy.utils.JsonMapper;
+import com.readboy.wetalk.BaseRequestPermissionActivity;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.recyclerview.wrapper.HeaderAndFooterWrapper;
 import com.readboy.utils.ToastUtils;
@@ -49,7 +50,7 @@ import java.util.Map;
  * @author oubin
  * @date 2018/12/27
  */
-public class FriendSelectorActivity extends Activity implements View.OnClickListener,
+public class FriendSelectorActivity extends BaseRequestPermissionActivity implements View.OnClickListener,
         BaseCheckAdapter.OnCheckedChangeListener {
     private static final String TAG = "hwj_FriendSelector";
     public static final String EXTRA_TYPE_ORDINAL = "type";
@@ -87,6 +88,11 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
     };
 
     @Override
+    protected void initContent() {
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.mContext = this;
@@ -120,6 +126,7 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         ToastUtils.cancel();
     }
 
+    @Override
     public void initView() {
         mRecyclerView = findViewById(R.id.friend_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
@@ -138,7 +145,8 @@ public class FriendSelectorActivity extends Activity implements View.OnClickList
         mProgressBar = findViewById(R.id.progress_bar);
     }
 
-    private void initData() {
+    @Override
+    protected void initData() {
         Intent intent = getIntent();
         if (intent != null) {
             mFriends.clear();
