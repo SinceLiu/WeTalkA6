@@ -104,7 +104,8 @@
             android:screenOrientation="portrait" />
 
         <service android:name=".UpdateContactPhotoService" />
-        <service android:name="com.readboy.receiver.MessageService" />
+
+        <service android:name="com.readboy.service.MessageService" />
 
         <activity android:name="com.readboy.activity.GifActivity" />
         <activity

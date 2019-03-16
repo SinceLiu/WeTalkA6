@@ -6,11 +6,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.readboy.service.MessageService;
 import com.readboy.utils.AudioUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
+import com.readboy.utils.NetWorkUtils;
 import com.readboy.wetalk.support.WetalkFragment;
 
 /**
@@ -19,6 +22,7 @@ import com.readboy.wetalk.support.WetalkFragment;
  */
 public class FriendFragmentActivity extends BaseFragmentActivity {
     private static final String TAG = "hwj_FriendActivity";
+    private NetWorkUtils mNetWorkUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,5 +89,19 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
     @Override
     protected void initContent() {
         MPrefs.setNotificationType(this, false);
+        mNetWorkUtils = NetWorkUtils.getInstance(this);
+        initDeviceInfo();
+    }
+
+    private void initDeviceInfo() {
+        if (TextUtils.isEmpty(MPrefs.getDeviceId(this)) ||
+                TextUtils.isEmpty(MPrefs.getNickName(this)) ||
+                TextUtils.isEmpty(MPrefs.getMessageTag(this))) {
+            //获取手表设备信息
+            MPrefs.setDeviceId(this, mNetWorkUtils.getDeviceUuid());
+            MPrefs.setNickName(this, mNetWorkUtils.getNickName());
+            mNetWorkUtils.saveMessageTag(this);
+//            MessageService.getAllMessage(this);
+        }
     }
 }

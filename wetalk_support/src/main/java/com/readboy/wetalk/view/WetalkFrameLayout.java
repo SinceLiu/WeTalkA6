@@ -113,6 +113,7 @@ public class WetalkFrameLayout extends FrameLayout {
 
     /**
      * 监听通讯录数据变化,只监听联系人未读信息数变化,不监听联系人信息变化
+     * TODO use {@link android.app.LoaderManager}
      */
     private ContentObserver mObserver = new ContentObserver(new Handler()) {
         @Override

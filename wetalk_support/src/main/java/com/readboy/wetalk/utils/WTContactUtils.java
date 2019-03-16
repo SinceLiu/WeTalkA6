@@ -125,7 +125,6 @@ public class WTContactUtils {
             if (contact == null) {
                 continue;
             }
-            String mimetype = cursor.getString(cursor.getColumnIndex(Data.MIMETYPE));
             switch (cursor.getString(cursor.getColumnIndex(Data.MIMETYPE))) {
                 case StructuredName.CONTENT_ITEM_TYPE:
                     contact.name = cursor.getString(cursor.getColumnIndex(StructuredName.DISPLAY_NAME));
@@ -189,64 +188,6 @@ public class WTContactUtils {
     }
 
     /**
-     * 更新联系人未读信息数
-     *
-     * @param context
-     * @param uuid
-     * @param count   增量  +-n
-     * @return 受影响行数
-     * @deprecated 直接读取微聊消息数据库字段
-     */
-    public static int updateUnreadCount(Context context, String uuid, int count) {
-        Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
-                new String[]{"data6"}, "data8=?",
-                new String[]{uuid}, null);
-        if (c != null && c.getCount() > 0) {
-            c.moveToFirst();
-            int pre = c.getInt(0);
-            pre += count;
-            pre = pre < 0 ? 0 : pre;
-            c.close();
-            ContentValues values = new ContentValues();
-            values.put(Data.MIMETYPE, StructuredPostal.CONTENT_ITEM_TYPE);
-            values.put(StructuredPostal.TYPE, StructuredPostal.TYPE_WORK);
-            values.put("data6", pre);
-            int result = context.getContentResolver().update(Data.CONTENT_URI, values, "data8 = ?",
-                    new String[]{uuid});
-            if (result <= 0) {
-                Log.i(TAG, "updateUnreadCount: update fail. result = " + result);
-            }
-        } else {
-            Log.w(TAG, "updateUnreadCount: query unread count false.");
-        }
-        return 0;
-    }
-
-    public void updateUnreadCount2(Context context, String uuid, int count) {
-
-    }
-
-    /**
-     * 获取联系人未读信息数
-     *
-     * @param context
-     * @param uuid
-     * @return
-     * @deprecated 不通过该方式读取未读消息数，使用{@link #getUnreadMessageCount(Context, String)}
-     */
-    public static int getFriendUnreadCount(Context context, String uuid) {
-        try (Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
-                new String[]{"data6"}, "data8=?",
-                new String[]{uuid}, null)) {
-            if (c != null && c.getCount() > 0) {
-                c.moveToFirst();
-                return c.getInt(0);
-            }
-            return 0;
-        }
-    }
-
-    /**
      * 返回所有微聊未读数
      */
     public static int getUnreadMessageCount(Context context) {
@@ -271,8 +212,6 @@ public class WTContactUtils {
             }
         }
         builder.append(")");
-//        String[] args = new String[]{};
-//        args = list.toArray(args);
         try (Cursor cursor = context.getContentResolver().query(CONVERSATION_URI, null,
                 builder.toString(), null, null)) {
             if (cursor != null) {
@@ -295,28 +234,6 @@ public class WTContactUtils {
             }
         }
         return result;
-    }
-
-    /**
-     * @deprecated use {@link #getUnreadMessageCount(Context)}
-     */
-    public static int getAllContactsUnreadCount(Context context) {
-        Cursor c = context.getContentResolver().query(Data.CONTENT_URI,
-                new String[]{"data6", Data.RAW_CONTACT_ID},
-                Data.MIMETYPE + "=? AND " + StructuredPostal.TYPE + "=?",
-                new String[]{StructuredPostal.CONTENT_ITEM_TYPE, StructuredPostal.TYPE_WORK + ""},
-                null);
-        int count = 0;
-        if (c != null && c.moveToFirst()) {
-            do {
-                int num = c.getInt(0);
-                count += num;
-            } while (c.moveToNext());
-            c.close();
-        } else {
-            Log.w(TAG, "getAllContactsUnreadCount: query fail, cursor = " + c);
-        }
-        return count;
     }
 
     public static boolean isContacts(Context context, String uuid) {
