@@ -22,7 +22,6 @@ import com.readboy.wetalk.support.WetalkFragment;
  */
 public class FriendFragmentActivity extends BaseFragmentActivity {
     private static final String TAG = "hwj_FriendActivity";
-    private NetWorkUtils mNetWorkUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +88,6 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
     @Override
     protected void initContent() {
         MPrefs.setNotificationType(this, false);
-        mNetWorkUtils = NetWorkUtils.getInstance(this);
         initDeviceInfo();
     }
 
@@ -98,9 +96,9 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
                 TextUtils.isEmpty(MPrefs.getNickName(this)) ||
                 TextUtils.isEmpty(MPrefs.getMessageTag(this))) {
             //获取手表设备信息
-            MPrefs.setDeviceId(this, mNetWorkUtils.getDeviceUuid());
-            MPrefs.setNickName(this, mNetWorkUtils.getNickName());
-            mNetWorkUtils.saveMessageTag(this);
+            MPrefs.setDeviceId(this, NetWorkUtils.getDeviceUuid(FriendFragmentActivity.this));
+            MPrefs.setNickName(this, NetWorkUtils.getNickName(FriendFragmentActivity.this));
+            NetWorkUtils.saveMessageTag(this);
 //            MessageService.getAllMessage(this);
         }
     }

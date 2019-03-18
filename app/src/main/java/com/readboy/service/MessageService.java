@@ -144,7 +144,7 @@ public class MessageService extends Service {
             Log.w(TAG, "handleSendCapture: data is null, path = " + path + ", uuid = " + ids);
             return;
         }
-        NetWorkUtils.getInstance(context).uploadCaptureFile(ids, path, mHandler);
+        NetWorkUtils.uploadCaptureFile(context, ids, path, mHandler);
     }
 
     private boolean canGetMessage(Context context) {
@@ -157,11 +157,10 @@ public class MessageService extends Service {
             requestAgain = true;
             return;
         }
-        final NetWorkUtils mNetWorkUtils = NetWorkUtils.getInstance(context);
         isGettingMessage = true;
         requestAgain = false;
         final String messageTag = MPrefs.getMessageTag(context);
-        mNetWorkUtils.getAllMessage(messageTag, new NetWorkUtils.PushResultListener() {
+        NetWorkUtils.getAllMessage(context, messageTag, new NetWorkUtils.PushResultListener() {
 
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
