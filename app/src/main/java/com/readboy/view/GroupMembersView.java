@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.readboy.activity.ContactsChangeListener;
 import com.readboy.adapter.BaseAdapter;
 import com.readboy.adapter.BaseViewHolder;
 import com.readboy.bean.GroupInfo;
@@ -43,16 +44,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * TODO,移除完所有成员，提示解散群，调解散接口，过程解散失败怎么办
  * TODO，进入聊天界面就检查，提示，这时获取群成员列表，log如何。
+ *
  * @author oubin
  * @date 2018/12/22
  */
 public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemClickListener,
-        GroupInfoManager.CallBack {
+        GroupInfoManager.CallBack, ContactsChangeListener {
     private static final String TAG = "hwj_GroupMembersView";
     public static final int REQUEST_CODE_REMOVE = 11;
     public static final int REQUEST_CODE_ADD = 12;
@@ -116,6 +119,33 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         super.onDetachedFromWindow();
         Log.i(TAG, "onDetachedFromWindow: ");
         unRegisterBroadcast();
+    }
+
+    @Override
+    public void onChange(Map<String, Friend> map) {
+        boolean notify = false;
+        String uuid = WearManagerProxy.getMyUuid(mContext);
+        for (Friend friend : mMemberList) {
+            if (friend.uuid.equals(uuid)) {
+            } else if (friend.addVisibility == VISIBLE) {
+                if (map.containsKey(friend.uuid)) {
+                    friend.addVisibility = GONE;
+                    notify = true;
+                }
+            } else {
+                if (!map.containsKey(friend.uuid)) {
+                    friend.addVisibility = VISIBLE;
+                    notify = true;
+                }
+            }
+        }
+        if (notify && mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void onNewIntent(Intent intent) {
+
     }
 
     private void registerBroadcast() {

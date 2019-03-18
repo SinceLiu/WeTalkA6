@@ -431,7 +431,6 @@ public class WetalkFrameLayout extends FrameLayout {
     }
 
     private void updateUnreadCount() {
-        Log.i(TAG, "updateUnreadCount: 1  >> " + Thread.currentThread().getName());
         if (mFriends == null || mFriends.size() <= 0) {
             Log.i(TAG, "updateUnreadCount: mFriends = " + mFriends);
             return;
@@ -447,7 +446,6 @@ public class WetalkFrameLayout extends FrameLayout {
         sortFriends(friends);
         updateFriendData(friends);
         mAdapter.notifyDataSetChanged();
-        Log.i(TAG, "updateUnreadCount: 2  >> ");
     }
 
     private class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAdapter.ViewHolder> {
@@ -458,7 +456,6 @@ public class WetalkFrameLayout extends FrameLayout {
                 super(itemView);
                 item = (FriendGridItem) itemView.findViewById(R.id.friend_item);
             }
-
         }
 
         @Override

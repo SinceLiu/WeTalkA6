@@ -352,7 +352,6 @@ public class FriendSelectorActivity extends BaseRequestPermissionActivity implem
     }
 
     private void gotoConversation(Friend friend) {
-        Log.i(TAG, "gotoConversation: ");
         Intent intent = new Intent(mContext, ConversationActivity.class);
         intent.putExtra(Constant.EXTRA_FRIEND, friend);
         startActivity(intent);

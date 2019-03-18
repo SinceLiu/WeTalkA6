@@ -1,6 +1,5 @@
 package com.readboy.view;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -8,7 +7,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.drawable.AnimationDrawable;
@@ -19,10 +17,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -40,6 +36,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.readboy.activity.ContactsChangeListener;
 import com.readboy.adapter.ConversationListAdapterSimple;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
@@ -81,7 +78,7 @@ import okhttp3.ResponseBody;
  * @author oubin
  */
 public class ConversationView extends RelativeLayout implements OnClickListener,
-        OnLongClickListener, OnTouchListener {
+        OnLongClickListener, OnTouchListener, ContactsChangeListener {
     private static final String TAG = "hwj_ConversationView";
     public static final int REQUEST_CODE_IMAGE = 21;
     public static final int REQUEST_CODE_EMOJI = 22;
@@ -121,6 +118,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private RecordStrategy mRecorder;
     private Context mContext;
     private Activity mActivity;
+    private boolean isInContacts = true;
 
     //    private ThreadFactory mThreadFactory = new ThreadFactory() {
 //        @Override
@@ -136,10 +134,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     private float density;
 
-    /**
-     * TODO，修改为LoaderManager加载更加合理？
-     */
-    private ContentObserver mContactsObserver;
     /**
      * TODO，修改为LoaderManager加载更加合理？
      * 监听消息ContentProvider数据变化,只有收到消息时候才会回调
@@ -270,35 +264,17 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     }
 
     private void registerContentObserver() {
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS)
-                == PackageManager.PERMISSION_GRANTED) {
-            mContactsObserver = new ContactsObserver(new Handler());
-            mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
-        } else {
-            Log.e(TAG, "registerContentObserver: has not read contacts permission.");
-        }
         mResolver.registerContentObserver(Conversations.Conversation.CONVERSATION_URI, true, mObserver);
     }
 
     public void recheckContactsObserver() {
         Log.i(TAG, "recheckContactsObserver: ");
-        if (mContactsObserver != null && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_CONTACTS)
-                == PackageManager.PERMISSION_GRANTED) {
-            mContactsObserver = new ContactsObserver(new Handler());
-            mResolver.registerContentObserver(ContactsContract.Contacts.CONTENT_URI, false, mContactsObserver);
-        }
     }
 
     private void unregisterContentObserver() {
         if (mObserver != null) {
             mResolver.unregisterContentObserver(mObserver);
             mObserver = null;
-        }
-        if (mContactsObserver != null) {
-            mResolver.unregisterContentObserver(mContactsObserver);
-            mContactsObserver = null;
-        } else {
-            Log.w(TAG, "unregisterContentObserver: mContactsObserver is null.");
         }
     }
 
@@ -372,17 +348,16 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
      */
     private void initFriendData(Intent intent) {
         //获取传递参数(用户Id)
-        Intent fromIntent = intent;
-        if (fromIntent != null) {
-            Friend friend = fromIntent.getParcelableExtra(Constant.EXTRA_FRIEND);
+        if (intent != null) {
+            Friend friend = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
             if (friend != null) {
                 mCurrentFriend = friend;
             } else {
                 //普通的微聊界面
                 mCurrentFriend = new Friend();
-                mCurrentFriend.uuid = fromIntent.getStringExtra(Constant.EXTRA_FRIEND_ID);
-                mCurrentFriend.name = fromIntent.getStringExtra(Constant.EXTRA_FRIEND_NAME);
-                mCurrentFriend.unreadCount = fromIntent.getIntExtra(Constant.FRIEND_UNREAD_COUNT, 0);
+                mCurrentFriend.uuid = intent.getStringExtra(Constant.EXTRA_FRIEND_ID);
+                mCurrentFriend.name = intent.getStringExtra(Constant.EXTRA_FRIEND_NAME);
+                mCurrentFriend.unreadCount = intent.getIntExtra(Constant.FRIEND_UNREAD_COUNT, 0);
             }
 
             mConversationName.setText(mCurrentFriend.name);
@@ -488,6 +463,10 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     @Override
 
     public void onClick(final View v) {
+        if (!isInContacts) {
+            toastNoInContacts();
+            return;
+        }
         int id = v.getId();
         v.setEnabled(false);
         mSendMessageResultHandler.postDelayed(new Runnable() {
@@ -1141,6 +1120,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                     cancelRecord();
                     requestParentDisallowInterceptTouchEvent(false);
                     break;
+                default:
+                    break;
             }
         }
         return false;
@@ -1174,11 +1155,28 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     @Override
     public boolean onLongClick(View v) {
-        startRecording();
+        if (isInContacts) {
+            startRecording();
+        } else {
+            toastNoInContacts();
+        }
         return true;
     }
 
-    private boolean isHiding = false;
+    @Override
+    public void onChange(Map<String, Friend> map) {
+        // 可能被对方删掉好友了
+        if (mCurrentFriend == null || !map.containsKey(mCurrentFriend.uuid)) {
+            isInContacts = false;
+//            toastNoInContacts();
+        } else {
+            isInContacts = true;
+        }
+    }
+
+    private void toastNoInContacts() {
+        ToastUtils.showShort(mContext, "对方已不是你好友");
+    }
 
     public void onDestroy() {
         unregisterContentObserver();
@@ -1211,6 +1209,12 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
             LogInfo.i("hwj", "onPause --- prepareSendVoiceMessage");
             prepareSendVoiceMessage();
         }
+    }
+
+    public void onNewIntent(Intent intent) {
+        initFriendData(intent);
+        GetConversationTask mConversationTask = new GetConversationTask();
+        mConversationTask.execute();
     }
 
     public void setActivity(Activity activity) {
@@ -1298,29 +1302,5 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
             result = am.abandonAudioFocus(null);
         }
         return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-    }
-
-    private class ContactsObserver extends ContentObserver {
-
-        /**
-         * Creates a content observer.
-         *
-         * @param handler The handler to run {@link #onChange} on, or null if none.
-         */
-        public ContactsObserver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-            Log.e(TAG, "contacts onChange() called with: selfChange = " + selfChange + "");
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            super.onChange(selfChange, uri);
-            Log.e(TAG, "contacts onChange() called with: selfChange = " + selfChange + ", uri = " + uri);
-        }
     }
 }

@@ -96,7 +96,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".ConversationActivity"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ChooseFriendActivity"

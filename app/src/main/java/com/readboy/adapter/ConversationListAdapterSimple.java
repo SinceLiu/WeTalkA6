@@ -104,7 +104,6 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         BaseHolder commonHolder = null;
         final Conversation conversation = mConversations.get(position);
         int type = conversation.type;
-        Log.i(TAG, "getView: position = " + position + " type = " + type);
         if (view == null) {
             if (type == Constant.SEND_VIDEO) {
                 //TODO layoutId可否抽象起来，统一处理

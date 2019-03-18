@@ -25,7 +25,6 @@ public class FriendActivity extends BaseRequestPermissionActivity {
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState) {
         LogInfo.i(TAG, " --- onCreate()");
-        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         AudioUtils.requestAudioFocus(this);
 

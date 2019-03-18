@@ -43,7 +43,8 @@ public class TaskUtils {
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         ActivityManager.RunningAppProcessInfo processInfo = appProcesses.get(0);
         if (context.getPackageName().equals(processInfo.processName)) {
-            return processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+            return processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+                    && processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING;
         } else {
             return true;
         }

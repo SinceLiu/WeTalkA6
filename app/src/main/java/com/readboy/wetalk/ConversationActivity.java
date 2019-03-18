@@ -1,39 +1,46 @@
 package com.readboy.wetalk;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.readboy.IReadboyWearListener;
+import android.app.LoaderManager;
 import android.content.ContentProviderOperation;
-import android.content.ContentProviderResult;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
-import android.graphics.MaskFilter;
+import android.content.Loader;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.readboy.bean.Constant;
 import com.readboy.bean.GroupInfo;
 import com.readboy.bean.GroupInfoManager;
 import com.readboy.provider.Conversations;
+import com.readboy.task.DelayLoader;
 import com.readboy.utils.FriendNameUtil;
 import com.readboy.utils.NotificationUtils;
-import com.readboy.utils.WearManagerProxy;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.view.ConversationView;
 import com.readboy.view.GroupMembersView;
 import com.readboy.widget.ImageIndication;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,9 +49,11 @@ import java.util.Map;
  * @author oubin
  * @date 2018/12/28
  */
-public class ConversationActivity extends BaseRequestPermissionActivity implements GroupInfoManager.CallBack {
+public class ConversationActivity extends BaseRequestPermissionActivity implements GroupInfoManager.CallBack,
+        LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "hwj-ConversationAct";
 
+    private static final int LOADER_ID_CONTACTS = 23;
     private static final int DELAY_LOAD_TIME = 1000;
     private static final int WHAT_UPDATE_GROUP = 10;
 
@@ -55,6 +64,7 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
     private Friend mFriend;
     private GroupMembersView mMembersView;
     private ConversationView mConversationView;
+    private ImageIndication mIndication;
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -85,6 +95,19 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
         setContentView(R.layout.activity_conversation);
 
         Intent intent = getIntent();
+        if (intent != null) {
+            parseIntent(intent);
+        }
+        Log.i(TAG, "onCreate: isFriendGroup = " + isGroup);
+
+        initView();
+        initData();
+        NotificationUtils.cancelMessageNotification(this);
+//        clearUnreadCount(this, mFriend.uuid);
+        initLoader();
+    }
+
+    private void parseIntent(Intent intent) {
         Friend friend = mFriend = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
         Log.i(TAG, "onCreate: friend = " + friend.toString());
         final String uuid = friend.uuid;
@@ -99,13 +122,18 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
                 mHandler.sendEmptyMessageDelayed(WHAT_UPDATE_GROUP, 1000);
                 Log.w(TAG, "onCreate: info = " + info);
             }
+        } else {
+            isGroup = false;
         }
-        Log.i(TAG, "onCreate: isFriendGroup = " + isGroup);
+    }
 
-        initView();
-        initData();
-        NotificationUtils.cancelMessageNotification(this);
-//        clearUnreadCount(this, mFriend.uuid);
+    private void initLoader() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            Log.e(TAG, "initLoader: no read contacts permission.");
+            return;
+        }
+        getLoaderManager().initLoader(LOADER_ID_CONTACTS, null, this);
     }
 
     private void updateGroupInfoFromNet(String uuid) {
@@ -140,22 +168,16 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
 
     private void assignView() {
         LayoutInflater inflater = LayoutInflater.from(this);
-        Log.e(TAG, "assignV iew: ");
         mConversationView = (ConversationView) inflater.inflate(R.layout.page_conversation, null);
         mConversationView.setActivity(this);
         mViewList.add(mConversationView);
         mViewPager = findViewById(R.id.conversation_view_pager);
-        ImageIndication indication = findViewById(R.id.image_indication);
+        mIndication = findViewById(R.id.image_indication);
         if (isGroup) {
-            mMembersView = (GroupMembersView) inflater.inflate(R.layout.page_group_members, null);
-            mMembersView.setActivity(this);
-            if (mGroup != null) {
-                mMembersView.updateGroupInfo(mGroup);
-            }
-            mViewList.add(mMembersView);
-            indication.setViewPager(mViewPager);
+            initMembersView();
+            mIndication.setViewPager(mViewPager);
         } else {
-            indication.setVisibility(View.GONE);
+            mIndication.setVisibility(View.GONE);
         }
         mViewPager.setAdapter(new PagerAdapter() {
             @Override
@@ -198,6 +220,15 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
 
     }
 
+    private void initMembersView() {
+        mMembersView = (GroupMembersView) getLayoutInflater().inflate(R.layout.page_group_members, null);
+        mMembersView.setActivity(this);
+        if (mGroup != null) {
+            mMembersView.updateGroupInfo(mGroup);
+        }
+        mViewList.add(mMembersView);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -209,6 +240,37 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
         mConversationView.onPause();
         // 也需要清掉当前页面正在收到的信息
         clearUnreadCount(this, mFriend.uuid);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // 启动模式为：singleTask的需要处理该回调
+        String temp = mFriend.uuid;
+        parseIntent(intent);
+        if (temp.equals(mFriend.uuid)) {
+            Log.i(TAG, "onNewIntent: is same uuid, do nothing.");
+            return;
+        }
+        if (mConversationView != null) {
+            mConversationView.onNewIntent(intent);
+        }
+        if (isGroup) {
+            if (mMembersView == null) {
+                initMembersView();
+            } else {
+                mMembersView.onNewIntent(intent);
+                if (mGroup != null) {
+                    mMembersView.updateGroupInfo(mGroup);
+                }
+            }
+            mIndication.setVisibility(View.VISIBLE);
+        } else {
+            if (mMembersView != null) {
+                mViewList.remove(mMembersView);
+            }
+            mIndication.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -276,4 +338,64 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
 //        }
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = new String[]{
+                ContactsContract.Data.MIMETYPE,
+                ContactsContract.Data.RAW_CONTACT_ID,
+                ContactsContract.Data.DATA1,
+                ContactsContract.Data.DATA2,
+                ContactsContract.Data.DATA8
+        };
+        return new CursorLoader(this, ContactsContract.Data.CONTENT_URI, projection,
+                null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        SparseArray<Friend> array = new SparseArray<>();
+        if (cursor == null || !cursor.moveToFirst() || cursor.getCount() <= 0) {
+            return;
+        }
+        while (cursor.moveToNext()) {
+            int rawId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Data.RAW_CONTACT_ID));
+            Friend friend = array.get(rawId);
+            if (friend == null) {
+                friend = new Friend();
+                friend.contactId = rawId;
+                array.put(rawId, friend);
+            }
+            String mineType = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
+            switch (mineType) {
+                case StructuredName.CONTENT_ITEM_TYPE:
+                    friend.name = cursor.getString(cursor.getColumnIndex(StructuredName.DISPLAY_NAME));
+                    break;
+                case ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE:
+                    if (cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE))
+                            == ContactsContract.CommonDataKinds.StructuredPostal.TYPE_WORK) {
+                        friend.uuid = cursor.getString(cursor.getColumnIndex("data8"));
+                    }
+                default:
+                    break;
+            }
+        }
+        //key: uuid
+        Map<String, Friend> friends = new HashMap<>(array.size());
+        for (int size = array.size() - 1; size >= 0; size--) {
+            Friend friend = array.valueAt(size);
+            friends.put(friend.uuid, friend);
+        }
+
+        if (mConversationView != null) {
+            mConversationView.onChange(friends);
+        }
+        if (mMembersView != null) {
+            mMembersView.onChange(friends);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        Log.i(TAG, "onLoaderReset: ");
+    }
 }
