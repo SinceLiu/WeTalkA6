@@ -1,5 +1,7 @@
 package com.readboy.service;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,12 +11,16 @@ import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -37,6 +43,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import static com.readboy.wetalk.BaseFragmentActivity.REQUEST_PERMISSIONS;
 
 /**
  * TODO，android系统高版本，可能会限制应用后台运行，把MessageReceiver部分任务用service或者Jobscheduler实现。
@@ -73,12 +81,12 @@ public class MessageService extends Service {
     /**
      * TODO: 网络慢是否会导致内容丢失，不会马上获取到最新的消息。
      */
-    private static boolean isGettingMessage = false;
-    private static boolean requestAgain = false;
+    private volatile static boolean isGettingMessage = false;
+    private volatile static boolean requestAgain = false;
     /**
      * 和requestAgain搭配使用，因为可能从新获取到的数据为空，
      */
-    private static boolean notifyNewMessage = false;
+    private volatile static boolean notifyNewMessage = false;
 
     private static ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 
@@ -167,20 +175,20 @@ public class MessageService extends Service {
                                     String response) {
                 LogInfo.d(TAG, "pushSucceed() called with: type = " + type + ", s1 = " + s1 +
                         ", code = " + code + ", response = " + response + "");
-                int count = parseMessage(response, context);
-                if (notifyNewMessage || (count > 0 && !requestAgain)) {
-                    notifyNewMessage = false;
-//                    mHandler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-                    NotificationUtils.sendNotification(context);
-//                        }
-//                    });
-                } else {
-                    Log.i(TAG, "pushSucceed: do not notify, count = " + count + ", requestAgain = " + requestAgain);
+                try {
+                    int count = parseMessage(response, context);
+                    if (notifyNewMessage || (count > 0 && !requestAgain)) {
+                        notifyNewMessage = false;
+                        NotificationUtils.sendNotification(context);
+                    } else {
+                        Log.i(TAG, "pushSucceed: do not notify, count = " + count + ", requestAgain = " + requestAgain);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    isGettingMessage = false;
+                    tryRequestAgain(context);
                 }
-                isGettingMessage = false;
-                tryRequestAgain(context);
             }
 
             @Override
@@ -273,9 +281,7 @@ public class MessageService extends Service {
         if (operationList.size() > 0) {
             try {
                 ContentProviderResult[] results = context.getContentResolver().applyBatch(Conversations.AUTHORITY, operationList);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            } catch (OperationApplicationException e) {
+            } catch (RemoteException | OperationApplicationException e) {
                 e.printStackTrace();
             }
         }
@@ -303,6 +309,7 @@ public class MessageService extends Service {
         conversation.isUnPlay = Constant.TRUE;
         conversation.isPlaying = Constant.FALSE;
         conversation.type = Constant.REC_VOICE;
+
         mHandler.post(new Runnable() {
             @Override
             public void run() {

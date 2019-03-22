@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2019/3/18
  */
 public class DelayLoader extends CursorLoader {
+    private static final String TAG = "DelayLoader";
 
     private static final int MESSAGE_DELAY_START = 10;
 
@@ -65,12 +68,13 @@ public class DelayLoader extends CursorLoader {
     }
 
     @Override
-    protected void onStartLoading() {
+    protected void onForceLoad() {
+        Log.i(TAG, "onForceLoad: ");
         mHandler.removeMessages(MESSAGE_DELAY_START);
         mHandler.sendEmptyMessageDelayed(MESSAGE_DELAY_START, this.mDelayTime);
     }
 
     private void start() {
-        super.onStartLoading();
+        super.onForceLoad();
     }
 }

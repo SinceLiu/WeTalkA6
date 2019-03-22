@@ -302,13 +302,12 @@ public class ConversationListAdapterSimple extends BaseAdapter {
     }
 
     private static void updateName(BaseHolder holder, Conversation conversation) {
-        if (holder.userName == null) {
-            // 系统消息没有名字
+        if (holder.userName == null || Constant.isSendMessage(conversation.type)) {
+            // 系统消息没有名字、不显示发送者自己的名字
             return;
         }
         if (conversation.isHomeGroup == Constant.TRUE) {
             String name = FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName);
-            Log.i(TAG, "updateName: senderName = " + conversation.senderName + ", name = " + name);
             holder.userName.setText(FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName));
             //WTContactUtils.getNameById(mContext,conversation.realSendId));
         } else {

@@ -83,7 +83,7 @@ public class UpdateContactPhotoService extends IntentService {
     private void handleError() {
         Log.i(TAG, "handleError: ");
         try {
-            Settings.System.putLong(UpdateContactPhotoService.this.getContentResolver()
+            Settings.Global.putLong(UpdateContactPhotoService.this.getContentResolver()
                     , RB_UPDATE_PHOTO_PER_HOUR, 0);
         } catch (Exception e) {
             e.printStackTrace();

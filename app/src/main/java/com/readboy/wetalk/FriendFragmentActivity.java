@@ -21,7 +21,7 @@ import com.readboy.wetalk.support.WetalkFragment;
  * @date 2019/02/18
  */
 public class FriendFragmentActivity extends BaseFragmentActivity {
-    private static final String TAG = "hwj_FriendActivity";
+    private static final String TAG = "hwj_FriendFragmentActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,19 +55,19 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
 
     @Override
     protected void onResume() {
-        LogInfo.i(TAG, " FriendActivity --- onResume()");
+        LogInfo.i(TAG, " FriendFragmentActivity --- onResume()");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        LogInfo.i(TAG, " FriendActivity --- onPause()");
+        LogInfo.i(TAG, " FriendFragmentActivity --- onPause()");
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        LogInfo.i(TAG, " FriendActivity --- onDestroy()");
+        LogInfo.i(TAG, " FriendFragmentActivity --- onDestroy()");
         super.onDestroy();
         MPrefs.setNotificationType(this, true);
         AudioUtils.abandonAudioFocus(this);

@@ -143,6 +143,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         public void onChange(boolean selfChange) {
             //获取最新的消息集合
             // TODO，对方正在插入数据，可能会获取到多条新消息
+            // 数据库记录，未必是按照time字段排序，可能先获取到最新的，再获取到旧的。
             List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
             if (conversations == null || conversations.size() <= mConversations.size()) {
                 Log.e(TAG, "onChange: conversation = null.");
@@ -150,27 +151,26 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                         "new size = " + (conversations != null ? conversations.size() : 0) + ", old size = " + mConversations.size()));
                 return;
             }
-            int length = conversations.size();
-            int current = mConversations.size();
-            boolean udpateGroupMember = false;
-            final Conversation last = mConversations.size() == 0
-                    ? null
-                    : mConversations.get(mConversations.size() - 1);
-            Log.i(TAG, "onChange: new length = " + length + ", current = " + current);
-            for (int i = length - 1; i >= current; i--) {
-                //按时间降序,获取最新的一条消息
-                Conversation conversation = conversations.get(i);
-//                if (last != null && last.conversationId.equals(conversation.conversationId)) {
-//                    Log.i(TAG, "onChange: last = " + last.conversationId);
+//            final int length = conversations.size();
+//            final int current = mConversations.size();
+//            final String lastTime = mConversations.size() == 0
+//                    ? null
+//                    : mConversations.get(current - 1).time;
+//            Log.i(TAG, "onChange: new length = " + length + ", current = " + current);
+//            for (int i = length - 1; i >= current; i--) {
+//                //按时间降序,获取最新的一条消息
+//                Conversation conversation = conversations.get(i);
+//                if (lastTime != null && lastTime.equals(conversation.time)) {
+//                    Log.i(TAG, "onChange: i = " + i + ", preview = " + conversation.preview);
 //                    break;
 //                }
-                if (!conversation.sendId.equals(MPrefs.getDeviceId(mContext))) {
-                    //添加到显示的消息列表集合
-                    Log.i(TAG, "onChange: i = " + i + ", conversation, " + i);
-                    mConversations.add(conversation);
-                    LogInfo.e(TAG, "onChange ---------- add conversation notifyDataSetChanged");
-                }
-            }
+//                Log.i(TAG, "onChange: add conversation: " + conversation.preview);
+//                mConversations.add(conversation);
+//            }
+
+            mConversations.clear();
+            mConversations.addAll(conversations);
+
             Log.e(TAG, "onChange: current conversations size = " + mConversations.size());
             notifyAndScrollBottom();
         }
@@ -721,7 +721,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
      * 刷新，并跳转到最新一条
      */
     private void notifyAndScrollBottom() {
-        Log.i(TAG, "notifyAndScrollBottom: thread = " + Thread.currentThread().getName());
         mAdapter.notifyDataSetChanged();
         //本应该是mAdapter.getCount-1的，但是发送图片时有bug，显示的不是最底下的图片。
         mConversationList.post(new Runnable() {
@@ -1270,10 +1269,11 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private void resolverConversations(List<Conversation> conversations) {
         Log.i(TAG, "resolverConversations:  1  >> ");
         for (Conversation conversation : conversations) {
-            if (TextUtils.isEmpty(conversation.voiceUrl) && TextUtils.isEmpty(conversation.voiceLocalPath)) {
+            if (!TextUtils.isEmpty(conversation.voiceUrl) && TextUtils.isEmpty(conversation.voiceLocalPath)) {
                 conversation.shouldResend = Constant.TRUE;
             }
         }
+
         Log.i(TAG, "resolverConversations:  2 >> ");
     }
 

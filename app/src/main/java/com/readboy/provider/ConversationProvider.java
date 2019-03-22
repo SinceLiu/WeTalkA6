@@ -331,6 +331,22 @@ public class ConversationProvider extends ContentProvider {
 
                 //TODO 兼容策略，这里需要修改
                 switch (conversation.type) {
+                    case Constant.REC_VOICE:
+                    case Constant.SEND_VOICE:
+                        conversation.content = conversation.voiceLocalPath;
+                        conversation.extra = conversation.voiceUrl;
+                        conversation.preview = String.valueOf(conversation.lastTime);
+                        break;
+                    case Constant.REC_IMAGE:
+                    case Constant.SEND_IMAGE:
+                        conversation.content = conversation.imageLocalPath;
+                        conversation.extra = conversation.imageUrl;
+                        conversation.preview = conversation.thumbImageUrl;
+                        break;
+                    case Constant.REC_VIDEO:
+                    case Constant.SEND_VIDEO:
+                        conversation.content = conversation.voiceLocalPath;
+                        break;
                     case Constant.REC_SYSTEM:
                         conversation.content = conversation.textContent;
                         break;

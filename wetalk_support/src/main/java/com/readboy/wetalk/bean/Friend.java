@@ -76,7 +76,7 @@ public class Friend implements Parcelable {
      */
     public List<Friend> members;
 
-    @IntDef({View.VISIBLE, View.GONE})
+    @IntDef({View.VISIBLE, View.INVISIBLE, View.GONE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface Visibility {
     }

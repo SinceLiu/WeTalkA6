@@ -32,6 +32,10 @@ public final class Constant {
     public static final int REC_SYSTEM = 11;
     //增长类型，记得Adapter.getViewTypeCount也要增加
 
+    public static boolean isSendMessage(int type) {
+        return type % 2 == 0 && type != REC_TEXT;
+    }
+
     public static final String EMPTY = "";
 
     /**

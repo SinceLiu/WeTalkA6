@@ -4,11 +4,10 @@
     coreApp="true"
     package="com.readboy.wetalk"
     android:sharedUserId="com.android.systemui"
-    android:versionCode="190316001"
-    android:versionName="2.0.3">
+    android:versionCode="190322001"
+    android:versionName="2.0.6">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
-
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -16,6 +15,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
     <uses-permission android:name="android.permission.READ_SETTINGS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />

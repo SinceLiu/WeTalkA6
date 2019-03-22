@@ -18,6 +18,8 @@ import com.readboy.utils.ToastUtils;
 
 import java.util.Arrays;
 
+import static com.readboy.wetalk.BaseFragmentActivity.REQUEST_PERMISSIONS;
+
 /**
  * Created by hwj on 2017/3/21.
  *
@@ -91,12 +93,6 @@ public abstract class BaseRequestPermissionActivity extends Activity {
     private int animIn = R.anim.slide_in_right;
     private int state = R.anim.state;
     private int animOut = R.anim.slide_out_right;
-
-    private static final String[] REQUEST_PERMISSIONS = new String[]{Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CONTACTS,
-            Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_LOGS,
-            Manifest.permission.ACCESS_WIFI_STATE};
 
     protected abstract void initView();
 

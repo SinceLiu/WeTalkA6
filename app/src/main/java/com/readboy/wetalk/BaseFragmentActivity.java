@@ -92,11 +92,12 @@ public abstract class BaseFragmentActivity extends FragmentActivity {
     private int state = R.anim.state;
     private int animOut = R.anim.slide_out_right;
 
-    private static final String[] REQUEST_PERMISSIONS = new String[]{Manifest.permission.RECORD_AUDIO,
+    public static final String[] REQUEST_PERMISSIONS = new String[]{Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_LOGS,
-            Manifest.permission.ACCESS_WIFI_STATE};
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.WRITE_SETTINGS, Manifest.permission.WRITE_SECURE_SETTINGS};
 
     protected View getView(int id) {
         return findViewById(id);

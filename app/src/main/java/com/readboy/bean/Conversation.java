@@ -81,7 +81,10 @@ public class Conversation implements Parcelable {
     public int shouldResend;
     //正在发送,是否需要显示进度
     public int isSending;
-    //消息的接收/发送时间
+    /**
+     * 接收：服务器的时间
+     * 发送：本地时间
+     */
     public String time;
     //是否正在播放语音(语音项特有)
     public int isPlaying;

@@ -16,7 +16,7 @@ import com.readboy.wetalk.utils.IOs;
  */
 
 public class MPrefs {
-    private static final String TAG = "whj_MPrefs";
+    private static final String TAG = "hwj_MPrefs";
 
     public static final String APP_NAME = "weTalk";
     public static final String LAST_POSITION = "last";
@@ -59,6 +59,7 @@ public class MPrefs {
     }
 
     public static void setMessageTag(Context context, String tag) {
+        Log.e("lxx","setTag: "+tag);
         if (!IOs.saveTimeTag(context, tag)) {
             saveMessageTagToPreference(context, tag);
         }

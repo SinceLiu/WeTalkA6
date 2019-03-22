@@ -42,12 +42,12 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
 
     private void startUpdateContactService() {
         try {
-            long last = Settings.System.getLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR, 0);
+            long last = Settings.Global.getLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR, 0);
             Log.e(TAG, "startUpdateContactService() called: last = " + last);
             if ((System.currentTimeMillis() - last) > UPDATE_CYCLE && !WeTalkApplication.IS_TEST_MODE) {
                 Intent serviceIntent = new Intent(this, UpdateContactPhotoService.class);
                 startService(serviceIntent);
-                Settings.System.putLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR, System.currentTimeMillis());
+                Settings.Global.putLong(getContentResolver(), RB_UPDATE_PHOTO_PER_HOUR, System.currentTimeMillis());
             }
         } catch (Exception e) {
             e.printStackTrace();

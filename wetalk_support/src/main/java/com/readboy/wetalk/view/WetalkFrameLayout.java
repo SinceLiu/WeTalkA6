@@ -5,17 +5,21 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.readboy.recyclerview.wrapper.HeaderAndFooterWrapper;
@@ -33,10 +38,18 @@ import com.readboy.wetalk.utils.LogInfo;
 import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.wetalk.utils.WeTalkConstant;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.Volley;
 
 /**
  * @author hwj
@@ -44,11 +57,14 @@ import java.util.List;
 public class WetalkFrameLayout extends FrameLayout {
     private static final String TAG = "hwj_WetalkView";
     private static final String PACKAGE_NAME = "com.readboy.wetalk";
+    private static final String ICON_URL = "http://img.readboy.com/avatar/";
+    private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
+    private static final int UPDATE_CYCLE = 60 * 60 * 1000;
     public static final String EXTRA_FRIENDS = "friends";
     public static final String EXTRA_FRIEND = "friend";
     private static final String CLASS_NAME_CONVERSATION = "com.readboy.wetalk.ConversationActivity";
     private static final String CLASS_NAME_FRIEND_SELECTOR = "com.readboy.activity.FriendSelectorActivity";
-
+    private static final int IMAGE_WIDTH = 126;
     public static final int MAX_MESSAGE_COUNT = 100;
     private static final int MESSAGE_UPDATE_CONTACT = 10;
     private static final int MESSAGE_UPDATE_UNREAD_COUNT = 20;
@@ -63,6 +79,7 @@ public class WetalkFrameLayout extends FrameLayout {
     private HeaderAndFooterWrapper mWrapperAdapter;
     private View mLoading;
     private boolean isUpdating = false;
+    private boolean getAgain = false;
     private boolean hasRegisterObserver = false;
     private int successCount;
     private Context mContext;
@@ -71,6 +88,7 @@ public class WetalkFrameLayout extends FrameLayout {
     private ContentObserver mConversationObserver;
     private boolean isShowing = false;
     private boolean unreadCountChange = false;
+    private String updateLastTime;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -85,6 +103,7 @@ public class WetalkFrameLayout extends FrameLayout {
                         mGetFriendTask = new GetFriendTask();
                         mGetFriendTask.execute();
                     } else {
+                        getAgain = true;
                         Log.w(TAG, "handleMessage: udpate contact, but is getting contacts.");
                     }
                     break;
@@ -119,9 +138,7 @@ public class WetalkFrameLayout extends FrameLayout {
         @Override
         public void onChange(boolean selfChange) {
             mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
-            if (!isUpdating) {
-                mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
-            }
+            mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
         }
 
     };
@@ -248,6 +265,11 @@ public class WetalkFrameLayout extends FrameLayout {
             updateFriendData(friends);
             mAdapter.notifyDataSetChanged();
             isUpdating = false;
+            if (getAgain) {
+                getAgain = false;
+                mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
+                mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
+            }
         }
     }
 
@@ -352,7 +374,7 @@ public class WetalkFrameLayout extends FrameLayout {
                     return -3;
                 } else if (f1.unreadCount < f2.unreadCount) {
                     return 1;
-                } else if (f1.unreadCount > f2.unreadCount){
+                } else if (f1.unreadCount > f2.unreadCount) {
                     return -1;
                 } else {
                     return 0;
@@ -432,6 +454,7 @@ public class WetalkFrameLayout extends FrameLayout {
     }
 
     private void updateUnreadCount() {
+        Log.i(TAG, "updateUnreadCount: 1  >> " + Thread.currentThread().getName());
         if (mFriends == null || mFriends.size() <= 0) {
             Log.i(TAG, "updateUnreadCount: mFriends = " + mFriends);
             return;
@@ -447,6 +470,7 @@ public class WetalkFrameLayout extends FrameLayout {
         sortFriends(friends);
         updateFriendData(friends);
         mAdapter.notifyDataSetChanged();
+        Log.i(TAG, "updateUnreadCount: 2  >> ");
     }
 
     private class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAdapter.ViewHolder> {
@@ -457,6 +481,7 @@ public class WetalkFrameLayout extends FrameLayout {
                 super(itemView);
                 item = (FriendGridItem) itemView.findViewById(R.id.friend_item);
             }
+
         }
 
         @Override
@@ -496,6 +521,8 @@ public class WetalkFrameLayout extends FrameLayout {
                                 v.setScaleY(1.0f);
                                 final int p = (int) v.getTag();
                                 final Friend friend = mFriends.get(p);
+                                //点击时更新该好友头像
+                                updatePhoto(friend);
                                 if (friend.type == Friend.TYPE_CREATE_GROUP) {
                                     gotoFriendSelector();
                                 } else {
@@ -547,6 +574,116 @@ public class WetalkFrameLayout extends FrameLayout {
             }
         }
     }
+
+    /**
+     * 更新一个联系人的头像
+     */
+    public void updatePhoto(final Friend friend) {
+        String url = ICON_URL + friend.uuid;
+        if (TextUtils.isEmpty(friend.photoUri)) {
+            ImageRequest request = new ImageRequest(url, new Listener<Bitmap>() {
+                @Override
+                public void onResponse(Bitmap response) {
+                    // TODO Auto-generated method stub
+                    insertPhoto(mContext, friend.contactId, response);
+                }
+            }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Bitmap.Config.ARGB_8888, errorListener);
+            getQueue(mContext).add(request);
+        } else {
+            updateLastTime = friend.uuid + RB_UPDATE_PHOTO_PER_HOUR;
+            long last = Settings.Global.getLong(mContext.getContentResolver(), updateLastTime, 0);
+            //超过一小时才更新
+            if ((System.currentTimeMillis() - last) < UPDATE_CYCLE) {
+                return;
+            }
+            ImageRequest request = new ImageRequest(url, new Listener<Bitmap>() {
+
+                @Override
+                public void onResponse(Bitmap response) {
+                    // TODO Auto-generated method stub
+                    updateContactPhoto(mContext, friend.contactId, response);
+                }
+            }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Bitmap.Config.ARGB_8888, errorListener);
+            getQueue(mContext).add(request);
+        }
+
+    }
+
+    /**
+     * 插入一个联系人的头像
+     */
+    private void insertPhoto(Context context, long rawContactId, Bitmap bmp) {
+        if (bmp == null) {
+            return;
+        }
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
+        byte[] avatar = os.toByteArray();
+        ContentValues cv = new ContentValues();
+        cv.put(ContactsContract.Data.RAW_CONTACT_ID, rawContactId);
+        cv.put(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE);
+        cv.put(ContactsContract.CommonDataKinds.Photo.PHOTO, avatar);
+        Uri uri = context.getContentResolver().insert(ContactsContract.Data.CONTENT_URI, cv);
+        Log.i(TAG, "insertPhoto: uri = " + uri);
+        if (uri == null) {
+            Settings.Global.putLong(mContext.getContentResolver(), updateLastTime, 0);
+        } else {
+            Settings.Global.putLong(mContext.getContentResolver(), updateLastTime, System.currentTimeMillis());
+        }
+    }
+
+    /**
+     * 更新头像
+     */
+    private void updateContactPhoto(Context context, long rawContactId, Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] data = baos.toByteArray();
+        ContentValues values = new ContentValues();
+        values.put(ContactsContract.CommonDataKinds.Photo.PHOTO, data);
+        int rows = context.getContentResolver().update(ContactsContract.Data.CONTENT_URI, values,
+                ContactsContract.Data.RAW_CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "=? ",
+                new String[]{rawContactId + "", ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE});
+        Log.i(TAG, "updatePhoto: rows = " + rows);
+        if (rows <= 0) {
+            Settings.Global.putLong(mContext.getContentResolver(), updateLastTime, 0);
+        } else {
+            Settings.Global.putLong(mContext.getContentResolver(), updateLastTime, System.currentTimeMillis());
+        }
+    }
+
+    static RequestQueue mQueue;
+
+    public static RequestQueue getQueue(Context context) {
+        if (mQueue == null) {
+            synchronized (context) {
+                if (mQueue == null) {
+                    mQueue = Volley.newRequestQueue(context);
+                }
+            }
+        }
+        return mQueue;
+    }
+
+    private ErrorListener errorListener = new ErrorListener() {
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            // TODO Auto-generated method stub
+            Log.i(TAG, "VolleyError = " + error.toString());
+            //更新失败，置零，下次进入可以更新。
+            // 404代表目标文件不存在
+            if (error.networkResponse == null || error.networkResponse.statusCode != 404) {
+                if (error.networkResponse != null) {
+                    byte[] data = error.networkResponse.data;
+                    String response = data != null ? new String(data) : "";
+                    Log.i(TAG, "onErrorResponse: status = " + error.networkResponse.statusCode
+                            + ", " + response);
+                }
+                Settings.Global.putLong(mContext.getContentResolver(), updateLastTime, 0);
+            }
+        }
+    };
 
 
 }
