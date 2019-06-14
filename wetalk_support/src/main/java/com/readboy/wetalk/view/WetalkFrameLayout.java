@@ -4,10 +4,6 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
@@ -16,14 +12,11 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -64,11 +57,7 @@ import com.android.volley.toolbox.Volley;
 public class WetalkFrameLayout extends FrameLayout {
     private static final String TAG = "hwj_WetalkView";
     private static final String PACKAGE_NAME = "com.readboy.wetalk";
-    public static final String AUTHORITY = "com.readboy.wetalk.provider.Conversation";
-    public static final String TABLE_NAME = "conversation";
-    public static final Uri CONVERSATION_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
     public static final String ACTION_UPDATE_NOTIFICATION = "readboy.action._UPDATE_NOTIFICATION";
-
     private static final String ICON_URL = "http://img.readboy.com/avatar/";
     private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
     private static final int UPDATE_CYCLE = 60 * 60 * 1000;
@@ -76,12 +65,10 @@ public class WetalkFrameLayout extends FrameLayout {
     public static final String EXTRA_FRIEND = "friend";
     private static final String CLASS_NAME_CONVERSATION = "com.readboy.wetalk.ConversationActivity";
     private static final String CLASS_NAME_FRIEND_SELECTOR = "com.readboy.activity.FriendSelectorActivity";
-    public static final String TAG_APPCTRL = "smartWatch_appctl";
     private static final int IMAGE_WIDTH = 126;
     public static final int MAX_MESSAGE_COUNT = 100;
     private static final int MESSAGE_UPDATE_CONTACT = 10;
     private static final int MESSAGE_UPDATE_UNREAD_COUNT = 20;
-    private static final int MESSAGE_CLEAR_GROUP_UNREAD_COUNT = 30;
     private static final int DELAY_UPDATE_MILLIS_TIME = 100;
 
     private List<Friend> mFriends = new ArrayList<>();
@@ -100,7 +87,6 @@ public class WetalkFrameLayout extends FrameLayout {
     private Activity mActivity;
 
     private ContentObserver mConversationObserver;
-    private ContentObserver mGroupControlledObserver;
     private boolean isShowing = false;
     private boolean unreadCountChange = false;
     private String updateLastTime;
@@ -124,13 +110,6 @@ public class WetalkFrameLayout extends FrameLayout {
                     break;
                 case MESSAGE_UPDATE_UNREAD_COUNT:
                     updateUnreadCount();
-                    break;
-                case MESSAGE_CLEAR_GROUP_UNREAD_COUNT:
-                    if (WTContactUtils.isGroupControlled(mContext)) {
-                        List<Friend> groupList = WTContactUtils.getGroupFromContacts(mContext);
-                        clearGroupUnreadCount(mContext, groupList);
-                        sendBroadcastToUpdateNotification(mContext);
-                    }
                     break;
                 default:
                     break;
@@ -231,11 +210,6 @@ public class WetalkFrameLayout extends FrameLayout {
             getActivity().getContentResolver().registerContentObserver(WeTalkConstant.CONVERSATION_URI,
                     true, mConversationObserver);
         }
-        if (getActivity() != null && mGroupControlledObserver == null) {
-            mGroupControlledObserver = new GroupControlledObserver(new Handler());
-            getActivity().getContentResolver().registerContentObserver(Settings.Global.getUriFor(TAG_APPCTRL),
-                    true, mGroupControlledObserver);
-        }
 
     }
 
@@ -262,10 +236,6 @@ public class WetalkFrameLayout extends FrameLayout {
             getActivity().getContentResolver().unregisterContentObserver(mConversationObserver);
             mConversationObserver = null;
         }
-        if (mGroupControlledObserver != null) {
-            getActivity().getContentResolver().unregisterContentObserver(mGroupControlledObserver);
-            mGroupControlledObserver = null;
-        }
     }
 
     private class GetFriendTask extends AsyncTask<Void, Void, List<Friend>> {
@@ -290,7 +260,7 @@ public class WetalkFrameLayout extends FrameLayout {
                 mLoading.setVisibility(GONE);
             }
             sortFriends(friends);
-            if (friends != null && friends.size() > 0 && !WTContactUtils.isGroupControlled(mContext)) {
+            if (friends != null && friends.size() > 0) {
                 friends.add(new CreateGroup());
             }
             updateFriendData(friends);
@@ -606,22 +576,6 @@ public class WetalkFrameLayout extends FrameLayout {
         }
     }
 
-    //群管控后隐藏群、清除未读消息数
-    private class GroupControlledObserver extends ContentObserver {
-        public GroupControlledObserver(Handler handler) {
-            super(handler);
-        }
-
-        @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            super.onChange(selfChange, uri);
-            mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
-            mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
-            mHandler.removeMessages(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
-            mHandler.sendEmptyMessage(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
-        }
-    }
-
     /**
      * 更新一个联系人的头像
      */
@@ -732,20 +686,5 @@ public class WetalkFrameLayout extends FrameLayout {
         }
     };
 
-    private void clearGroupUnreadCount(Context context, List<Friend> groupList) {
-        for (Friend group : groupList) {
-            ContentValues values = new ContentValues();
-            values.put("unread", 0);
-            String where = "send_id=?";
-            String[] args = new String[]{group.uuid};
-            int rows = context.getContentResolver().update(CONVERSATION_URI, values, where, args);
-        }
-    }
 
-    private void sendBroadcastToUpdateNotification(Context context){
-        Intent intent = new Intent(ACTION_UPDATE_NOTIFICATION);
-        ComponentName componentName = new ComponentName("com.readboy.wetalk","com.readboy.receiver.MessageReceiver");
-        intent.setComponent(componentName);
-        context.sendBroadcast(intent);
-    }
 }

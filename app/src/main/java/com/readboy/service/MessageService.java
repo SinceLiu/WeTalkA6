@@ -142,7 +142,7 @@ public class MessageService extends Service {
                 LogInfo.i("hwj", "uploadFile capture succeed");
             } else if (msg.what == NetWorkUtils.UPLOAD_FAIL) {
                 LogInfo.i("hwj", "uploadFile capture fail");
-            } else if (msg.what == GET_MESSAGE_TIME_OUT) {
+            } else if(msg.what == GET_MESSAGE_TIME_OUT){
                 isGettingMessage = false;
             }
         }
@@ -156,7 +156,7 @@ public class MessageService extends Service {
         }
         isGettingMessage = true;
         requestAgain = false;
-        mHandler.sendEmptyMessageDelayed(GET_MESSAGE_TIME_OUT, TIME_OUT);
+        mHandler.sendEmptyMessageDelayed(GET_MESSAGE_TIME_OUT,TIME_OUT);
         final String messageTag = MPrefs.getMessageTag(context);
         NetWorkUtils.getAllMessage(context, messageTag, new NetWorkUtils.PushResultListener() {
 
@@ -355,9 +355,6 @@ public class MessageService extends Service {
         //是否是家庭圈的消息,根据发件人的群Id判断
         conversation.isHomeGroup = conversation.sendId.startsWith("G") ? Constant.TRUE : Constant.FALSE;
         if (conversation.isHomeGroup == Constant.TRUE) {
-            if (WTContactUtils.isGroupControlled(context) && !conversation.realSendId.startsWith("U")) {
-                return null;
-            }
             String name = WTContactUtils.getNameById(context, conversation.realSendId);
             if (TextUtils.isEmpty(name)) {
                 Profile profile = Profile.queryProfileWithUuid(context.getContentResolver(), conversation.realSendId);
