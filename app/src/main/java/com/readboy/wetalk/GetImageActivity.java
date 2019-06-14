@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
 import com.readboy.wetalk.utils.IOs;
 import com.readboy.utils.NetWorkUtils;
+import com.readboy.wetalk.view.MyGridLayoutManager;
 
 /**
  * @deprecated 直接调图库，图库activity
@@ -68,7 +69,7 @@ public class GetImageActivity extends BaseActivity {
     @Override
     protected void initView() {
         mImageList = (RecyclerView) getView(R.id.choose_image_list);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+        MyGridLayoutManager layoutManager = new MyGridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
         mImageList.setLayoutManager(layoutManager);
         mLoading = getView(R.id.loading);
         mImagePaths = new ArrayList<String>();

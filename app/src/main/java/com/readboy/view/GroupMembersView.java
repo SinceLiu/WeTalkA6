@@ -35,6 +35,7 @@ import com.readboy.utils.ToastUtils;
 import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.utils.WearManagerProxy;
 import com.readboy.wetalk.R;
+import com.readboy.wetalk.view.MyGridLayoutManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,6 +76,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     private Handler mHandler = new Handler();
     private PersonalInfo mPersonalInfo;
     private BroadcastReceiver mReceiver;
+    private CommonDialog dialog;
 
     public GroupMembersView(Context context) {
         this(context, null);
@@ -94,7 +96,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         mProgressBar = findViewById(R.id.progress_bar);
         mMessageTv = (TextView) findViewById(R.id.message);
         mGroupRv = (RecyclerView) findViewById(R.id.group_recycler_view);
-        GridLayoutManager layoutManager = new GridLayoutManager(mContext, 2);
+        MyGridLayoutManager layoutManager = new MyGridLayoutManager(mContext, 2);
         layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int i) {
@@ -317,6 +319,10 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
     }
 
     private void leaveAction() {
+        if (dialog != null) {
+            dialog.show();
+            return;
+        }
         String content;
         if (isOwner()) {
             content = getResources().getString(R.string.warning_disband_group);
@@ -331,7 +337,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                         leaveGroup();
                     }
                 });
-        CommonDialog dialog = builder.build(mActivity);
+        dialog = builder.build(mActivity);
         dialog.show();
 
     }
@@ -357,6 +363,9 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                                     ToastUtils.show(mContext, "成功解散群");
                                 } else {
                                     ToastUtils.show(mContext, "成功退群");
+                                }
+                                if (dialog != null && dialog.isShowing()) {
+                                    dialog.dismiss();
                                 }
                                 getActivity().finish();
                             } else {

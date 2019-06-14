@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.readboy.utils.ToastUtils;
+import com.readboy.view.ConversationView;
 import com.readboy.view.VideoView;
 import com.readboy.wetalk.R;
 
@@ -29,7 +30,6 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
 
     public static final String EXTRA_DATA = "data";
 
-    private Context mContext;
     private VideoView mVideoView;
     private ImageView mFirstFrameIv;
     private Bitmap mFirstFrame;
@@ -37,6 +37,7 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
     private View mPlayBtn;
     private String mVideoPath;
     private boolean isValidity = false;
+    private boolean bResumeVideo = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +80,12 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
             return;
         }
         Log.i(TAG, "playVideo: m");
-        mVideoView.setVideoPath(mVideoPath);
+        if (!bResumeVideo) {
+            mVideoView.setVideoPath(mVideoPath);
+        }
+        ConversationView.muteAudioFocus(VideoActivity.this, true);
         mVideoView.start();
+        mPlayBtn.setVisibility(View.GONE);
     }
 
     private void resumeVideo() {
@@ -90,6 +95,7 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
     @Override
     protected void onResume() {
         super.onResume();
+        bResumeVideo = false;
         Log.i(TAG, "onResume: ");
     }
 
@@ -97,6 +103,8 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
     protected void onPause() {
         super.onPause();
         showFirstFrame();
+        ConversationView.muteAudioFocus(VideoActivity.this, false);
+        mPlayBtn.setVisibility(View.VISIBLE);
     }
 
     private void showFirstFrame() {
@@ -128,6 +136,7 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
     public void onCompletion(MediaPlayer mp) {
         Log.i(TAG, "onCompletion: ");
         mPlayBtn.setVisibility(View.VISIBLE);
+        ConversationView.muteAudioFocus(VideoActivity.this, false);
 //        showFirstFrame();
     }
 
@@ -141,7 +150,9 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
         switch (v.getId()) {
             case R.id.video_view:
                 if (mVideoView.isPlaying()) {
+                    ConversationView.muteAudioFocus(VideoActivity.this, false);
                     mVideoView.pause();
+                    bResumeVideo = true;
                     mPlayBtn.setVisibility(View.VISIBLE);
                 } else {
                     Log.i(TAG, "onClick: can pause  " + mVideoView.isPlaying());
@@ -150,13 +161,14 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
             case R.id.video_play_btn:
                 playVideo();
                 break;
+            default:
+                break;
         }
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
         Log.i(TAG, "onPrepared: ");
-        mPlayBtn.setVisibility(View.GONE);
         mFirstFrameIv.setVisibility(View.GONE);
     }
 }

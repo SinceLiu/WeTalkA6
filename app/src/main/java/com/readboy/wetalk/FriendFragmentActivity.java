@@ -50,7 +50,7 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
     public void onEnterAnimationComplete() {
         super.onEnterAnimationComplete();
         Log.i(TAG, "onEnterAnimationComplete: ");
-        AudioUtils.requestAudioFocus(this);
+//        AudioUtils.requestAudioFocus(this);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
         LogInfo.i(TAG, " FriendFragmentActivity --- onDestroy()");
         super.onDestroy();
         MPrefs.setNotificationType(this, true);
-        AudioUtils.abandonAudioFocus(this);
+//        AudioUtils.abandonAudioFocus(this);
         killBackgroundProcesses();
     }
 

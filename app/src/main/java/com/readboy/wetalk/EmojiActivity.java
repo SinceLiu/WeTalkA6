@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.readboy.bean.Constant;
 import com.readboy.utils.EmojiUtils;
+import com.readboy.wetalk.view.MyGridLayoutManager;
 
 /**
  * @author hwj
@@ -52,7 +53,7 @@ public class EmojiActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
+        MyGridLayoutManager layoutManager = new MyGridLayoutManager(this, 3, GridLayoutManager.VERTICAL, false);
         mEmojiRecyclerView.setLayoutManager(layoutManager);
 //		new LinearSnapHelper().attachToRecyclerView(mEmojiRecyclerView);
         mEmojiRecyclerView.setAdapter(new EmojiRecyclerAdapter());

@@ -1,7 +1,5 @@
 package com.readboy.service;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,16 +9,12 @@ import android.content.ContentProviderResult;
 import android.content.Context;
 import android.content.Intent;
 import android.content.OperationApplicationException;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -44,10 +38,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import static com.readboy.wetalk.BaseFragmentActivity.REQUEST_PERMISSIONS;
+import static com.readboy.utils.NotificationUtils.NOTIFY_ID;
+import static com.readboy.wetalk.view.WetalkFrameLayout.ACTION_UPDATE_NOTIFICATION;
+
 
 /**
- * TODO，android系统高版本，可能会限制应用后台运行，把MessageReceiver部分任务用service或者Jobscheduler实现。
+ * TODO，低内存时5s内没执行startForeground，停止运行问题
  *
  * @author oubin
  * @date 2019/1/8
@@ -81,12 +77,14 @@ public class MessageService extends Service {
     /**
      * TODO: 网络慢是否会导致内容丢失，不会马上获取到最新的消息。
      */
-    private volatile static boolean isGettingMessage = false;
-    private volatile static boolean requestAgain = false;
+    private static volatile boolean isGettingMessage = false;
+    private static volatile boolean requestAgain = false;
+    public static final int GET_MESSAGE_TIME_OUT = 0x10;
+    public static final int TIME_OUT = 10000;
     /**
      * 和requestAgain搭配使用，因为可能从新获取到的数据为空，
      */
-    private volatile static boolean notifyNewMessage = false;
+    private volatile boolean notifyNewMessage = false;
 
     private static ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
 
@@ -103,6 +101,7 @@ public class MessageService extends Service {
         notificationManager.createNotificationChannel(mChannel);
         Notification notification = new Notification.Builder(this, CHANNEL_ID).build();
         startForeground(1, notification);
+        isGettingMessage = false;
         Log.e(TAG, "onCreate: ");
     }
 
@@ -115,16 +114,18 @@ public class MessageService extends Service {
                 //如果正在获取新消息，是否应已队列形式，排队获取。
                 getAllMessage(MessageService.this);
                 break;
-            case ACTION_SEND_CAPTURE:
-                //发送监拍指令
-                handleSendCapture(MessageService.this, intent);
-                break;
-
             case ACTION_NOTIFY_FRIEND_REQUEST:
-            case ACTION_NOTIFY_FRIEND_ADD:
                 requestAddFriend(MessageService.this, intent);
                 break;
-            case ACTION_NOTIFY_FRIEND_REFUSE:
+            case ACTION_UPDATE_NOTIFICATION:
+                Notification notification = NotificationUtils.getSilentNotification(MessageService.this);
+                NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                if (notification != null) {
+                    manager.notify(NOTIFY_ID, notification);
+                } else {
+                    manager.cancel(NOTIFY_ID);
+                }
+                stopSelf();
                 break;
             default:
                 break;
@@ -141,23 +142,11 @@ public class MessageService extends Service {
                 LogInfo.i("hwj", "uploadFile capture succeed");
             } else if (msg.what == NetWorkUtils.UPLOAD_FAIL) {
                 LogInfo.i("hwj", "uploadFile capture fail");
+            } else if (msg.what == GET_MESSAGE_TIME_OUT) {
+                isGettingMessage = false;
             }
         }
     };
-
-    private void handleSendCapture(Context context, Intent intent) {
-        String path = intent.getStringExtra("picture_path");
-        ArrayList<String> ids = intent.getStringArrayListExtra("capture_uuid");
-        if (TextUtils.isEmpty(path) || ids == null) {
-            Log.w(TAG, "handleSendCapture: data is null, path = " + path + ", uuid = " + ids);
-            return;
-        }
-        NetWorkUtils.uploadCaptureFile(context, ids, path, mHandler);
-    }
-
-    private boolean canGetMessage(Context context) {
-        return Constant.ENABLE_FAKE || NetWorkUtils.isWifiConnected(context);
-    }
 
     public void getAllMessage(final Context context) {
         if (isGettingMessage) {
@@ -167,6 +156,7 @@ public class MessageService extends Service {
         }
         isGettingMessage = true;
         requestAgain = false;
+        mHandler.sendEmptyMessageDelayed(GET_MESSAGE_TIME_OUT, TIME_OUT);
         final String messageTag = MPrefs.getMessageTag(context);
         NetWorkUtils.getAllMessage(context, messageTag, new NetWorkUtils.PushResultListener() {
 
@@ -177,6 +167,9 @@ public class MessageService extends Service {
                         ", code = " + code + ", response = " + response + "");
                 try {
                     int count = parseMessage(response, context);
+                    if (TextUtils.isEmpty(messageTag)) {
+                        MPrefs.setMessageTag(context, new JSONObject(response).getString(NetWorkUtils.TIME));
+                    }
                     if (notifyNewMessage || (count > 0 && !requestAgain)) {
                         notifyNewMessage = false;
                         NotificationUtils.sendNotification(context);
@@ -186,6 +179,7 @@ public class MessageService extends Service {
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
+                    mHandler.removeMessages(GET_MESSAGE_TIME_OUT);
                     isGettingMessage = false;
                     tryRequestAgain(context);
                 }
@@ -194,6 +188,7 @@ public class MessageService extends Service {
             @Override
             public void pushFail(String s, String s1, int i, String s2) {
                 LogInfo.e(TAG, "pushFail() called with: s = " + s + ", s1 = " + s1 + ", i = " + i + ", s2 = " + s2 + "");
+                mHandler.removeMessages(GET_MESSAGE_TIME_OUT);
                 isGettingMessage = false;
                 stopSelf();
             }
@@ -217,7 +212,7 @@ public class MessageService extends Service {
             return -1;
         }
         int count = array.length();
-        //文件类型就递减，用于判断是否发送通知。
+        //用于判断是否发送通知。
         int result = count;
         if (count >= MAX_COUNT_SINGLE_RESPONSE) {
             Log.d(TAG, "parseMessage: multi messages.");
@@ -254,22 +249,19 @@ public class MessageService extends Service {
                     parseTextMessage(context, data, conversation);
                     break;
                 case NetWorkUtils.AUDIO:
-                    result--;
                     parseAudioMessage(context, data, conversation);
+                    operationList.add(createInsertOperation(conversation));
                     break;
                 case NetWorkUtils.IMAGE:
                     conversation.imageUrl = data.optJSONObject(NetWorkUtils.A).optString(NetWorkUtils.SRC);
                     conversation.thumbImageUrl = data.optString(NetWorkUtils.MESSAGE);
                     conversation.type = Constant.REC_IMAGE;
-//                    addToDatabase(context, conversation);
                     operationList.add(createInsertOperation(conversation));
                     break;
                 case NetWorkUtils.VIDEO:
                     if (FILE_ADVANCE_LOADING) {
-                        result--;
                         parseVideoMessage(context, data, conversation);
-                    } else {
-
+                        operationList.add(createInsertOperation(conversation));
                     }
                     break;
                 case NetWorkUtils.LINK:
@@ -294,7 +286,6 @@ public class MessageService extends Service {
         conversation.content = data.optString(NetWorkUtils.MESSAGE);
         conversation.textContent = data.optString(NetWorkUtils.MESSAGE);
         conversation.type = Constant.REC_SYSTEM;
-//        addToDatabase(context, conversation);
         operationList.add(createInsertOperation(conversation));
     }
 
@@ -313,7 +304,7 @@ public class MessageService extends Service {
         mHandler.post(new Runnable() {
             @Override
             public void run() {
-                NetWorkUtils.downloadFile(context, conversation);
+                NetWorkUtils.downloadFile(context, conversation, null);
             }
         });
     }
@@ -331,7 +322,6 @@ public class MessageService extends Service {
             conversation.textContent = content;
             conversation.type = Constant.REC_TEXT;
         }
-//        addToDatabase(context, conversation);
         operationList.add(createInsertOperation(conversation));
     }
 
@@ -345,10 +335,9 @@ public class MessageService extends Service {
                 // 需要在主线程，防止
                 // java.lang.IllegalArgumentException: Synchronous ResponseHandler used in AsyncHttpClient.
                 // You should create your response handler in a looper thread or use SyncHttpClient instead.
-                NetWorkUtils.downloadFile(context, conversation);
+                NetWorkUtils.downloadFile(context, conversation, null);
             }
         });
-//        addToDatabase(context, conversation);
     }
 
     private static Conversation parseBaseConversation(String[] messageInfo, Context context) {
@@ -366,6 +355,9 @@ public class MessageService extends Service {
         //是否是家庭圈的消息,根据发件人的群Id判断
         conversation.isHomeGroup = conversation.sendId.startsWith("G") ? Constant.TRUE : Constant.FALSE;
         if (conversation.isHomeGroup == Constant.TRUE) {
+            if (WTContactUtils.isGroupControlled(context) && !conversation.realSendId.startsWith("U")) {
+                return null;
+            }
             String name = WTContactUtils.getNameById(context, conversation.realSendId);
             if (TextUtils.isEmpty(name)) {
                 Profile profile = Profile.queryProfileWithUuid(context.getContentResolver(), conversation.realSendId);
@@ -438,11 +430,13 @@ public class MessageService extends Service {
             public void onResponse(Profile profile) {
                 Log.i(TAG, "onSuccess: " + profile.toString());
                 NotificationUtils.sendContactNotification(context, profile);
+                stopSelf();
             }
 
             @Override
             public void onFail(Exception e) {
                 Log.w(TAG, "onFail: " + e.toString(), e);
+                stopSelf();
             }
         });
     }
@@ -452,5 +446,13 @@ public class MessageService extends Service {
         intent.setAction(GroupMembersView.ACTION_UPDATE_MEMBER);
         intent.putExtra(GroupMembersView.EXTRA_UUID, uuid);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isGettingMessage = false;
+        mHandler.removeMessages(GET_MESSAGE_TIME_OUT);
+        Log.e(TAG, "onDestroy");
     }
 }

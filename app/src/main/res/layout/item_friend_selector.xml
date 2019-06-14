@@ -3,21 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/group_action_parent"
     android:layout_width="match_parent"
-    android:layout_height="80px"
-    android:layout_marginStart="2px"
-    android:layout_marginEnd="2px"
-    android:layout_marginTop="4px"
-    android:layout_marginBottom="4px"
+    android:layout_height="@dimen/item_friend_selector_height"
+    android:layout_marginStart="@dimen/item_friend_selector_margin_horizontal"
+    android:layout_marginEnd="@dimen/item_friend_selector_margin_horizontal"
+    android:layout_marginTop="@dimen/item_friend_selector_margin_vertical"
+    android:layout_marginBottom="@dimen/item_friend_selector_margin_vertical"
     android:background="@drawable/corners_gray_dark_20"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <ImageView
         android:id="@+id/group_action_icon"
-        android:layout_width="60px"
-        android:layout_height="60px"
+        android:layout_width="@dimen/item_friend_selector_icon_size"
+        android:layout_height="@dimen/item_friend_selector_icon_size"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="10px"
+        android:layout_marginLeft="@dimen/item_friend_selector_icon_margin_left"
         android:scaleType="fitCenter"
         android:src="@drawable/common" />
 
@@ -25,19 +25,19 @@
         android:id="@+id/group_action_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10px"
+        android:layout_marginLeft="@dimen/item_friend_selector_name_margin_left"
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@android:color/white"
-        android:textSize="22px"
+        android:textSize="@dimen/item_friend_selector_name_text_size"
         tools:text="读书郎" />
 
     <CheckBox
         android:id="@+id/group_action_check_box"
-        android:layout_width="36px"
-        android:layout_height="36px"
-        android:layout_marginRight="12px"
+        android:layout_width="@dimen/item_friend_selector_check_box_size"
+        android:layout_height="@dimen/item_friend_selector_check_box_size"
+        android:layout_marginRight="@dimen/item_friend_selector_check_box_margin_right"
         android:background="@null"
         android:button="@drawable/switch_confirm_selector" />
 

@@ -26,7 +26,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
     protected void onCreate(android.os.Bundle savedInstanceState) {
         LogInfo.i(TAG, " --- onCreate()");
         super.onCreate(savedInstanceState);
-        AudioUtils.requestAudioFocus(this);
+//        AudioUtils.requestAudioFocus(this);
 
     }
 
@@ -62,7 +62,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         super.onDestroy();
         mParent.onDestroy();
         MPrefs.setNotificationType(this, true);
-        AudioUtils.abandonAudioFocus(this);
+//        AudioUtils.abandonAudioFocus(this);
         killBackgroundProcesses();
     }
 

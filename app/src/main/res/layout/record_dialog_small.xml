@@ -22,16 +22,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10px"
+        android:layout_marginTop="@dimen/record_dialog_small_record_name_margin_top"
         android:textColor="@android:color/white"
-        android:textSize="24px" />
+        android:textSize="@dimen/record_dialog_small_record_name_text_size" />
 
     <ImageView
         android:id="@+id/record_state"
         android:layout_width="wrap_content"
-        android:layout_height="48px"
+        android:layout_height="@dimen/record_dialog_small_record_state_height"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="1px"
+        android:layout_marginBottom="@dimen/record_dialog_small_record_state_margin_bottom"
         android:src="@drawable/btn_send_voice_common_normal" />
 </RelativeLayout>

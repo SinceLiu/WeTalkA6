@@ -12,7 +12,6 @@
     <TextView
         android:id="@+id/item_conversation_name"
         style="@style/UserNameStyle"
-        android:visibility="gone"
         tools:text="@string/app_name"
         tools:visibility="visible" />
 
@@ -20,25 +19,25 @@
         android:id="@+id/item_conversation_content_parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="3px">
+        android:paddingBottom="@dimen/item_conversation_video_content_parent_padding_bottom">
 
         <ImageView
             android:id="@+id/item_conversation_content"
-            android:layout_width="90px"
-            android:layout_height="90px"
+            android:layout_width="@dimen/item_conversation_video_content_size"
+            android:layout_height="@dimen/item_conversation_video_content_size"
             tools:src="@drawable/wetalk_icon" />
 
         <ImageView
-            android:layout_width="90px"
-            android:layout_height="90px"
+            android:layout_width="@dimen/item_conversation_video_content_size"
+            android:layout_height="@dimen/item_conversation_video_content_size"
             android:src="@drawable/video_mask_left" />
 
         <ImageView
             android:id="@+id/item_conversation_video_tag"
-            android:layout_width="28px"
-            android:layout_height="28px"
-            android:layout_marginLeft="58px"
-            android:layout_marginTop="58px"
+            android:layout_width="@dimen/item_conversation_video_tag_size"
+            android:layout_height="@dimen/item_conversation_video_tag_size"
+            android:layout_marginLeft="@dimen/item_conversation_video_tag_margin"
+            android:layout_marginTop="@dimen/item_conversation_video_tag_margin"
             android:contentDescription="item_conversation_video_tag"
             android:src="@drawable/ic_video" />
 
@@ -47,7 +46,7 @@
             android:layout_width="@dimen/retry_square_btn_width"
             android:layout_height="@dimen/retry_square_btn_width"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5px"
+            android:layout_marginLeft="@dimen/item_conversation_video_progress_bar_margin_horizontal"
             android:layout_toRightOf="@+id/item_conversation_content"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -57,7 +56,7 @@
             android:layout_width="@dimen/retry_square_btn_width"
             android:layout_height="@dimen/retry_square_btn_width"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5px"
+            android:layout_marginLeft="@dimen/item_conversation_video_retry_margin_horizontal"
             android:layout_toRightOf="@+id/item_conversation_content"
             android:background="@drawable/retry_btn_selector"
             android:clickable="true"

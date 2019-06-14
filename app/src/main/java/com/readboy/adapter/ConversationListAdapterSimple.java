@@ -113,6 +113,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             } else if (type == Constant.REC_VIDEO) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_video_left, viewGroup, false);
                 commonHolder = new VideoItemHolder(view);
+                commonHolder.userName = (TextView) view.findViewById(R.id.item_conversation_name);
                 view.setTag(commonHolder);
             } else if (type == Constant.REC_SYSTEM) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_system, viewGroup, false);
@@ -121,6 +122,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             } else if (type == Constant.REC_TEXT) {
                 view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_text_left, viewGroup, false);
                 commonHolder = new TextItemHolder(view);
+                commonHolder.userName = (TextView) view.findViewById(R.id.item_conversation_name);
                 view.setTag(commonHolder);
             } else {
                 view = LayoutInflater.from(mContext).inflate(R.layout.conversation_item_simple, viewGroup, false);
@@ -176,6 +178,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         voiceItemHolder.play = view.findViewById(R.id.conversation_item_rec_voice_play);
                         voiceItemHolder.time = (TextView) view.findViewById(R.id.conversation_item_rec_voice_time);
                         voiceItemHolder.unread = view.findViewById(R.id.conversation_item_rec_voice_unread);
+                        voiceItemHolder.progress = (ImageView) view.findViewById(R.id.conversation_item_rec_voice_progress);
                         voiceItemHolder.playAnim = (ImageView) view.findViewById(R.id.conversation_item_rec_voice_play_anim);
                         voiceItemHolder.item = view.findViewById(R.id.conversation_item_rec_voice_item);
                         voiceItemHolder.userName = (TextView) view.findViewById(R.id.conversation_item_rec_voice_user_name);
@@ -251,7 +254,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             case Constant.SEND_VOICE:
                 voiceItemHolder.item.setVisibility(View.VISIBLE);
                 voiceItemHolder.time.setText(String.valueOf(conversation.lastTime + "''"));
-                playVoice(conversation, conversation.voiceLocalPath, voiceItemHolder, true);
+                playVoice(conversation, voiceItemHolder, true);
                 showUploadFileProgressOrResend(conversation, voiceItemHolder);
                 if (conversation.isPlaying == Constant.TRUE) {
                     voiceItemHolder.playAnim.setVisibility(View.VISIBLE);
@@ -273,7 +276,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 } else {
                     voiceItemHolder.unread.setVisibility(View.GONE);
                 }
-                playVoice(conversation, conversation.voiceLocalPath, voiceItemHolder, false);
+                playVoice(conversation, voiceItemHolder, false);
                 if (conversation.isPlaying == Constant.TRUE) {
                     voiceItemHolder.playAnim.setVisibility(View.VISIBLE);
                     ((AnimationDrawable) voiceItemHolder.playAnim.getBackground()).start();
@@ -285,8 +288,9 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                 showReceiveOrSendTime(conversation, position, voiceItemHolder);
                 break;
             case Constant.REC_TEXT:
-            case Constant.SEND_VIDEO:
             case Constant.REC_VIDEO:
+                updateName(commonHolder, conversation);
+            case Constant.SEND_VIDEO:
             case Constant.REC_SYSTEM:
                 if (commonHolder != null) {
                     commonHolder.bindView(position, conversation);
@@ -307,7 +311,6 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             return;
         }
         if (conversation.isHomeGroup == Constant.TRUE) {
-            String name = FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName);
             holder.userName.setText(FriendNameUtil.resolveName(conversation.realSendId, conversation.senderName));
             //WTContactUtils.getNameById(mContext,conversation.realSendId));
         } else {
@@ -404,8 +407,8 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             return;
         }
         if (conversation.shouldResend == Constant.TRUE) {
-            holder.retry.setVisibility(View.VISIBLE);
             holder.progress.setVisibility(View.GONE);
+            holder.retry.setVisibility(View.VISIBLE);
             holder.retry.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -444,7 +447,7 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         }
                     } else if (type == Constant.REC_VIDEO || type == Constant.REC_VOICE) {
                         if (!TextUtils.isEmpty(conversation.voiceUrl)) {
-                            NetWorkUtils.downloadFile(mContext, conversation);
+                            NetWorkUtils.downloadFile(mContext, conversation, null);
                         } else {
                             Log.i(TAG, "showUploadFileProgressOrResend: url is null.");
                         }
@@ -543,96 +546,146 @@ public class ConversationListAdapterSimple extends BaseAdapter {
         textDialog.show();
     }
 
+
     /**
      * 播放语音文件
      *
-     * @param path   语音文件路径
      * @param holder holder
      */
-    protected void playVoice(final Conversation conv, final String path,
-                             final VoiceItemHolder holder, final boolean isSend) {
+    protected void playVoice(final Conversation conv, final VoiceItemHolder holder, final boolean isSend) {
         //播放的点击事件
         holder.play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 //语音文件不存在
-                if (TextUtils.isEmpty(path) || !new File(path).exists()) {
-                    if (!mIsToastShow) {
-                        mIsToastShow = true;
-                        ToastUtils.show(mContext, R.string.play_voice_error);
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mIsToastShow = false;
-                            }
-                        }, 2000);
-                    }
-                    //删除数据库中的记录
-                    mResolver.delete(Conversations.Conversation.CONVERSATION_URI,
-                            Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
-                    return;
-                }
-                if (conv.isPlaying == Constant.FALSE) {
-                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-                        mMediaPlayer.stop();
-                        stopPlayingAnimation();
-                        mMediaPlayer = null;
-                    }
-                    //初始化MediaPlayer
-                    mMediaPlayer = new MediaPlayer();
-                    mMediaPlayer.setVolume(1.0f, 1.0f);
-                    //设置播放结束监听器
-                    mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                if (TextUtils.isEmpty(conv.voiceLocalPath) || !new File(conv.voiceLocalPath).exists()) {
+                    //下载，然后播放
+                    holder.progress.setVisibility(View.VISIBLE);
+                    holder.play.setClickable(false);
+                    Glide.with(mContext).load(R.drawable.loading_anim).asGif().into(holder.progress);
+                    NetWorkUtils.downloadFile(mContext, conv, new NetWorkUtils.DownLoadFileListener() {
                         @Override
-                        public void onCompletion(MediaPlayer mediaPlayer) {
-                            setKeepScreenOn(view, false);
-                            ConversationView.muteAudioFocus(mContext, false);
-                            //更新接收语音信息,要更新列表的数据才能刷新界面显示
-                            if (!isSend && conv.isUnPlay == Constant.TRUE) {
-                                //数据库更新播放状态
-                                ContentValues values = new ContentValues();
-                                values.put(Conversations.Conversation.IS_UN_PLAY, Constant.FALSE);
-                                mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
-                                        Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
-                                //列表显示更新,已播放
-                                conv.isUnPlay = Constant.FALSE;
-                                conv.isPlaying = Constant.FALSE;
-                                notifyDataSetChanged();
-                            }
-                            if (conv.isPlaying == Constant.TRUE) {
-                                conv.isPlaying = Constant.FALSE;
-                                notifyDataSetChanged();
+                        public void downLoadSucceed() {
+                            holder.progress.setVisibility(View.GONE);
+                            holder.play.setClickable(true);
+                            play(view, conv, isSend, conv.voiceLocalPath);
+                            //TODO 播放语音动画
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    holder.playAnim.setVisibility(View.VISIBLE);
+                                    ((AnimationDrawable) holder.playAnim.getBackground()).stop();
+                                    ((AnimationDrawable) holder.playAnim.getBackground()).start();
+                                    holder.playImg.setVisibility(View.GONE);
+                                }
+                            }, 100);
+                        }
+
+                        @Override
+                        public void downLoadFailed() {
+                            holder.progress.setVisibility(View.GONE);
+                            holder.play.setClickable(true);
+                            if (!mIsToastShow) {
+                                mIsToastShow = true;
+                                ToastUtils.show(mContext, R.string.play_voice_error);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mIsToastShow = false;
+                                    }
+                                }, 2000);
                             }
                         }
                     });
-                    //播放语音文件
-                    try {
-                        ConversationView.muteAudioFocus(mContext, true);
-                        mMediaPlayer.setDataSource(path);
-                        mMediaPlayer.prepare();
-                        mMediaPlayer.start();
-                        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        conv.isPlaying = Constant.TRUE;
-                        notifyDataSetChanged();
-                        setKeepScreenOn(view, true);
-                    } catch (IOException e) {
-                        conv.isPlaying = Constant.FALSE;
-                        notifyDataSetChanged();
-                        e.printStackTrace();
-                    }
                 } else {
-                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-                        ConversationView.muteAudioFocus(mContext, false);
-                        mMediaPlayer.stop();
-                        stopPlayingAnimation();
-                        mMediaPlayer = null;
-                        conv.isPlaying = Constant.FALSE;
-                        notifyDataSetChanged();
-                        setKeepScreenOn(view, false);
-                    }
+                    play(view, conv, isSend, conv.voiceLocalPath);
                 }
             }
         });
+    }
+
+    //播放
+    private void play(View view, Conversation conv, boolean isSend, String path) {
+        if (conv.isPlaying == Constant.FALSE) {
+            if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
+                stopPlayingAnimation();
+                mMediaPlayer = null;
+            }
+            //初始化MediaPlayer
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setVolume(1.0f, 1.0f);
+            //设置播放结束监听器
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    setKeepScreenOn(view, false);
+                    ConversationView.muteAudioFocus(mContext, false);
+                    //更新接收语音信息,要更新列表的数据才能刷新界面显示
+                    if (!isSend && conv.isUnPlay == Constant.TRUE) {
+                        //数据库更新播放状态
+                        ContentValues values = new ContentValues();
+                        values.put(Conversations.Conversation.IS_UN_PLAY, Constant.FALSE);
+                        values.put(Conversations.Conversation.IS_PLAYING, Constant.FALSE);
+                        mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                                Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
+                        //列表显示更新,已播放
+                        conv.isUnPlay = Constant.FALSE;
+                        conv.isPlaying = Constant.FALSE;
+                        notifyDataSetChanged();
+                    }
+                    if (conv.isPlaying == Constant.TRUE) {
+                        conv.isPlaying = Constant.FALSE;
+                        //数据库更新播放状态
+                        ContentValues values = new ContentValues();
+                        values.put(Conversations.Conversation.IS_PLAYING, Constant.FALSE);
+                        mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                                Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
+                        notifyDataSetChanged();
+                    }
+                }
+            });
+            //播放语音文件
+            try {
+                ConversationView.muteAudioFocus(mContext, true);
+                mMediaPlayer.setDataSource(path);
+                mMediaPlayer.prepare();
+                mMediaPlayer.start();
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                conv.isPlaying = Constant.TRUE;
+                //数据库更新播放状态
+                ContentValues values = new ContentValues();
+                values.put(Conversations.Conversation.IS_PLAYING, Constant.TRUE);
+                mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                        Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
+                notifyDataSetChanged();
+                setKeepScreenOn(view, true);
+            } catch (IOException e) {
+                conv.isPlaying = Constant.FALSE;
+                //数据库更新播放状态
+                ContentValues values = new ContentValues();
+                values.put(Conversations.Conversation.IS_PLAYING, Constant.FALSE);
+                mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                        Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
+                notifyDataSetChanged();
+                e.printStackTrace();
+            }
+        } else {
+            if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                ConversationView.muteAudioFocus(mContext, false);
+                mMediaPlayer.stop();
+                stopPlayingAnimation();
+                mMediaPlayer = null;
+                conv.isPlaying = Constant.FALSE;
+                //数据库更新播放状态
+                ContentValues values = new ContentValues();
+                values.put(Conversations.Conversation.IS_PLAYING, Constant.FALSE);
+                mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                        Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conv.conversationId});
+                notifyDataSetChanged();
+                setKeepScreenOn(view, false);
+            }
+        }
     }
 
     private void setKeepScreenOn(View view, boolean keepScreenOn) {
@@ -791,14 +844,34 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             retry = view.findViewById(R.id.item_conversation_retry);
             progress = view.findViewById(R.id.item_conversation_progress_bar);
             content = view.findViewById(R.id.item_conversation_content);
+            content.setClickable(true);
             view.setTag(this);
             content.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String path = mConversation.voiceLocalPath;
                     if (TextUtils.isEmpty(path)) {
-                        mConversation.shouldResend = Constant.TRUE;
-                        showUploadFileProgressOrResend(mConversation, VideoItemHolder.this);
+//                        mConversation.shouldResend = Constant.TRUE;
+//                        showUploadFileProgressOrResend(mConversation, VideoItemHolder.this);
+                        content.setClickable(false);
+                        progress.setVisibility(View.VISIBLE);
+                        Glide.with(mContext).load(R.drawable.loading_anim).asGif().into(progress);
+                        NetWorkUtils.downloadFile(mContext, mConversation, new NetWorkUtils.DownLoadFileListener() {
+                            @Override
+                            public void downLoadSucceed() {
+                                content.setClickable(true);
+                                notifyDataSetChanged();
+                                Intent intent = new Intent(mContext, VideoActivity.class);
+                                intent.putExtra(VideoActivity.EXTRA_DATA, mConversation.voiceLocalPath);
+                                mContext.startActivity(intent);
+                            }
+
+                            @Override
+                            public void downLoadFailed() {
+                                content.setClickable(true);
+                                progress.setVisibility(View.GONE);
+                            }
+                        });
                     } else {
                         Intent intent = new Intent(mContext, VideoActivity.class);
                         intent.putExtra(VideoActivity.EXTRA_DATA, mConversation.voiceLocalPath);
@@ -860,9 +933,15 @@ public class ConversationListAdapterSimple extends BaseAdapter {
 
     private void stopPlayingAnimation() {
         for (Conversation conversation : mConversations) {
-            if (conversation.type == Constant.SEND_VOICE ||
-                    conversation.type == Constant.REC_VOICE) {
-                conversation.isPlaying = Constant.FALSE;
+            if (conversation.type == Constant.SEND_VOICE || conversation.type == Constant.REC_VOICE) {
+                if (conversation.isPlaying == Constant.TRUE) {
+                    conversation.isPlaying = Constant.FALSE;
+                    //数据库更新播放状态
+                    ContentValues values = new ContentValues();
+                    values.put(Conversations.Conversation.IS_PLAYING, Constant.FALSE);
+                    mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
+                            Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
+                }
             }
         }
         notifyDataSetChanged();

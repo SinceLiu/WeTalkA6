@@ -12,10 +12,10 @@
 
     <com.readboy.widget.ImageIndication
         android:id="@+id/image_indication"
-        android:layout_width="40px"
-        android:layout_height="10px"
+        android:layout_width="@dimen/image_indication_width"
+        android:layout_height="@dimen/image_indication_height"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5px"
+        android:layout_marginTop="@dimen/image_indication_margin_top"
         android:gravity="center_horizontal"
         android:orientation="horizontal" />
 

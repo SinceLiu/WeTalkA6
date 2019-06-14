@@ -298,7 +298,7 @@ public class ConversationProvider extends ContentProvider {
         }
     }
 
-    public static List<Conversation> getConversationList(Context context, String uuid) {
+    public static List<Conversation> getConversationList(Context context, String uuid, boolean shouldResend) {
         Cursor cursor = context.getContentResolver().query(Conversations.Conversation.CONVERSATION_URI, null,
                 Conversations.Conversation.SEND_ID + " = ? OR " + Conversations.Conversation.REC_ID + " = ? ",
                 new String[]{uuid, uuid}, Conversations.Conversation.TIME + " ASC");
@@ -354,11 +354,18 @@ public class ConversationProvider extends ContentProvider {
                         break;
                 }
 
-                //上次意外中断，有发送中的消息,改成
-                if (conversation.isSending == Constant.TRUE) {
+                //上次意外中断，有发送中的消息,重新进入时改成
+                if (conversation.isSending == Constant.TRUE && shouldResend) {
                     conversation.isSending = Constant.FALSE;
                     conversation.shouldResend = Constant.TRUE;
+                    //数据库更新发送状态
+                    ContentValues values = new ContentValues();
+                    values.put(Conversations.Conversation.IS_SENDING, Constant.FALSE);
+                    values.put(Conversations.Conversation.SHOULD_RESEND, Constant.TRUE);
+                    context.getContentResolver().update(Conversations.Conversation.CONVERSATION_URI, values,
+                            Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
                 }
+
                 //如果本地的图片被删除了,那这条记录也删了
                 if (conversation.type == Constant.SEND_IMAGE) {
                     if (new File(conversation.imageLocalPath).exists()) {

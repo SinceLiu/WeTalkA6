@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:text="@string/synchronizing"
         android:textColor="#cccccc"
-        android:textSize="24px"
+        android:textSize="@dimen/get_image_loading_text_size"
         android:gravity="center"
         android:background="@color/main_color"/>
 </RelativeLayout>

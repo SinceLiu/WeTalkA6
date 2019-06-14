@@ -23,6 +23,8 @@ import android.util.Log;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.wetalk.support.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -95,7 +97,27 @@ public class WTContactUtils {
         return "";
     }
 
+    public static boolean isGroupControlled(Context context) {
+        String deviceModelString = Settings.Global.getString(context.getContentResolver(), "smartWatch_appctl");
+        if (deviceModelString == null) {
+            return false;
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(deviceModelString);
+            JSONObject systemAppObject = jsonObject.getJSONObject("system");
+            JSONObject friendGroupChatObject = systemAppObject.getJSONObject("friendGroupChat");
+            String friendGroupChat = friendGroupChatObject.optString("enabled");
+            if ("0".equals(friendGroupChat)) {
+                return true;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static List<Friend> getFriendFromContacts(Context context) {
+
         return getFriendFromContacts(context, null, null);
     }
 
@@ -103,6 +125,7 @@ public class WTContactUtils {
      * 获取全部联系人,支持单聊了
      */
     public static List<Friend> getFriendFromContacts(Context context, String selection, String[] args) {
+        boolean isGroupControlled = isGroupControlled(context);
         List<Friend> list = new ArrayList<Friend>();
         int oldrid = -1;
         int contactId = -1;
@@ -116,7 +139,9 @@ public class WTContactUtils {
             contactId = cursor.getInt(cursor.getColumnIndex(Data.RAW_CONTACT_ID));
             if (oldrid != contactId) {
                 if (contact != null && contact.uuid != null && !contact.uuid.startsWith("M")) {
-                    list.add(contact);
+                    if (!isGroupControlled || "家庭圈".equals(contact.name) || !contact.uuid.startsWith("G")) {
+                        list.add(contact);
+                    }
                 }
                 contact = new Friend();
                 contact.contactId = contactId;
@@ -166,7 +191,9 @@ public class WTContactUtils {
         cursor.close();
         try {
             if (contact != null && !list.contains(contact) && contact.uuid != null && !contact.uuid.startsWith("M")) {
-                list.add(contact);
+                if (!isGroupControlled || "家庭圈".equals(contact.name) || !contact.uuid.startsWith("G")) {
+                    list.add(contact);
+                }
             }
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -176,6 +203,57 @@ public class WTContactUtils {
 //		  //头像保存本地
 //		  saveFriendDataToLocal(context,friend);
 //	  }
+        return list;
+    }
+
+    /**
+     * 获取全部群组
+     */
+    public static List<Friend> getGroupFromContacts(Context context) {
+        List<Friend> list = new ArrayList<Friend>();
+        int oldrid = -1;
+        int contactId = -1;
+        Cursor cursor = context.getContentResolver().query(Data.CONTENT_URI, null, null, null, Data.RAW_CONTACT_ID);
+        if (cursor == null || cursor.getCount() == 0) {
+            Log.i("hwj", "没有获取到群组");
+            return list;
+        }
+        Friend contact = null;
+        while (cursor.moveToNext()) {
+            contactId = cursor.getInt(cursor.getColumnIndex(Data.RAW_CONTACT_ID));
+            if (oldrid != contactId) {
+                if (contact != null && contact.uuid != null && contact.uuid.startsWith("G") && !"家庭圈".equals(contact.name)) {
+                    list.add(contact);
+                }
+                contact = new Friend();
+                contact.contactId = contactId;
+                oldrid = contactId;
+            }
+            if (contact == null) {
+                continue;
+            }
+            switch (cursor.getString(cursor.getColumnIndex(Data.MIMETYPE))) {
+                case StructuredName.CONTENT_ITEM_TYPE:
+                    contact.name = cursor.getString(cursor.getColumnIndex(StructuredName.DISPLAY_NAME));
+                    break;
+                case StructuredPostal.CONTENT_ITEM_TYPE:
+                    if (cursor.getInt(cursor.getColumnIndex(StructuredPostal.TYPE)) == StructuredPostal.TYPE_WORK) {
+                        contact.uuid = cursor.getString(cursor.getColumnIndex("data8"));
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        cursor.close();
+        try {
+            if (contact != null && contact.uuid != null && contact.uuid.startsWith("G") && !"家庭圈".equals(contact.name)) {
+                list.add(contact);
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return null;
+        }
         return list;
     }
 

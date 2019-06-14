@@ -1,5 +1,6 @@
 package com.readboy.wetalk;
 
+import com.readboy.utils.ActivityLifecycleListener;
 import com.readboy.utils.LogInfo;
 import com.tencent.bugly.crashreport.CrashReport;
 
@@ -18,6 +19,7 @@ public class WeTalkApplication extends Application {
         super.onCreate();
 //        CrashReport.initCrashReport(getApplicationContext(), "61c2c66a3a", false);
         asyncInitBugly();
+        registerActivityLifecycleCallbacks(new ActivityLifecycleListener());
     }
 
     private void asyncInitBugly(){

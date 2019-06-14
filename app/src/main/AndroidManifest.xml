@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     coreApp="true"
     package="com.readboy.wetalk"
-    android:sharedUserId="com.android.systemui"
-    android:versionCode="190322001"
-    android:versionName="2.0.6">
+    android:sharedUserId="android.uid.systemui"
+    android:versionCode="190530001"
+    android:versionName="2.1.3">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -32,7 +32,7 @@
         android:icon="@drawable/wetalk_icon"
         android:label="@string/app_name"
         android:theme="@style/SwipeToDismissTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
         <meta-data
             android:name="com.readboy.utils.GlideConfiguration"
@@ -48,9 +48,6 @@
                 <action android:name="readboy.action.NOTIFY_MESSAGE" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.readboy.action.SENDPICTURE" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="readboy.action.NOTIFY_FRIEND_ADD" />
             </intent-filter>
             <intent-filter>
@@ -59,6 +56,10 @@
             <intent-filter>
                 <action android:name="readboy.action.NOTIFY_FRIEND_REQUEST" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="readboy.action._UPDATE_NOTIFICATION" />
+            </intent-filter>
+
         </receiver>
 
         <activity
@@ -106,8 +107,8 @@
         <service android:name=".UpdateContactPhotoService" />
 
         <service
-            android:name="com.readboy.service.MessageService"
-            android:process="com.android.systemui" />
+            android:name="com.readboy.service.MessageService"/>
+            <!--android:process="com.android.systemui" />-->
 
         <activity android:name="com.readboy.activity.GifActivity" />
         <activity

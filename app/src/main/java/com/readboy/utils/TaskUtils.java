@@ -28,23 +28,12 @@ public class TaskUtils {
      * 通过Activity生命周期判断不可靠，比如跳转到表情界面，相机界面。
      * 如何界定怎样的是前台，什么情况需要弹出通知栏，什么时候只要振动。
      */
-    public static boolean isBackground(Context context) {
-//        String foregroundApp = getForegroundApp();
-//        Log.e(TAG, "isBackground: foregroundApp = " + foregroundApp);
-//        getTopApp(context);
-//        Log.e(TAG, "isBackground: processs = " + isProcess(context));
-        return isBackgroundProcess(context);
-//        return !context.getPackageName().equalsIgnoreCase(foregroundApp);
-
-    }
-
-    private static boolean isBackgroundProcess(Context context) {
+    public static boolean isBackgroundProcess(Context context) {
         ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
         ActivityManager.RunningAppProcessInfo processInfo = appProcesses.get(0);
         if (context.getPackageName().equals(processInfo.processName)) {
-            return processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
-                    && processInfo.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING;
+            return processInfo.importance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_TOP_SLEEPING;
         } else {
             return true;
         }

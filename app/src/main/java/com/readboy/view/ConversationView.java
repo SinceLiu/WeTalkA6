@@ -141,38 +141,23 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private ContentObserver mObserver = new ContentObserver(new Handler()) {
         @Override
         public void onChange(boolean selfChange) {
-            //获取最新的消息集合
+            // 获取最新的消息集合
             // TODO，对方正在插入数据，可能会获取到多条新消息
             // 数据库记录，未必是按照time字段排序，可能先获取到最新的，再获取到旧的。
-            List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
-            if (conversations == null || conversations.size() <= mConversations.size()) {
-                Log.e(TAG, "onChange: conversation = null.");
-                CrashReport.postCatchedException(new UnknownError("新获取的conversations不大于现有的conversations, " +
-                        "new size = " + (conversations != null ? conversations.size() : 0) + ", old size = " + mConversations.size()));
+            List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid, false);
+            if (conversations == null || conversations.size() < mConversations.size()) {
                 return;
             }
-//            final int length = conversations.size();
-//            final int current = mConversations.size();
-//            final String lastTime = mConversations.size() == 0
-//                    ? null
-//                    : mConversations.get(current - 1).time;
-//            Log.i(TAG, "onChange: new length = " + length + ", current = " + current);
-//            for (int i = length - 1; i >= current; i--) {
-//                //按时间降序,获取最新的一条消息
-//                Conversation conversation = conversations.get(i);
-//                if (lastTime != null && lastTime.equals(conversation.time)) {
-//                    Log.i(TAG, "onChange: i = " + i + ", preview = " + conversation.preview);
-//                    break;
-//                }
-//                Log.i(TAG, "onChange: add conversation: " + conversation.preview);
-//                mConversations.add(conversation);
-//            }
-
-            mConversations.clear();
-            mConversations.addAll(conversations);
-
-            Log.e(TAG, "onChange: current conversations size = " + mConversations.size());
-            notifyAndScrollBottom();
+            //有新消息才跳转到最新一条
+            if (conversations.size() == mConversations.size()) {
+                mConversations.clear();
+                mConversations.addAll(conversations);
+                mAdapter.notifyDataSetChanged();
+            } else {
+                mConversations.clear();
+                mConversations.addAll(conversations);
+                notifyAndScrollBottom();
+            }
         }
     };
 
@@ -184,20 +169,13 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         @Override
         protected List<Conversation> doInBackground(Void... params) {
             Log.i(TAG, "doInBackground: uuid = " + mCurrentFriend.uuid);
-            return ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid);
+            return ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid, true);
         }
 
         @Override
         protected void onPostExecute(List<Conversation> result) {
-            List<Conversation> temp = new ArrayList<>();
-            if (mConversations.size() > 0) {
-                temp.addAll(mConversations);
-            }
             mConversations.clear();
             mConversations.addAll(result);
-            if (temp.size() > 0) {
-                mConversations.addAll(temp);
-            }
             Log.i(TAG, "onPostExecute: conversations size = " + mConversations.size());
             limitConversationSize();
             notifyAndScrollBottom();
@@ -241,7 +219,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         mAdapter = new ConversationListAdapterSimple(mContext, mConversations);
         mAdapter.setSendMessageHandler(mSendMessageResultHandler);
         mConversationList.setAdapter(mAdapter);
-
         mSendEmojiBtn = findViewById(R.id.send_emoji_btn);
         mSendVoiceBtn = findViewById(R.id.send_voice_btn);
         mSendImageBtn = findViewById(R.id.send_image_btn);
@@ -453,9 +430,12 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     }
 
     public void notifyDataSetChanged() {
-        post(() -> {
-            if (mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
+        post(new Runnable() {
+            @Override
+            public void run() {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
             }
         });
     }
@@ -481,10 +461,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                 getEmojiId();
                 break;
             case R.id.send_image_btn:
-//                getImage();
                 getImageOrVideo();
-//                uploadVideo();
-//                uploadTest();
                 break;
             default:
                 break;
@@ -583,7 +560,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                         handleVideoData(MediaUtils.getVideoInfo(mContext, uri));
                     }
                 } else {
-                    mCurrentImagePath = data.getStringExtra("path");
+                    mCurrentImagePath = data.getStringExtra("filePath");
                     showImageConversation();
                 }
                 LogInfo.i("hwj", "send image path : " + mCurrentImagePath);
@@ -721,12 +698,14 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
      * 刷新，并跳转到最新一条
      */
     private void notifyAndScrollBottom() {
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
         //本应该是mAdapter.getCount-1的，但是发送图片时有bug，显示的不是最底下的图片。
         mConversationList.post(new Runnable() {
             @Override
             public void run() {
-                mConversationList.setSelection(mAdapter.getCount());
+                //setSelection后立刻再notifyDataSetChanged会导致setSelection无效，改为再setAdapter
+                mConversationList.setAdapter(mAdapter);
+//                mConversationList.setSelection(mAdapter.getCount());
             }
         });
     }
@@ -766,7 +745,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         mResolver.update(Conversations.Conversation.CONVERSATION_URI, values,
                 Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
         LogInfo.i("hwj", "handleSendMessageResult ---------- change conversation sending state notifyDataSetChanged");
-        notifyAndScrollBottom();
+        mAdapter.notifyDataSetChanged();
     }
 
     private void sendConversationInfo(final Conversation conversation) {

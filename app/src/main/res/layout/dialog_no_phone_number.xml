@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/dialog_no_phone_number_parent"
-    android:layout_width="240px"
-    android:layout_height="240px"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@android:color/black">
 
     <TextView
         android:id="@+id/request_friend_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50px"
-        android:layout_marginStart="15px"
-        android:layout_marginEnd="15px"
-        android:lineSpacingExtra="2px"
+        android:layout_marginTop="@dimen/dialog_no_phone_number_content_margin_top"
+        android:layout_marginStart="@dimen/dialog_no_phone_number_content_margin_horizontal"
+        android:layout_marginEnd="@dimen/dialog_no_phone_number_content_margin_horizontal"
+        android:lineSpacingExtra="@dimen/dialog_no_phone_number_content_line_spacing_extra"
         android:text="@string/warning_no_phone_number"
         android:textColor="@android:color/white"
-        android:textSize="21px" />
+        android:textSize="@dimen/dialog_no_phone_number_content_text_size" />
 
     <Button
         android:id="@+id/dialog_no_phone_number_confirm"
-        android:layout_width="236px"
-        android:layout_height="50px"
+        android:layout_width="@dimen/dialog_no_phone_number_confirm_width"
+        android:layout_height="@dimen/dialog_no_phone_number_confirm_height"
         android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginBottom="5px"
+        android:layout_marginBottom="@dimen/dialog_no_phone_number_confirm_margin_bottom"
         android:background="@drawable/btn_confirm_corner_selector" />
 
 </FrameLayout>

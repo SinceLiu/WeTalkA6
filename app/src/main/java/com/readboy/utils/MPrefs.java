@@ -59,7 +59,6 @@ public class MPrefs {
     }
 
     public static void setMessageTag(Context context, String tag) {
-        Log.e("lxx","setTag: "+tag);
         if (!IOs.saveTimeTag(context, tag)) {
             saveMessageTagToPreference(context, tag);
         }

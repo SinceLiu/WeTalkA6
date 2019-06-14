@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         android:overScrollMode="never"
-        android:layout_marginTop="20px" />
+        android:layout_marginTop="@dimen/page_group_members_recyclerview_margin_top" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
@@ -25,6 +25,6 @@
         android:layout_gravity="center"
         android:text="@string/load_failure"
         android:textColor="@android:color/white"
-        android:textSize="28px"
+        android:textSize="@dimen/page_group_members_message_text_size"
         android:visibility="gone" />
 </com.readboy.view.GroupMembersView>

@@ -6,12 +6,12 @@
 
     <FrameLayout
         android:id="@+id/avatar"
-        android:layout_width="80px"
-        android:layout_height="80px"
+        android:layout_width="@dimen/item_friend_grid_avatar_size"
+        android:layout_height="@dimen/item_friend_grid_avatar_size"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="20px"
-        android:layout_marginTop="10px"
-        android:layout_marginRight="20px">
+        android:layout_marginLeft="@dimen/item_friend_grid_avatar_margin_horizontal"
+        android:layout_marginTop="@dimen/item_friend_grid_avatar_margin_top"
+        android:layout_marginRight="@dimen/item_friend_grid_avatar_margin_horizontal">
 
         <ImageView
             android:id="@+id/friend_pager_item_img"
@@ -28,14 +28,14 @@
 
     <TextView
         android:id="@+id/friend_pager_item_unread"
-        android:layout_width="25px"
-        android:layout_height="25px"
-        android:layout_marginLeft="80px"
-        android:layout_marginTop="6px"
+        android:layout_width="@dimen/item_friend_grid_unread_size"
+        android:layout_height="@dimen/item_friend_grid_unread_size"
+        android:layout_marginLeft="@dimen/item_friend_grid_unread_margin_left"
+        android:layout_marginTop="@dimen/item_friend_grid_unread_margin_top"
         android:background="@drawable/unread_bg"
         android:gravity="center"
         android:textColor="@android:color/white"
-        android:textSize="16px"
+        android:textSize="@dimen/item_friend_grid_unread_text_size"
         android:visibility="gone" />
 
     <TextView
@@ -45,8 +45,8 @@
         android:layout_below="@id/avatar"
         android:layout_centerHorizontal="true"
         android:ellipsize="middle"
-        android:maxWidth="120px"
+        android:maxWidth="@dimen/item_friend_grid_name_max_width"
         android:singleLine="true"
         android:textColor="@android:color/white"
-        android:textSize="20px" />
+        android:textSize="@dimen/item_friend_grid_name_text_size" />
 </com.readboy.wetalk.view.FriendGridItem>

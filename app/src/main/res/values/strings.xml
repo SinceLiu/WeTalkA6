@@ -2,7 +2,7 @@
     <string name="app_name">微聊</string>
     <string name="speak">按住说话</string>
     <string name="get_image_fail">获取照片数据出错</string>
-    <string name="play_voice_error">语音文件不存在</string>
+    <string name="play_voice_error">语音文件下载失败</string>
     <string name="homeGroup">家庭圈</string>
     <string name="voice_error_msg">录音时间太短</string>
     <string name="out_off_limit">录音最大时长为20秒</string>
@@ -43,5 +43,7 @@
     <string name="warning_leave_group">确定退出该群吗</string>
     <string name="warning_no_phone_number">为了不影响好友间的正常联系，请在家长端宝贝资料添加电话号码。</string>
     <string name="load_failure">加载失败</string>
+    <string name="add">添加</string>
+    <string name="remove">删除</string>
 
 </resources>

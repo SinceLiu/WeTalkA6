@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="item_friend_grid_avatar_size">80px</dimen>
+    <dimen name="item_friend_grid_avatar_margin_horizontal">20px</dimen>
+    <dimen name="item_friend_grid_avatar_margin_top">10px</dimen>
+    <dimen name="item_friend_grid_unread_size">25px</dimen>
+    <dimen name="item_friend_grid_unread_margin_left">80px</dimen>
+    <dimen name="item_friend_grid_unread_margin_top">6px</dimen>
+    <dimen name="item_friend_grid_unread_text_size">16px</dimen>
+    <dimen name="item_friend_grid_name_max_width">120px</dimen>
+    <dimen name="item_friend_grid_name_text_size">20px</dimen>
+    <dimen name="item_title_height">44px</dimen>
+    <dimen name="item_title_text_size">26px</dimen>
+    <dimen name="pager_friend_text_size">24px</dimen>
+</resources>

@@ -44,7 +44,7 @@ public class Conversations {
         public static final String THUMB_IMAGE_URL = "thumb_url";
         public static final String IMAGE_URL = "image_url";
         static final String TEXT_CONTENT = "text_content";
-        static final String VOICE_PATH = "voice_path";
+        public static final String VOICE_PATH = "voice_path";
         static final String LAST_TIME = "last_time";
         public static final String IS_UN_PLAY = "is_un_play";
         public static final String VOICE_URL = "voice_url";

@@ -2,7 +2,7 @@
 <Space xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@android:color/holo_orange_light"
-    android:minHeight="56px"
-    android:layout_height="56px">
+    android:minHeight="@dimen/footer_friend_selector_min_height"
+    android:layout_height="@dimen/footer_friend_selector_height">
 
 </Space>

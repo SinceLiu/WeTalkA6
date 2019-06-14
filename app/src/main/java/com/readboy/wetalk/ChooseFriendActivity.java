@@ -24,6 +24,7 @@ import com.readboy.wetalk.bean.Friend;
 import com.readboy.utils.GlideCircleTransform;
 import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.view.CircleImageView;
+import com.readboy.wetalk.view.MyLinearLayoutManager;
 
 /**
  * @deprecated
@@ -43,7 +44,7 @@ public class ChooseFriendActivity extends BaseRequestPermissionActivity {
     @Override
     protected void initView() {
         mFriendList = (RecyclerView) getView(R.id.choose_friend_list);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(ChooseFriendActivity.this);
+        MyLinearLayoutManager mLayoutManager = new MyLinearLayoutManager(ChooseFriendActivity.this);
         mLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mFriendList.setLayoutManager(mLayoutManager);
         mLoading = getView(R.id.loading);

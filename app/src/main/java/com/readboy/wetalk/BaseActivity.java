@@ -17,7 +17,6 @@ import com.readboy.utils.ToastUtils;
 public abstract class BaseActivity extends Activity {
 
     public static final String TAG = "hwj_WeTalk";
-
     private int animIn = R.anim.slide_in_right;
     private int animOut = R.anim.slide_out_right;
 
@@ -53,6 +52,8 @@ public abstract class BaseActivity extends Activity {
         super.onResume();
 
     }
+
+
 
     @Override
     public void finish() {

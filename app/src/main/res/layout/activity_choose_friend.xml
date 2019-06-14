@@ -9,8 +9,8 @@
         android:id="@+id/choose_friend_tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20px"
-        android:layout_marginTop="5px"
+        android:textSize="@dimen/choose_friend_tip_text_size"
+        android:layout_marginTop="@dimen/choose_friend_margin_top"
         android:layout_centerHorizontal="true"
         android:textColor="@android:color/white"
         android:text="@string/share_to"/>
@@ -23,7 +23,8 @@
         android:overScrollMode="never"
         android:layout_centerHorizontal="true"
         android:layout_below="@id/choose_friend_tip"
-        android:layout_marginTop="5px"/>
+		android:layout_marginTop="@dimen/choose_friend_margin_top"
+		/>
 	<TextView
         android:id="@+id/no_contact"
         android:layout_width="match_parent"

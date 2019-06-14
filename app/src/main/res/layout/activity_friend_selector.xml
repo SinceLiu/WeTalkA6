@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="1px"
+        android:layout_marginBottom="@dimen/friend_selector_confirm_margin_bottom"
         android:background="@drawable/btn_add_group_normal" />
 
 
@@ -29,8 +29,8 @@
 
         <ProgressBar
             android:id="@+id/progress_bar"
-            android:layout_width="80px"
-            android:layout_height="80px"
+            android:layout_width="@dimen/friend_selector_progress_bar_width"
+            android:layout_height="@dimen/friend_selector_progress_bar_height"
             android:layout_gravity="center"
             android:indeterminateDrawable="@drawable/progress_bar"
             android:visibility="visible" />

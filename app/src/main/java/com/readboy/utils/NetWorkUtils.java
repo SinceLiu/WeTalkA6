@@ -14,9 +14,10 @@ import java.util.Arrays;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -39,16 +40,12 @@ import com.readboy.bean.Conversation;
 import com.readboy.provider.ConversationProvider;
 import com.readboy.provider.Conversations;
 import com.readboy.wetalk.WeTalkApplication;
-import com.readboy.wetalk.utils.WTContactUtils;
 
 import android.app.readboy.ReadboyWearManager;
 import android.app.readboy.IReadboyWearListener;
 import android.util.Log;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.message.BasicHeader;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
 /**
  * @author 1-PC
@@ -406,6 +403,12 @@ public class NetWorkUtils {
                 }
 
                 @Override
+                public void onProgress(long bytesWritten,long totalSize){
+                    //TODO 显示进度
+//                    Log.e("lxx","进度："+(int)(bytesWritten*1.0/totalSize*100)+"%");
+                }
+
+                @Override
                 public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     Log.i(TAG, "uploadVideo voice file onFailure() called with: statusCode = " + statusCode +
                             ", headers = " + headers + ", throwable = " + throwable +
@@ -462,12 +465,18 @@ public class NetWorkUtils {
     //指定语音文件类型
     private static String[] allowedContentTypes = new String[]{".*"};
 
+
+    public interface DownLoadFileListener {
+        void downLoadSucceed();
+
+        void downLoadFailed();
+    }
+
     /**
-     * 只需下载语音文件
+     * 下载语音、视频文件
      *
-     * @param conversation 语音文件的url
      */
-    public static void downloadFile(final Context context, final Conversation conversation) {
+    public static void downloadFile(final Context context, final Conversation conversation, final DownLoadFileListener downLoadFileListener) {
         if (WeTalkApplication.IS_TEST_MODE) {
             return;
         }
@@ -477,7 +486,7 @@ public class NetWorkUtils {
 //        String name = url.substring(url.indexOf("a/") + 2, url.length() - 4);
         String name = uri.getLastPathSegment();
         Log.i(TAG, "downloadFile: name = " + name);
-        //下载完成,保存语音文件
+        //下载完成,保存文件
         File dir = new File(Constant.getDownloadPath(context));
         if (!dir.exists() && !dir.mkdirs()) {
             Log.w(TAG, "downloadFile: create file fail. " + dir.getAbsolutePath());
@@ -496,14 +505,30 @@ public class NetWorkUtils {
                             outputStream.flush();
                             outputStream.close();
                             conversation.voiceLocalPath = file.getPath();
-                            //插入数据库
-                            Uri uri = context.getContentResolver().insert(Conversations.Conversation.CONVERSATION_URI,
-                                    ConversationProvider.getContentValue(conversation, true));
-                            if (uri != null) {
-//                                WTContactUtils.updateUnreadCount(context, conversation.sendId, 1);
-                                NotificationUtils.sendNotification(context);
+                            if (downLoadFileListener != null) {
+                                downLoadFileListener.downLoadSucceed();
+                            }
+                            Cursor cursor = context.getContentResolver().query(Conversations.Conversation.CONVERSATION_URI, null,
+                                    Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId},
+                                    null);
+                            //插入或更新数据库
+                            if (cursor == null || cursor.getCount() == 0 || !cursor.moveToFirst()) {
+                                Uri uri = context.getContentResolver().insert(Conversations.Conversation.CONVERSATION_URI,
+                                        ConversationProvider.getContentValue(conversation, true));
+                                if (uri == null) {
+                                    Log.i(TAG, "onSuccess: insert fail.");
+                                }
                             } else {
-                                Log.i(TAG, "onSuccess: insert fail.");
+                                ContentValues values = new ContentValues();
+                                values.put(Conversations.Conversation.VOICE_PATH, conversation.voiceLocalPath);
+                                int rows = context.getContentResolver().update(Conversations.Conversation.CONVERSATION_URI,
+                                        values, Conversations.Conversation.CONVERSATION_ID + " = ?", new String[]{conversation.conversationId});
+                                if (rows <= 0) {
+                                    Log.i(TAG, "onSuccess: update fail.");
+                                }
+                            }
+                            if (cursor != null) {
+                                cursor.close();
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -518,6 +543,9 @@ public class NetWorkUtils {
                 @Override
                 public void onFailure(int i, Header[] headers, byte[] bytes, Throwable throwable) {
                     Log.i(TAG, "onFailure: headers, " + getHeadersString(headers));
+                    if (downLoadFileListener != null) {
+                        downLoadFileListener.downLoadFailed();
+                    }
                 }
 
                 @Override
@@ -626,7 +654,7 @@ public class NetWorkUtils {
      * @param listener 回调
      */
     private static void sendCapture(Context context, String url, String thumbUrl, int width, int height, String uuid,
-                             final PushResultListener listener) {
+                                    final PushResultListener listener) {
         ReadboyWearManager manager = getManager(context);
         if (manager == null) {
             return;
@@ -755,6 +783,9 @@ public class NetWorkUtils {
     }
 
     private static String getHeadersString(Header[] headers) {
+        if (headers == null || headers.length == 0) {
+            return null;
+        }
         StringBuilder builder = new StringBuilder();
         for (Header header : headers) {
             builder.append(header.getName()).append(":").append(header.getValue());

@@ -7,8 +7,8 @@
     tools:parentTag="com.readboy.widget.ImageIndication">
 
     <ImageView
-        android:layout_width="10px"
-        android:layout_height="10px"
+        android:layout_width="@dimen/indication_image_width"
+        android:layout_height="@dimen/indication_image_height"
         android:src="@drawable/indicator_conversation_selector" />
 
 </merge>

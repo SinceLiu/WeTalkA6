@@ -20,13 +20,13 @@
         android:id="@+id/conversation_name_tip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10px"
+        android:layout_marginLeft="@dimen/page_conversation_name_tip_magin_left"
         android:ellipsize="end"
-        android:maxWidth="105px"
+        android:maxWidth="@dimen/page_conversation_name_tip_max_width"
         android:singleLine="true"
         android:text="@string/app_name"
         android:textColor="@color/green"
-        android:textSize="20px" />
+        android:textSize="@dimen/page_conversation_name_tip_text_size" />
     <!--BottomBar-->
     <LinearLayout
         android:id="@+id/conversation_send_msg_tab"
@@ -35,38 +35,38 @@
         android:layout_alignParentBottom="true"
         android:background="@drawable/action_bar_bg"
         android:orientation="horizontal"
-        android:paddingBottom="1px">
+        android:paddingBottom="@dimen/page_conversation_send_msg_tab_padding_bottom">
 
         <Space
-            android:layout_width="6px"
+            android:layout_width="@dimen/page_conversation_send_msg_tab_space_width"
             android:layout_height="wrap_content" />
 
         <View
             android:id="@+id/send_emoji_btn"
-            android:layout_width="48px"
-            android:layout_height="48px"
+            android:layout_width="@dimen/page_conversation_send_msg_tab_emoji_btn_size"
+            android:layout_height="@dimen/page_conversation_send_msg_tab_emoji_btn_size"
             android:background="@drawable/send_emoji_btn_sel"
             android:clickable="true" />
 
         <Button
             android:id="@+id/send_voice_btn"
             android:layout_width="0dp"
-            android:layout_height="48px"
-            android:layout_marginLeft="6px"
-            android:layout_marginRight="6px"
+            android:layout_height="@dimen/page_conversation_send_msg_tab_emoji_btn_size"
+            android:layout_marginLeft="@dimen/page_conversation_send_msg_tab_space_width"
+            android:layout_marginRight="@dimen/page_conversation_send_msg_tab_space_width"
             android:layout_weight="1"
             android:background="@drawable/btn_send_voice_short_selector"
             android:textColor="@android:color/white" />
 
         <View
             android:id="@+id/send_image_btn"
-            android:layout_width="48px"
-            android:layout_height="48px"
+            android:layout_width="@dimen/page_conversation_send_msg_tab_emoji_btn_size"
+            android:layout_height="@dimen/page_conversation_send_msg_tab_emoji_btn_size"
             android:background="@drawable/send_image_btn_sel"
             android:clickable="true" />
 
         <Space
-            android:layout_width="6px"
+            android:layout_width="@dimen/page_conversation_send_msg_tab_space_width"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
@@ -78,7 +78,7 @@
         android:gravity="center"
         android:text="@string/no_data"
         android:textColor="#cccccc"
-        android:textSize="24px"
+        android:textSize="@dimen/page_conversation_no_msg_tip_text_size"
         android:visibility="gone" />
 
     <TextView

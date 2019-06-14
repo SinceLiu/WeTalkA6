@@ -62,9 +62,11 @@ public class ToastUtils {
         } else {
             twoTime = System.currentTimeMillis();
             if (msg.equals(oldMsg)) {
-                if (twoTime - oneTime > time) {
+                if (twoTime - oneTime > 2000) {
                     toast.setDuration(time);
                     toast.show();
+                }else {
+                    return;
                 }
             } else {
                 oldMsg = msg;

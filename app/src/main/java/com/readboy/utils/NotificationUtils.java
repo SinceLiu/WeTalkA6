@@ -17,6 +17,7 @@ import android.util.Log;
 import com.readboy.activity.RequestFriendActivity;
 import com.readboy.provider.Profile;
 import com.readboy.wetalk.R;
+import com.readboy.wetalk.WeTalkApplication;
 import com.readboy.wetalk.utils.WTContactUtils;
 
 import org.json.JSONArray;
@@ -29,7 +30,6 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- *
  * @author hwwjian
  * @date 2016/12/21
  * 发通知的情况:
@@ -62,13 +62,22 @@ public class NotificationUtils {
         //在联系人信息界面或者
         if (isSilent) {
             Log.i(TAG, "notification: notify silent notification.");
-            manager.notify(NOTIFY_ID, getSilentNotification(context));
-        } else if (!TaskUtils.isBackground(context)) {
+            Notification notification = getSilentNotification(context);
+            if (notification != null) {
+                manager.notify(NOTIFY_ID, notification);
+            }
+        } else if (!ActivityLifecycleListener.isBackground(context)) {
             Log.e(TAG, "notification: normal. only vibrate.");
-            manager.notify(NORMAL_NOTIFY_ID, getNotification(context));
+            Notification notification = getNotification(context);
+            if (notification != null) {
+                manager.notify(NORMAL_NOTIFY_ID, notification);
+            }
         } else {
             Log.e(TAG, "notification: floating. sound and vibrate.");
-            manager.notify(NOTIFY_ID, getFloatingNotification(context));
+            Notification notification = getFloatingNotification(context);
+            if (notification != null) {
+                manager.notify(NOTIFY_ID, notification);
+            }
         }
     }
 
@@ -98,7 +107,8 @@ public class NotificationUtils {
         } else if (count > 0) {
             builder.setContentText("收到" + count + "条新消息");
         } else {
-            builder.setContentText("收到新消息");
+//            builder.setContentText("收到新消息");
+            return null;
         }
         builder.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE);
         builder.setContentIntent(pendingIntent3);
@@ -132,7 +142,8 @@ public class NotificationUtils {
         } else if (count > 0) {
             builder.setContentText("收到" + count + "条新消息");
         } else {
-            builder.setContentText("收到新消息");
+//            builder.setContentText("收到新消息");
+            return null;
         }
         builder.setSound(null);
         builder.setDefaults(Notification.DEFAULT_VIBRATE);
@@ -143,7 +154,7 @@ public class NotificationUtils {
     /**
      * 针对上课禁用类型，静默，无振动，无响铃，无弹窗，只更新通知栏
      */
-    private static Notification getSilentNotification(Context context) {
+    public static Notification getSilentNotification(Context context) {
         PendingIntent pendingIntent3 = PendingIntent.getActivity(context, 0,
                 getFriendsIntent(context), 0);
         Bundle bundle = new Bundle();
@@ -165,7 +176,8 @@ public class NotificationUtils {
         } else if (count > 0) {
             builder.setContentText("收到" + count + "条新消息");
         } else {
-            builder.setContentText("收到新消息");
+//            builder.setContentText("收到新消息");
+            return null;
         }
 //        builder.setDefaults(Notification.DEFAULT_LIGHTS);
         builder.setPriority(Notification.PRIORITY_LOW);

@@ -140,7 +140,7 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
                     });
             mIcon = (ImageView) itemView.findViewById(R.id.group_members_icon);
             mAdd = itemView.findViewById(R.id.group_members_add);
-            mName = itemView.findViewById(R.id.group_members_name);
+            mName = (TextView) itemView.findViewById(R.id.group_members_name);
         }
 
         @Override
@@ -149,14 +149,14 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
                 Glide.with(mContext)
                         .load(friend.photoUri)
                         .error(R.drawable.common)
-                        .transform(new GlideRoundTransform(mContext, 32))
+                        .transform(new GlideRoundTransform(mContext, 60))
                         .into(mIcon);
             } else {
                 String url = Constant.ICON_URL + friend.uuid;
                 Glide.with(mContext)
                         .load(url)
                         .error(R.drawable.common)
-                        .transform(new GlideRoundTransform(mContext, 32))
+                        .transform(new GlideRoundTransform(mContext, 60))
                         .into(mIcon);
             }
             mAdd.setVisibility(friend.addVisibility);
@@ -168,14 +168,18 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
     class ActionViewHolder extends MemberViewHolder {
 
         private ImageView action;
+        private TextView name;
 
         ActionViewHolder(View itemView, int a) {
             super(itemView);
             action = (ImageView) itemView.findViewById(R.id.group_members_action);
+            name = (TextView) itemView.findViewById(R.id.group_members_action_name);
             if (a == TYPE_ACTION_ADD) {
                 action.setImageResource(R.drawable.btn_action_add_selector);
+                name.setText(R.string.add);
             } else {
                 action.setImageResource(R.drawable.btn_action_remove_selector);
+                name.setText(R.string.remove);
             }
             action.setOnClickListener(new View.OnClickListener() {
                 @Override

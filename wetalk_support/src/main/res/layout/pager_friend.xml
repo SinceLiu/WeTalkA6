@@ -24,7 +24,7 @@
         android:layout_gravity="center"
         android:text="@string/no_contacts"
         android:textColor="@android:color/white"
-        android:textSize="24px"
+        android:textSize="@dimen/pager_friend_text_size"
         android:visibility="gone" />
 
     <TextView
@@ -36,5 +36,5 @@
         android:background="@android:color/black"
         android:text="@string/loading"
         android:textColor="@android:color/white"
-        android:textSize="24px" />
+        android:textSize="@dimen/pager_friend_text_size" />
 </merge>

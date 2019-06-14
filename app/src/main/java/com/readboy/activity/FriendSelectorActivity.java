@@ -35,6 +35,7 @@ import com.readboy.utils.WearManagerProxy;
 import com.readboy.utils.WearManagerProxy.Command;
 import com.readboy.wetalk.ConversationActivity;
 import com.readboy.wetalk.R;
+import com.readboy.wetalk.view.MyLinearLayoutManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -129,7 +130,7 @@ public class FriendSelectorActivity extends BaseRequestPermissionActivity implem
     @Override
     public void initView() {
         mRecyclerView = findViewById(R.id.friend_list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
+        mRecyclerView.setLayoutManager(new MyLinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
         mAdapter = new FriendSelectorAdapter(mContext);
         mAdapter.setData(mFriends);
         mAdapter.setOnCheckedChangeListener(this);

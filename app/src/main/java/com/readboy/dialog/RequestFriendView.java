@@ -145,7 +145,7 @@ public class RequestFriendView extends FrameLayout implements View.OnClickListen
         friend.name = mFriend.getName();
         intent.putExtra(Constant.EXTRA_FRIEND, friend);
         mProgressBar.setVisibility(GONE);
-        // startActivity();
+        mContext.startActivity(intent);
         dismiss();
     }
 

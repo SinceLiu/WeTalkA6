@@ -8,29 +8,29 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25px"
+        android:layout_marginTop="@dimen/dialog_request_friend_title_margin_top"
         android:gravity="center_horizontal"
         android:text="@string/request_friend_title"
         android:textColor="@android:color/white"
-        android:textSize="24px" />
+        android:textSize="@dimen/dialog_request_friend_title_text_size" />
 
     <TextView
         android:id="@+id/request_friend_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginStart="10px"
-        android:layout_marginEnd="10px"
+        android:layout_marginStart="@dimen/dialog_request_friend_content_margin_horizontal"
+        android:layout_marginEnd="@dimen/dialog_request_friend_content_margin_horizontal"
         android:gravity="center"
         android:text="@string/request_friend_content"
         android:textColor="@android:color/white"
-        android:textSize="20px" />
+        android:textSize="@dimen/dialog_request_friend_content_text_size" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="5px"
+        android:layout_marginBottom="@dimen/dialog_request_friend_button_margin_bottom"
         android:gravity="center_horizontal"
         android:orientation="horizontal">
 
@@ -44,7 +44,7 @@
             android:id="@+id/request_friend_agree"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2px"
+            android:layout_marginLeft="@dimen/dialog_request_friend_agree_margin_left"
             android:background="@drawable/btn_agree_selector" />
 
     </LinearLayout>

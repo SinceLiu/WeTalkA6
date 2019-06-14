@@ -13,10 +13,10 @@
         android:id="@+id/item_conversation_system_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3px"
+        android:layout_marginTop="@dimen/item_conversation_system_content_margin_top"
         android:gravity="center"
         tools:text="@string/app_name"
         android:textColor="@android:color/white"
-        android:textSize="16px" />
+        android:textSize="@dimen/item_conversation_system_content_text_size" />
 
 </LinearLayout>

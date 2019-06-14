@@ -32,7 +32,6 @@ import com.readboy.bean.Constant;
 import com.readboy.bean.GroupInfo;
 import com.readboy.bean.GroupInfoManager;
 import com.readboy.provider.Conversations;
-import com.readboy.task.DelayLoader;
 import com.readboy.utils.FriendNameUtil;
 import com.readboy.utils.NotificationUtils;
 import com.readboy.wetalk.bean.Friend;
@@ -102,13 +101,15 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
 
         initView();
         initData();
-        NotificationUtils.cancelMessageNotification(this);
 //        clearUnreadCount(this, mFriend.uuid);
         initLoader();
     }
 
     private void parseIntent(Intent intent) {
         Friend friend = mFriend = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
+        if (friend == null) {
+            return;
+        }
         Log.i(TAG, "onCreate: friend = " + friend.toString());
         final String uuid = friend.uuid;
         if (friend.isFriendGroup()) {
@@ -170,6 +171,7 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
         LayoutInflater inflater = LayoutInflater.from(this);
         mConversationView = (ConversationView) inflater.inflate(R.layout.page_conversation, null);
         mConversationView.setActivity(this);
+        mViewList.clear();
         mViewList.add(mConversationView);
         mViewPager = findViewById(R.id.conversation_view_pager);
         mIndication = findViewById(R.id.image_indication);
@@ -196,6 +198,11 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
                 View view = mViewList.get(position);
                 container.addView(view);
                 return view;
+            }
+            @Override
+            public void destroyItem(ViewGroup container, int position, Object object){
+//                super.destroyItem(container,position,object);
+                container.removeView((View)object);
             }
         });
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -240,37 +247,22 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
         mConversationView.onPause();
         // 也需要清掉当前页面正在收到的信息
         clearUnreadCount(this, mFriend.uuid);
+        //清除通知
+        NotificationUtils.cancelMessageNotification(this);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         // 启动模式为：singleTask的需要处理该回调
+        setIntent(intent);
         String temp = mFriend.uuid;
         parseIntent(intent);
         if (temp.equals(mFriend.uuid)) {
             Log.i(TAG, "onNewIntent: is same uuid, do nothing.");
             return;
         }
-        if (mConversationView != null) {
-            mConversationView.onNewIntent(intent);
-        }
-        if (isGroup) {
-            if (mMembersView == null) {
-                initMembersView();
-            } else {
-                mMembersView.onNewIntent(intent);
-                if (mGroup != null) {
-                    mMembersView.updateGroupInfo(mGroup);
-                }
-            }
-            mIndication.setVisibility(View.VISIBLE);
-        } else {
-            if (mMembersView != null) {
-                mViewList.remove(mMembersView);
-            }
-            mIndication.setVisibility(View.GONE);
-        }
+       initView();
     }
 
     @Override
@@ -319,13 +311,13 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
         values.put(Conversations.Conversation.UNREAD, 0);
         String where = Conversations.Conversation.SEND_ID + "=?";
         String[] args = new String[]{uuid};
-        ContentProviderOperation operation = ContentProviderOperation
-                .newUpdate(uri)
-                .withValue(Conversations.Conversation.UNREAD, 0)
-                .withSelection(where, args)
-                .build();
-        int raws = context.getContentResolver().update(uri, values, where, args);
-        Log.i(TAG, "clearUnreadCount: raws = " + raws);
+//        ContentProviderOperation operation = ContentProviderOperation
+//                .newUpdate(uri)
+//                .withValue(Conversations.Conversation.UNREAD, 0)
+//                .withSelection(where, args)
+//                .build();
+        int rows = context.getContentResolver().update(uri, values, where, args);
+        Log.i(TAG, "clearUnreadCount: raws = " + rows);
 //        ArrayList<ContentProviderOperation> operations = new ArrayList<>();
 //        operations.add(operation);
 //        try {
