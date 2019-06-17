@@ -119,6 +119,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private Context mContext;
     private Activity mActivity;
     private boolean isInContacts = true;
+    private boolean isNewGroup = false;
 
     //    private ThreadFactory mThreadFactory = new ThreadFactory() {
 //        @Override
@@ -326,6 +327,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private void initFriendData(Intent intent) {
         //获取传递参数(用户Id)
         if (intent != null) {
+            isNewGroup = intent.getBooleanExtra("new_group", false);
             Friend friend = intent.getParcelableExtra(Constant.EXTRA_FRIEND);
             if (friend != null) {
                 mCurrentFriend = friend;
@@ -441,9 +443,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     }
 
     @Override
-
     public void onClick(final View v) {
-        if (!isInContacts) {
+        if (!isInContacts && !isNewGroup) {
             toastNoInContacts();
             return;
         }
@@ -1133,7 +1134,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     @Override
     public boolean onLongClick(View v) {
-        if (isInContacts) {
+        if (isInContacts || isNewGroup) {
             startRecording();
         } else {
             toastNoInContacts();
