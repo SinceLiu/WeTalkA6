@@ -4,8 +4,8 @@
     coreApp="true"
     package="com.readboy.wetalk"
     android:sharedUserId="android.uid.systemui"
-    android:versionCode="190530001"
-    android:versionName="2.1.3">
+    android:versionCode="190617001"
+    android:versionName="2.1.4">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />

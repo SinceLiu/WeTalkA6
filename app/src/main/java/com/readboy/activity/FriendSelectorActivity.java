@@ -355,6 +355,7 @@ public class FriendSelectorActivity extends BaseRequestPermissionActivity implem
     private void gotoConversation(Friend friend) {
         Intent intent = new Intent(mContext, ConversationActivity.class);
         intent.putExtra(Constant.EXTRA_FRIEND, friend);
+        intent.putExtra("new_group",true);
         startActivity(intent);
     }
 
