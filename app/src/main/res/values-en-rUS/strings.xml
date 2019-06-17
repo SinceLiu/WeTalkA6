@@ -1,24 +1,18 @@
 <resources>
     <string name="app_name">Chat</string>
-    <string name="speak">Hold to speak</string>
     <string name="get_image_fail">Failure to obtain photo data</string>
     <string name="play_voice_error">Voice files do not exist</string>
     <string name="homeGroup">homeGroup</string>
     <string name="voice_error_msg">The recording time is too short</string>
-    <string name="out_off_limit">The maximum length of the recording is 20 seconds</string>
     <string name="out_off_limit_format">The maximum length of the recording is %s seconds</string>
     <string name="synchronizing">loading</string>
     <string name="disk_error">Failure to create a local directory</string>
-    <string name="cancel_record">cancel record</string>
     <string name="no_data">no message</string>
-    <string name="square_mode">square mode</string>
-    <string name="circle_mode">circle mode</string>
     <string name="wrong_data">Failure to obtain user info</string>
     <string name="share_to">share to</string>
     <string name="share_error">Failure to share picture</string>
     <string name="no_contact">no contacts</string>
     <string name="contact_fail">Failure to obtain the contacts</string>
-    <string name="me">me</string>
     <string name="missing_required_permission">Lack important permission</string>
     <string name="internet_down">Network connection exception</string>
     <string name="file_not_found">Cannot find file</string>
