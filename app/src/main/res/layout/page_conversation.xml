@@ -29,7 +29,6 @@
         android:textSize="@dimen/page_conversation_name_tip_text_size" />
     <!--BottomBar-->
     <LinearLayout
-        android:id="@+id/conversation_send_msg_tab"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

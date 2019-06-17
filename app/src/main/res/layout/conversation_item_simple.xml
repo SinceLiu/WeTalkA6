@@ -279,7 +279,6 @@
         </RelativeLayout>
         <!--rec_text_item-->
         <RelativeLayout
-            android:id="@+id/conversation_item_rec_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="@dimen/conversation_item_padding_bottom"
@@ -290,7 +289,6 @@
                 style="@style/UserNameStyle" />
 
             <TextView
-                android:id="@+id/conversation_item_rec_text_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/conversation_item_rec_text_user_name"

@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="InputTypeStyle">
-        <item name="android:layout_width">@dimen/input_type_btn_width</item>
-        <item name="android:layout_height">@dimen/input_type_btn_width</item>
-        <item name="android:layout_alignParentRight">true</item>
-        <item name="android:layout_alignParentBottom">true</item>
-        <item name="android:layout_marginRight">45px</item>
-        <item name="android:layout_marginBottom">68px</item>
-        <item name="android:visibility">invisible</item>
-        <item name="android:clickable">true</item>
-        <item name="android:padding">10px</item>
-    </style>
-
-    <style name="ConversationItemStyle">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">@dimen/choice_input_type_width</item>
-        <item name="android:layout_marginRight">@dimen/choice_input_type_width</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:orientation">horizontal</item>
-    </style>
-
     <style name="UserNameStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

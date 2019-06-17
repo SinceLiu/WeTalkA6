@@ -16,7 +16,6 @@
         tools:visibility="visible" />
 
     <RelativeLayout
-        android:id="@+id/item_conversation_content_parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/item_conversation_video_content_parent_padding_bottom">
@@ -33,7 +32,6 @@
             android:src="@drawable/video_mask_left" />
 
         <ImageView
-            android:id="@+id/item_conversation_video_tag"
             android:layout_width="@dimen/item_conversation_video_tag_size"
             android:layout_height="@dimen/item_conversation_video_tag_size"
             android:layout_marginLeft="@dimen/item_conversation_video_tag_margin"
