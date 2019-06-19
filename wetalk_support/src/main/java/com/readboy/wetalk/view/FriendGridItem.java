@@ -57,8 +57,8 @@ public class FriendGridItem extends RelativeLayout {
         mFriendUnread = (TextView) findViewById(R.id.friend_pager_item_unread);
         mFriendUnread.setActivated(false);
         mFriendName = (TextView) findViewById(R.id.friend_pager_item_name);
-        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(mFriendName, 16,
-                20, 2, TypedValue.COMPLEX_UNIT_PX);
+//        TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(mFriendName, 16,
+//                20, 2, TypedValue.COMPLEX_UNIT_PX);
         mAvatar = findViewById(R.id.avatar);
     }
 

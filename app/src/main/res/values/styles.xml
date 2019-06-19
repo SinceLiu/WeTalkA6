@@ -4,7 +4,7 @@
     <style name="UserNameStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">15px</item>
+        <item name="android:textSize">@dimen/user_name_style_text_size</item>
         <item name="android:textColor">@color/username_color</item>
     </style>
 
@@ -42,9 +42,9 @@
         <item name="android:layout_marginTop">@dimen/conversation_item_margin_top</item>
         <item name="android:background">@drawable/answer_bg</item>
         <item name="android:gravity">center_vertical</item>
-        <item name="android:maxWidth">187px</item>
-        <item name="android:minWidth">50px</item>
-        <item name="android:minHeight">45px</item>
+        <item name="android:maxWidth">@dimen/conversation_text_item_max_width</item>
+        <item name="android:minWidth">@dimen/conversation_text_item_min_width</item>
+        <item name="android:minHeight">@dimen/conversation_text_item_min_height</item>
         <item name="android:textSize">@dimen/rec_text_size</item>
     </style>
 
