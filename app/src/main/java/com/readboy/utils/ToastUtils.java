@@ -35,7 +35,7 @@ public class ToastUtils {
         }
         viewGroup.getBackground().setAlpha(180);
         TextView textView = (TextView) viewGroup.getChildAt(0);
-        textView.setTextSize(24);
+        textView.setTextSize(24 * context.getResources().getDisplayMetrics().widthPixels);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.setView(viewGroup);
     }
@@ -65,7 +65,7 @@ public class ToastUtils {
                 if (twoTime - oneTime > 2000) {
                     toast.setDuration(time);
                     toast.show();
-                }else {
+                } else {
                     return;
                 }
             } else {

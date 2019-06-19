@@ -121,6 +121,8 @@
     <dimen name="record_dialog_small_record_state_margin_bottom">1px</dimen>
     <dimen name="item_conversation_video_right_margin_left">6px</dimen>
     <dimen name="item_conversation_video_right_padding_left">6px</dimen>
-
-
+    <dimen name="user_name_style_text_size">15px</dimen>
+    <dimen name="conversation_text_item_max_width">187px</dimen>
+    <dimen name="conversation_text_item_min_width">50px</dimen>
+    <dimen name="conversation_text_item_min_height">45px</dimen>
 </resources>
