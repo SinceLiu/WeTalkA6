@@ -111,7 +111,11 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
         Log.i(TAG, "showFirstFrame:  1 >>");
         if (mFirstFrame == null && isValidity) {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(mVideoPath);
+            try {
+                retriever.setDataSource(mVideoPath);
+            } catch (Exception e) {
+                Log.e(TAG, "video path is invalid");
+            }
             mFirstFrame = retriever.getFrameAtTime();
             retriever.release();
         }

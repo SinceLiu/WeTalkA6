@@ -225,17 +225,12 @@ public class ConversationListAdapterSimple extends BaseAdapter {
             case Constant.SEND_EMOJI:
                 //发送的表情显示本地的
                 emojiItemHolder.item.setVisibility(View.VISIBLE);
-                if (conversation.emojiId == 0 && !TextUtils.isEmpty(conversation.emojiCode)) {
-                    emojiItemHolder.content.setImageResource(EmojiUtils.getEmojiIdContainOldCode(conversation.emojiCode));
-                } else {
-                    emojiItemHolder.content.setImageResource(conversation.emojiId);
-                }
+                emojiItemHolder.content.setImageResource(EmojiUtils.getEmojiIdContainOldCode(conversation.emojiCode));
                 showSendEmojiProgressOrResend(conversation, emojiItemHolder);
                 showReceiveOrSendTime(conversation, position, emojiItemHolder);
                 break;
             case Constant.REC_EMOJI:
                 //接收的图片
-//                LogInfo.e(TAG, " type = " + type + ", emojiId = " + conversation.emojiId);
                 updateName(emojiItemHolder, conversation);
                 emojiItemHolder.item.setVisibility(View.VISIBLE);
                 emojiItemHolder.content.setImageResource(EmojiUtils.getEmojiIdContainOldCode(conversation.emojiCode));

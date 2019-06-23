@@ -12,6 +12,8 @@ import android.util.Log;
 
 import com.readboy.bean.VideoInfo;
 
+import java.io.File;
+
 /**
  * @author oubin
  * @date 2019/1/12
@@ -42,6 +44,9 @@ public class MediaUtils {
     }
 
     public static int[] getVideoSize(String path) {
+        if (!new File(path).exists()) {
+            return null;
+        }
         int[] result = new int[2];
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(path);
