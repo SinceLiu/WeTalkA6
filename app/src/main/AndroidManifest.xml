@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     coreApp="true"
     package="com.readboy.wetalk"
-    android:sharedUserId="android.uid.systemui"
+    android:sharedUserId="com.android.systemui"
     android:versionCode="190622001"
     android:versionName="2.1.4">
 

@@ -45,6 +45,7 @@ public class MediaUtils {
 
     public static int[] getVideoSize(String path) {
         if (!new File(path).exists()) {
+            Log.e(TAG,"video not exits!");
             return null;
         }
         int[] result = new int[2];
