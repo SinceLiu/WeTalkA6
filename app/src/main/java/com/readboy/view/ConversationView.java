@@ -643,7 +643,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
             return;
         }
         if (!isVideoSupported) {
-            showMsg("对方暂不支持视频消息");
+            showMsg("对方不支持视频消息");
             return;
         }
         String path = videoInfo.data;
