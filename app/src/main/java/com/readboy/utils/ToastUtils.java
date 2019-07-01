@@ -2,12 +2,9 @@ package com.readboy.utils;
 
 import android.content.Context;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 /**
  * @author ouibn
@@ -35,7 +32,7 @@ public class ToastUtils {
         }
         viewGroup.getBackground().setAlpha(180);
         TextView textView = (TextView) viewGroup.getChildAt(0);
-        textView.setTextSize(24 * context.getResources().getDisplayMetrics().widthPixels);
+        textView.setTextSize(24);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.setView(viewGroup);
     }

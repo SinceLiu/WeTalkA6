@@ -120,6 +120,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private Activity mActivity;
     private boolean isInContacts = true;
     private boolean isNewGroup = false;
+    private boolean isVideoSupported = true;
 
     //    private ThreadFactory mThreadFactory = new ThreadFactory() {
 //        @Override
@@ -362,6 +363,9 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                     @Override
                     public void run() {
                         mLoading.setVisibility(View.GONE);
+                        if (!profile.getImei().startsWith("8642270")) {
+                            isVideoSupported = false;
+                        }
                         mCurrentFriend.model = Model.getModel(profile.getImei());
                         adjustViewCaseModel(mCurrentFriend.model);
                     }
@@ -636,6 +640,10 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private void handleVideoData(VideoInfo videoInfo) {
         if (videoInfo == null) {
             showMsg("视频获取失败");
+            return;
+        }
+        if (!isVideoSupported) {
+            showMsg("对方暂不支持视频消息");
             return;
         }
         String path = videoInfo.data;

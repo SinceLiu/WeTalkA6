@@ -149,14 +149,14 @@ public class GroupMembersAdapter extends BaseAdapter<Friend, GroupMembersAdapter
                 Glide.with(mContext)
                         .load(friend.photoUri)
                         .error(R.drawable.common)
-                        .transform(new GlideRoundTransform(mContext, 60))
+                        .transform(new GlideRoundTransform(mContext, 50))
                         .into(mIcon);
             } else {
                 String url = Constant.ICON_URL + friend.uuid;
                 Glide.with(mContext)
                         .load(url)
                         .error(R.drawable.common)
-                        .transform(new GlideRoundTransform(mContext, 60))
+                        .transform(new GlideRoundTransform(mContext, 50))
                         .into(mIcon);
             }
             mAdd.setVisibility(friend.addVisibility);
