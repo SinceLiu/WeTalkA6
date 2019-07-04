@@ -98,22 +98,12 @@ public class WTContactUtils {
     }
 
     public static boolean isGroupControlled(Context context) {
-        String deviceModelString = Settings.Global.getString(context.getContentResolver(), "smartWatch_appctl");
-        if (deviceModelString == null) {
+        ReadboyWearManager rwm = (ReadboyWearManager) context.getSystemService(Context.RBW_SERVICE);
+        PersonalInfo info = rwm.getPersonalInfo();
+        if (info == null) {
             return false;
         }
-        try {
-            JSONObject jsonObject = new JSONObject(deviceModelString);
-            JSONObject systemAppObject = jsonObject.getJSONObject("system");
-            JSONObject friendGroupChatObject = systemAppObject.getJSONObject("friendGroupChat");
-            String friendGroupChat = friendGroupChatObject.optString("enabled");
-            if ("0".equals(friendGroupChat)) {
-                return true;
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return info.isAppCtrl(true,"friendGroupChat");
     }
 
     public static List<Friend> getFriendFromContacts(Context context) {

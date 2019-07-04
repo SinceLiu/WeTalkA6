@@ -8,10 +8,12 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -76,7 +78,7 @@ public class WetalkFrameLayout extends FrameLayout {
     public static final String EXTRA_FRIEND = "friend";
     private static final String CLASS_NAME_CONVERSATION = "com.readboy.wetalk.ConversationActivity";
     private static final String CLASS_NAME_FRIEND_SELECTOR = "com.readboy.activity.FriendSelectorActivity";
-    public static final String TAG_APPCTRL = "smartWatch_appctl";
+    public static final String ACTION_APPCTRL = "readboy.action.NOTIFY_APP_CTRL";
     private static final int IMAGE_WIDTH = 126;
     public static final int MAX_MESSAGE_COUNT = 100;
     private static final int MESSAGE_UPDATE_CONTACT = 10;
@@ -100,7 +102,7 @@ public class WetalkFrameLayout extends FrameLayout {
     private Activity mActivity;
 
     private ContentObserver mConversationObserver;
-    private ContentObserver mGroupControlledObserver;
+    private BroadcastReceiver mReceiver;
     private boolean isShowing = false;
     private boolean unreadCountChange = false;
     private String updateLastTime;
@@ -231,10 +233,12 @@ public class WetalkFrameLayout extends FrameLayout {
             getActivity().getContentResolver().registerContentObserver(WeTalkConstant.CONVERSATION_URI,
                     true, mConversationObserver);
         }
-        if (getActivity() != null && mGroupControlledObserver == null) {
-            mGroupControlledObserver = new GroupControlledObserver(new Handler());
-            getActivity().getContentResolver().registerContentObserver(Settings.Global.getUriFor(TAG_APPCTRL),
-                    true, mGroupControlledObserver);
+
+        if (getActivity() != null && mReceiver == null) {
+            mReceiver = new InnerReceiver();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_APPCTRL);
+            getActivity().registerReceiver(mReceiver, filter);
         }
 
     }
@@ -262,9 +266,9 @@ public class WetalkFrameLayout extends FrameLayout {
             getActivity().getContentResolver().unregisterContentObserver(mConversationObserver);
             mConversationObserver = null;
         }
-        if (mGroupControlledObserver != null) {
-            getActivity().getContentResolver().unregisterContentObserver(mGroupControlledObserver);
-            mGroupControlledObserver = null;
+        if (mReceiver != null) {
+            getActivity().unregisterReceiver(mReceiver);
+            mReceiver = null;
         }
     }
 
@@ -606,19 +610,17 @@ public class WetalkFrameLayout extends FrameLayout {
         }
     }
 
-    //群管控后隐藏群、清除未读消息数
-    private class GroupControlledObserver extends ContentObserver {
-        public GroupControlledObserver(Handler handler) {
-            super(handler);
-        }
-
+    private class InnerReceiver extends BroadcastReceiver {
         @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            super.onChange(selfChange, uri);
-            mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
-            mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
-            mHandler.removeMessages(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
-            mHandler.sendEmptyMessage(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_APPCTRL.equals(action)) {
+                //群管控后隐藏群、清除未读消息数
+                mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
+                mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
+                mHandler.removeMessages(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
+                mHandler.sendEmptyMessage(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
+            }
         }
     }
 
@@ -742,9 +744,9 @@ public class WetalkFrameLayout extends FrameLayout {
         }
     }
 
-    private void sendBroadcastToUpdateNotification(Context context){
+    private void sendBroadcastToUpdateNotification(Context context) {
         Intent intent = new Intent(ACTION_UPDATE_NOTIFICATION);
-        ComponentName componentName = new ComponentName("com.readboy.wetalk","com.readboy.receiver.MessageReceiver");
+        ComponentName componentName = new ComponentName("com.readboy.wetalk", "com.readboy.receiver.MessageReceiver");
         intent.setComponent(componentName);
         context.sendBroadcast(intent);
     }
