@@ -54,7 +54,7 @@ public class VideoActivity extends Activity implements View.OnClickListener, Med
         if (TextUtils.isEmpty(mVideoPath) || !new File(mVideoPath).exists()) {
             Log.i(TAG, "parseData: data invalid, path = " + mVideoPath);
             mVideoPath = "";
-            ToastUtils.show(this, "视频读取出错");
+            ToastUtils.show(this, getString(R.string.parse_video_fail));
             finish();
         } else {
             isValidity = true;

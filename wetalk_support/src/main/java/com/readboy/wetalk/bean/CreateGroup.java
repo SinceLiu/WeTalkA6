@@ -1,6 +1,8 @@
 package com.readboy.wetalk.bean;
 
 
+import android.content.Context;
+
 import com.readboy.wetalk.support.R;
 
 /**
@@ -10,10 +12,10 @@ import com.readboy.wetalk.support.R;
  */
 public class CreateGroup extends Friend {
 
-    public CreateGroup() {
+    public CreateGroup(Context context) {
         // 防止内部引用出错
         this.uuid = "createGroup";
-        this.name = "新建群";
+        this.name = context.getString(R.string.create_group);
         this.icon = R.drawable.ic_create_group;
         this.type = TYPE_CREATE_GROUP;
     }

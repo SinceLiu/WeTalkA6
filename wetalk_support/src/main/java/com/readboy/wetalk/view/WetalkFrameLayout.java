@@ -295,7 +295,7 @@ public class WetalkFrameLayout extends FrameLayout {
             }
             sortFriends(friends);
             if (friends != null && friends.size() > 0 && !WTContactUtils.isGroupControlled(mContext)) {
-                friends.add(new CreateGroup());
+                friends.add(new CreateGroup(mContext));
             }
             updateFriendData(friends);
             mAdapter.notifyDataSetChanged();

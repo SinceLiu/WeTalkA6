@@ -294,7 +294,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
         List<Friend> friends = WTContactUtils.getFriendFromContacts(mContext, selection, null);
         Log.i(TAG, "addAction: end.");
         if (friends == null) {
-            ToastUtils.show(mContext, "无可用添加的好友");
+            ToastUtils.show(mContext, mContext.getString(R.string.no_addable_friend));
             return;
         }
         ArrayList<Friend> data = new ArrayList<>();
@@ -308,7 +308,7 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
             }
         }
         if (data.size() <= 0) {
-            ToastUtils.show(mContext, "无可添加的好友");
+            ToastUtils.show(mContext, mContext.getString(R.string.no_addable_friend));
             return;
         }
         Intent intent = new Intent(getActivity(), FriendSelectorActivity.class);
@@ -360,16 +360,16 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                         public void run() {
                             if (code == 0) {
                                 if (isOwner()) {
-                                    ToastUtils.show(mContext, "成功解散群");
+                                    ToastUtils.show(mContext, mContext.getString(R.string.disband_group_succss));
                                 } else {
-                                    ToastUtils.show(mContext, "成功退群");
+                                    ToastUtils.show(mContext, mContext.getString(R.string.leave_group_success));
                                 }
                                 if (dialog != null && dialog.isShowing()) {
                                     dialog.dismiss();
                                 }
                                 getActivity().finish();
                             } else {
-                                ToastUtils.show(mContext, "操作失败.");
+                                ToastUtils.show(mContext, mContext.getString(R.string.action_fail));
                             }
                         }
                     });
@@ -381,14 +381,14 @@ public class GroupMembersView extends FrameLayout implements BaseAdapter.OnItemC
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            ToastUtils.show(mContext, "失败：" + errorMsg);
+                            ToastUtils.show(mContext, "fail：" + errorMsg);
                         }
                     });
                 }
             });
         } catch (JSONException e) {
             e.printStackTrace();
-            ToastUtils.show(mContext, "数据解析失败: " + e.toString());
+            ToastUtils.show(mContext, "parse fail: " + e.toString());
         }
     }
 
