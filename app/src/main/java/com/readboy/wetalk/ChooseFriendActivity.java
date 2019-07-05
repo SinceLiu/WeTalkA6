@@ -109,7 +109,7 @@ public class ChooseFriendActivity extends BaseRequestPermissionActivity {
                 return;
             }
             final Friend friend = mFriends.get(position);
-            if (friend.avatar == null && friend.name.equals(getResources().getString(R.string.homeGroup))) {
+            if (friend.avatar == null && friend.name.equals(getResources().getString(R.string.home_group))) {
                 holder.avatar.setImageResource(R.drawable.ic_family_group);
             } else if (friend.avatar == null) {
                 holder.avatar.setImageResource(R.drawable.common);

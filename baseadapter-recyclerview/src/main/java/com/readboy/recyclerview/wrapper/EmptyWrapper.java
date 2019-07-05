@@ -107,7 +107,9 @@ public class EmptyWrapper<T> extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount()
     {
-        if (isEmpty()) return 1;
+        if (isEmpty()) {
+            return 1;
+        }
         return mInnerAdapter.getItemCount();
     }
 

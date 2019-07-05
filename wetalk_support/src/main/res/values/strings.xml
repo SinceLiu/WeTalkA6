@@ -2,5 +2,7 @@
 
     <string name="no_contacts">没有联系人</string>
     <string name="loading">加载中</string>
+    <string name="wetalk">微聊</string>
+    <string name="home_group">家庭圈</string>
 
 </resources>

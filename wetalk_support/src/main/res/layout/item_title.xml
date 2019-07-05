@@ -4,7 +4,7 @@
     android:layout_height="@dimen/item_title_height"
     android:background="@drawable/bg_title"
     android:gravity="center"
-    android:text="微聊"
+    android:text="@string/wetalk"
     android:textColor="@android:color/white"
     android:textSize="@dimen/item_title_text_size">
 

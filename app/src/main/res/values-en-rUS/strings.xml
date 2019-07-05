@@ -2,7 +2,7 @@
     <string name="app_name">Chat</string>
     <string name="get_image_fail">Failure to obtain photo data</string>
     <string name="play_voice_error">Voice files do not exist</string>
-    <string name="homeGroup">homeGroup</string>
+    <string name="home_group">homeGroup</string>
     <string name="voice_error_msg">The recording time is too short</string>
     <string name="out_off_limit_format">The maximum length of the recording is %s seconds</string>
     <string name="synchronizing">loading</string>

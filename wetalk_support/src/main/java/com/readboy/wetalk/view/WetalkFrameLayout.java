@@ -399,9 +399,9 @@ public class WetalkFrameLayout extends FrameLayout {
 
             @Override
             public int compare(Friend f1, Friend f2) {
-                if ("家庭圈".equals(f1.name)) {
+                if (getString(R.string.home_group).equals(f1.name)) {
                     return -2;
-                } else if ("家庭圈".equals(f2.name)) {
+                } else if (getString(R.string.home_group).equals(f2.name)) {
                     return 2;
                 } else if (f1.type == Friend.TYPE_CREATE_GROUP) {
                     return 3;

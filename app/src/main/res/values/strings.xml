@@ -2,7 +2,7 @@
     <string name="app_name">微聊</string>
     <string name="get_image_fail">获取照片数据出错</string>
     <string name="play_voice_error">语音文件下载失败</string>
-    <string name="homeGroup">家庭圈</string>
+    <string name="home_group">家庭圈</string>
     <string name="voice_error_msg">录音时间太短</string>
     <string name="out_off_limit_format">录音最大时长为%s秒</string>
     <string name="synchronizing">正在加载</string>

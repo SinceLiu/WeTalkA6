@@ -117,8 +117,7 @@ public class MediaUtils {
                     null, null)) {
                 if (null != cursor) {
                     if (cursor.moveToFirst()) {
-                        VideoInfo info = VideoInfo.createVideoInfo(cursor);
-//                        if (info != null && (info.width <= 0 || info.height <= 0)) {
+                        //                        if (info != null && (info.width <= 0 || info.height <= 0)) {
 //                            try {
 //                                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
 //                                retriever.setDataSource(context, uri);
@@ -129,7 +128,7 @@ public class MediaUtils {
 //                                Log.e(TAG, "getVideoInfo: e = " + e.toString());
 //                            }
 //                        }
-                        return info;
+                        return VideoInfo.createVideoInfo(cursor);
                     }
                 }
             } catch (Exception e) {

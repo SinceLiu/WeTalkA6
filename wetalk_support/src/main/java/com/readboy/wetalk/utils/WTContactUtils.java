@@ -129,7 +129,7 @@ public class WTContactUtils {
             contactId = cursor.getInt(cursor.getColumnIndex(Data.RAW_CONTACT_ID));
             if (oldrid != contactId) {
                 if (contact != null && contact.uuid != null && !contact.uuid.startsWith("M")) {
-                    if (!isGroupControlled || "家庭圈".equals(contact.name) || !contact.uuid.startsWith("G")) {
+                    if (!isGroupControlled || context.getString(R.string.home_group).equals(contact.name) || !contact.uuid.startsWith("G")) {
                         list.add(contact);
                     }
                 }
@@ -160,7 +160,7 @@ public class WTContactUtils {
                 case StructuredPostal.CONTENT_ITEM_TYPE:
                     if (cursor.getInt(cursor.getColumnIndex(StructuredPostal.TYPE)) == StructuredPostal.TYPE_WORK) {
                         contact.uuid = cursor.getString(cursor.getColumnIndex("data8"));
-                        if ("家庭圈".equals(contact.name)) {
+                        if (context.getString(R.string.home_group).equals(contact.name)) {
                             contact.icon = R.drawable.ic_family_group;
                         } else if (contact.uuid.startsWith("G")) {
                             contact.icon = R.drawable.ic_friend_group;
@@ -181,7 +181,7 @@ public class WTContactUtils {
         cursor.close();
         try {
             if (contact != null && !list.contains(contact) && contact.uuid != null && !contact.uuid.startsWith("M")) {
-                if (!isGroupControlled || "家庭圈".equals(contact.name) || !contact.uuid.startsWith("G")) {
+                if (!isGroupControlled || context.getString(R.string.home_group).equals(contact.name) || !contact.uuid.startsWith("G")) {
                     list.add(contact);
                 }
             }
@@ -212,7 +212,7 @@ public class WTContactUtils {
         while (cursor.moveToNext()) {
             contactId = cursor.getInt(cursor.getColumnIndex(Data.RAW_CONTACT_ID));
             if (oldrid != contactId) {
-                if (contact != null && contact.uuid != null && contact.uuid.startsWith("G") && !"家庭圈".equals(contact.name)) {
+                if (contact != null && contact.uuid != null && contact.uuid.startsWith("G") && !context.getString(R.string.home_group).equals(contact.name)) {
                     list.add(contact);
                 }
                 contact = new Friend();
@@ -237,7 +237,7 @@ public class WTContactUtils {
         }
         cursor.close();
         try {
-            if (contact != null && contact.uuid != null && contact.uuid.startsWith("G") && !"家庭圈".equals(contact.name)) {
+            if (contact != null && contact.uuid != null && contact.uuid.startsWith("G") && !context.getString(R.string.home_group).equals(contact.name)) {
                 list.add(contact);
             }
         } catch (NullPointerException e) {
