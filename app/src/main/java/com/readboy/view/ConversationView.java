@@ -363,7 +363,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                     @Override
                     public void run() {
                         mLoading.setVisibility(View.GONE);
-                        if (!profile.getImei().startsWith("8642270")) {
+                        if (!profile.getImei().startsWith("86422704") && !profile.getImei().startsWith("86172404") &&
+                                !profile.getImei().startsWith("86626104")) {
                             isVideoSupported = false;
                         }
                         mCurrentFriend.model = Model.getModel(profile.getImei());
