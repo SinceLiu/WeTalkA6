@@ -630,7 +630,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     private void showImageConversation() {
         Conversation img = getSendBaseConversation(Constant.SEND_IMAGE);
         img.imageLocalPath = mCurrentImagePath;
-        if (new File(img.imageLocalPath).exists()) {
+        if (!TextUtils.isEmpty(img.imageLocalPath) && new File(img.imageLocalPath).exists()) {
             saveConversationToLocal(img);
             NetWorkUtils.uploadFile(img, mUploadFileHandler);
         } else {
@@ -655,7 +655,7 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         video.imageLocalPath = path;
         video.voiceLocalPath = path;
         video.content = path;
-        if (new File(path).exists()) {
+        if (!TextUtils.isEmpty(path) && new File(path).exists()) {
             saveConversationToLocal(video);
             NetWorkUtils.uploadFile(video, mUploadFileHandler);
 //            HttpClient.uploadVideo(path, new Callback() {

@@ -238,6 +238,12 @@ public class MessageService extends Service {
                 result--;
                 continue;
             }
+            //群管控时，群消息设为已读，不发通知
+            if (conversation.isHomeGroup == Constant.TRUE && WTContactUtils.isGroupControlled(context)
+                    && !conversation.realSendId.startsWith("U")) {
+                result--;
+                conversation.isUnread = Constant.FALSE;
+            }
             Log.i(TAG, "parseMessage: messageInfo[0] " + messageInfo[0]);
             if (SYSTEM_NOTIFICATION.equalsIgnoreCase(messageInfo[0])) {
                 parseSystemMessage(context, data, conversation);
@@ -355,9 +361,6 @@ public class MessageService extends Service {
         //是否是家庭圈的消息,根据发件人的群Id判断
         conversation.isHomeGroup = conversation.sendId.startsWith("G") ? Constant.TRUE : Constant.FALSE;
         if (conversation.isHomeGroup == Constant.TRUE) {
-            if (WTContactUtils.isGroupControlled(context) && !conversation.realSendId.startsWith("U")) {
-                return null;
-            }
             String name = WTContactUtils.getNameById(context, conversation.realSendId);
             if (TextUtils.isEmpty(name)) {
                 Profile profile = Profile.queryProfileWithUuid(context.getContentResolver(), conversation.realSendId);
