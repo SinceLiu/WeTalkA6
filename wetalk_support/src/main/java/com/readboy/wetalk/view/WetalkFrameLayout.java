@@ -4,10 +4,6 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -18,14 +14,11 @@ import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -69,7 +62,7 @@ public class WetalkFrameLayout extends FrameLayout {
     public static final String AUTHORITY = "com.readboy.wetalk.provider.Conversation";
     public static final String TABLE_NAME = "conversation";
     public static final Uri CONVERSATION_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_NAME);
-    public static final String ACTION_UPDATE_NOTIFICATION = "readboy.action._UPDATE_NOTIFICATION";
+    public static final String ACTION_UPDATE_NOTIFICATION = "readboy.action.UPDATE_NOTIFICATION";
 
     private static final String ICON_URL = "http://img.readboy.com/avatar/";
     private static final String RB_UPDATE_PHOTO_PER_HOUR = "RB_UPDATE_PHOTO_PER_HOUR";
@@ -106,6 +99,7 @@ public class WetalkFrameLayout extends FrameLayout {
     private boolean isShowing = false;
     private boolean unreadCountChange = false;
     private String updateLastTime;
+    private boolean lastIsGroupControlled = false;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -616,10 +610,14 @@ public class WetalkFrameLayout extends FrameLayout {
             String action = intent.getAction();
             if (ACTION_APPCTRL.equals(action)) {
                 //群管控后隐藏群、清除未读消息数
-                mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
-                mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
-                mHandler.removeMessages(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
-                mHandler.sendEmptyMessage(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
+                boolean isGroupControlled = WTContactUtils.isGroupControlled(context);
+                if (isGroupControlled != lastIsGroupControlled) {
+                    mHandler.removeMessages(MESSAGE_UPDATE_CONTACT);
+                    mHandler.sendEmptyMessageDelayed(MESSAGE_UPDATE_CONTACT, DELAY_UPDATE_MILLIS_TIME);
+                    mHandler.removeMessages(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
+                    mHandler.sendEmptyMessage(MESSAGE_CLEAR_GROUP_UNREAD_COUNT);
+                    lastIsGroupControlled = isGroupControlled;
+                }
             }
         }
     }
@@ -745,6 +743,10 @@ public class WetalkFrameLayout extends FrameLayout {
     }
 
     private void sendBroadcastToUpdateNotification(Context context) {
+        //只有主界面的实例发送
+        if ("com.readboy.wetalk".equals(context.getPackageName())) {
+            return;
+        }
         Intent intent = new Intent(ACTION_UPDATE_NOTIFICATION);
         ComponentName componentName = new ComponentName("com.readboy.wetalk", "com.readboy.receiver.MessageReceiver");
         intent.setComponent(componentName);

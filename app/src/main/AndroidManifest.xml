@@ -4,7 +4,7 @@
     coreApp="true"
     package="com.readboy.wetalk"
     android:sharedUserId="com.android.systemui"
-    android:versionCode="190708001"
+    android:versionCode="190710004"
     android:versionName="2.1.6">
 
     <!-- <uses-feature android:name="android.hardware.type.watch" /> -->
@@ -57,7 +57,7 @@
                 <action android:name="readboy.action.NOTIFY_FRIEND_REQUEST" />
             </intent-filter>
             <intent-filter>
-                <action android:name="readboy.action._UPDATE_NOTIFICATION" />
+                <action android:name="readboy.action.UPDATE_NOTIFICATION" />
             </intent-filter>
 
         </receiver>
