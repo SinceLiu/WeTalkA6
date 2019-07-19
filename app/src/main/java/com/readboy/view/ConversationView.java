@@ -18,7 +18,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,7 +40,6 @@ import com.readboy.adapter.ConversationListAdapterSimple;
 import com.readboy.bean.Constant;
 import com.readboy.bean.Conversation;
 import com.readboy.bean.VideoInfo;
-import com.readboy.http.HttpClient;
 import com.readboy.utils.MediaUtils;
 import com.readboy.wetalk.bean.Friend;
 import com.readboy.wetalk.bean.Model;
@@ -59,19 +57,13 @@ import com.readboy.utils.ToastUtils;
 import com.readboy.wetalk.EmojiActivity;
 import com.readboy.wetalk.GetImageActivity;
 import com.readboy.wetalk.R;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * @author hwj
@@ -472,26 +464,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
             default:
                 break;
         }
-    }
-
-    private void uploadTest(String path) {
-        HttpClient.uploadImage(path, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.i(TAG, "onFailure() called with: call = " + call + ", e = " + e + "");
-            }
-
-            @Override
-            public void onResponse(Call call, @NonNull Response response) throws IOException {
-                Log.i(TAG, "onResponse: ");
-                Log.i(TAG, "onResponse: header = " + response.headers().toString());
-                ResponseBody body = response.body();
-                if (body != null) {
-                    String result = body.string();
-                    Log.i(TAG, "onResponse: body = " + result);
-                }
-            }
-        });
     }
 
     /**
