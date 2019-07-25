@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.readboy.recyclerview.wrapper.HeaderAndFooterWrapper;
@@ -427,15 +428,19 @@ public class WetalkFrameLayout extends FrameLayout {
     }
 
     private void gotoFriendSelector() {
-        Intent intent = new Intent();
-        ComponentName name = new ComponentName(PACKAGE_NAME, CLASS_NAME_FRIEND_SELECTOR);
-        intent.setComponent(name);
         ArrayList<Friend> data = new ArrayList<>();
         for (Friend friend : mFriends) {
             if (friend.isSupportGroup()) {
                 data.add(friend);
             }
         }
+        if (data.size() == 0) {
+            Toast.makeText(mContext, getString(R.string.no_watch_friend), Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent();
+        ComponentName name = new ComponentName(PACKAGE_NAME, CLASS_NAME_FRIEND_SELECTOR);
+        intent.setComponent(name);
         intent.putParcelableArrayListExtra(EXTRA_FRIENDS, data);
         startActivity(intent);
     }

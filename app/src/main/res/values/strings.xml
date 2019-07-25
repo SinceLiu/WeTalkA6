@@ -44,5 +44,4 @@
     <string name="leave_group_success">成功退群</string>
     <string name="action_fail">操作失败.</string>
     <string name="parse_video_fail">视频读取出错</string>
-
 </resources>

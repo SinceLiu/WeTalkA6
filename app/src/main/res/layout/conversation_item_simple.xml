@@ -34,8 +34,7 @@
                 android:id="@+id/conversation_item_rec_voice_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/conversation_item_rec_voice_user_name"
-                android:layout_centerVertical="true">
+                android:layout_below="@id/conversation_item_rec_voice_user_name">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -85,9 +84,9 @@
                 android:id="@+id/conversation_item_rec_voice_progress"
                 android:layout_width="@dimen/retry_square_btn_width"
                 android:layout_height="@dimen/retry_square_btn_width"
-                android:layout_centerVertical="true"
                 android:layout_margin="@dimen/conversation_item_simple_padding"
                 android:layout_toRightOf="@id/conversation_item_rec_voice_unread"
+                android:layout_alignBottom="@+id/conversation_item_rec_voice_play"
                 android:visibility="gone" />
         </RelativeLayout>
 
