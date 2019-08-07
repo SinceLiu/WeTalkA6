@@ -109,7 +109,7 @@ public class FirstStartActivity extends BaseRequestPermissionActivity {
 
         startUpdateContactService();
 
-        MPrefs.setNotificationType(this, false);
+//        MPrefs.setNotificationType(this, false);
         initDeviceInfo();
         Intent intent = getIntent();
         String path = intent.getStringExtra("share_image");

@@ -421,9 +421,12 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
     public void updateMembers(Map<String, Friend> map) {
         mMemberMap.clear();
         mMemberMap.putAll(map);
-        post(() -> {
-            if (mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
+        post(new Runnable() {
+            @Override
+            public void run() {
+                if (mAdapter != null) {
+                    mAdapter.notifyDataSetChanged();
+                }
             }
         });
     }
@@ -732,7 +735,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
 
     private void sendConversationInfo(final Conversation conversation) {
         NetWorkUtils.sendMessage(mContext, conversation, new PushResultListener() {
-
             @Override
             public void pushSucceed(String type, String s1, int code, String s,
                                     String response) {

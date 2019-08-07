@@ -1,6 +1,5 @@
 package com.readboy.activity;
 
-import android.util.SparseArray;
 
 import com.readboy.wetalk.bean.Friend;
 

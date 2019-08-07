@@ -177,6 +177,7 @@ public class WetalkFrameLayout extends FrameLayout {
         initView();
         initData();
         registerObserver();
+        lastIsGroupControlled = WTContactUtils.isGroupControlled(context);
     }
 
     @Override
@@ -411,20 +412,6 @@ public class WetalkFrameLayout extends FrameLayout {
                 }
             }
         });
-//        int homeGroupPos = getFriendPosition(getString(R.string.wetalk_home_group));
-//        if (homeGroupPos < friends.size()) {
-//            Friend homeGroup = friends.get(homeGroupPos);
-//            homeGroup.icon = R.drawable.ic_family_group;
-//            friends.remove(homeGroupPos);
-//            friends.add(0, homeGroup);
-//        }
-//        for (Friend friend : friends) {
-//            if (friend.type == Friend.TYPE_CREATE_GROUP) {
-//                friends.remove(friend);
-//                friends.add(friend);
-//            }
-//        }
-
     }
 
     private void gotoFriendSelector() {
@@ -555,11 +542,11 @@ public class WetalkFrameLayout extends FrameLayout {
                                 v.setScaleY(1.0f);
                                 final int p = (int) v.getTag();
                                 final Friend friend = mFriends.get(p);
-                                //点击时更新该好友头像
-                                updatePhoto(friend);
                                 if (friend.type == Friend.TYPE_CREATE_GROUP) {
                                     gotoFriendSelector();
                                 } else {
+                                    //点击时更新该好友头像
+                                    updatePhoto(friend);
                                     gotoConversation(friend);
                                 }
                                 v.performClick();
@@ -632,6 +619,7 @@ public class WetalkFrameLayout extends FrameLayout {
      */
     public void updatePhoto(final Friend friend) {
         String url = ICON_URL + friend.uuid;
+        updateLastTime = friend.uuid + RB_UPDATE_PHOTO_PER_HOUR;
         if (TextUtils.isEmpty(friend.photoUri)) {
             ImageRequest request = new ImageRequest(url, new Listener<Bitmap>() {
                 @Override
@@ -642,7 +630,6 @@ public class WetalkFrameLayout extends FrameLayout {
             }, IMAGE_WIDTH, IMAGE_WIDTH, ImageView.ScaleType.CENTER_INSIDE, Bitmap.Config.ARGB_8888, errorListener);
             getQueue(mContext).add(request);
         } else {
-            updateLastTime = friend.uuid + RB_UPDATE_PHOTO_PER_HOUR;
             long last = Settings.Global.getLong(mContext.getContentResolver(), updateLastTime, 0);
             //超过一小时才更新
             if ((System.currentTimeMillis() - last) < UPDATE_CYCLE) {

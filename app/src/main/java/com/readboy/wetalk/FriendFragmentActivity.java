@@ -69,7 +69,7 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
     protected void onDestroy() {
         LogInfo.i(TAG, " FriendFragmentActivity --- onDestroy()");
         super.onDestroy();
-        MPrefs.setNotificationType(this, true);
+//        MPrefs.setNotificationType(this, true);
 //        AudioUtils.abandonAudioFocus(this);
         killBackgroundProcesses();
     }
@@ -87,7 +87,7 @@ public class FriendFragmentActivity extends BaseFragmentActivity {
 
     @Override
     protected void initContent() {
-        MPrefs.setNotificationType(this, false);
+//        MPrefs.setNotificationType(this, false);
         initDeviceInfo();
     }
 

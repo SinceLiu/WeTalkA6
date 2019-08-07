@@ -1,17 +1,10 @@
 package com.readboy.wetalk;
 
 import android.app.ActivityManager;
-import android.app.readboy.ReadboyWearManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
-import com.readboy.utils.AudioUtils;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.MPrefs;
-import com.readboy.wetalk.utils.WTContactUtils;
 import com.readboy.wetalk.view.WetalkFrameLayout;
 
 /**
@@ -61,7 +54,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
         LogInfo.i(TAG, " FriendActivity --- onDestroy()");
         super.onDestroy();
         mParent.onDestroy();
-        MPrefs.setNotificationType(this, true);
+//        MPrefs.setNotificationType(this, true);
 //        AudioUtils.abandonAudioFocus(this);
         killBackgroundProcesses();
     }
@@ -80,7 +73,7 @@ public class FriendActivity extends BaseRequestPermissionActivity {
     @Override
     protected void initContent() {
         setContentView(R.layout.activity_friend);
-        MPrefs.setNotificationType(this, false);
+//        MPrefs.setNotificationType(this, false);
         initView();
     }
 }
