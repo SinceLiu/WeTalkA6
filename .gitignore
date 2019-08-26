@@ -13,6 +13,6 @@
 /.gitignore
 /**/build
 /projectFilesBackup
-/readboywearmanager
 /.idea
 *.patch
+/ReadboyWearManager

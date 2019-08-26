@@ -1,1 +1,1 @@
-include ':app', ':readboywearmanager', ':baseadapter-recyclerview', ':wetalk_support'
+include ':app', ':baseadapter-recyclerview', ':wetalk_support'

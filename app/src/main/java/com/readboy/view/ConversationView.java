@@ -136,7 +136,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
         @Override
         public void onChange(boolean selfChange) {
             // 获取最新的消息集合
-            // TODO，对方正在插入数据，可能会获取到多条新消息
             // 数据库记录，未必是按照time字段排序，可能先获取到最新的，再获取到旧的。
             List<Conversation> conversations = ConversationProvider.getConversationList(mContext, mCurrentFriend.uuid, false);
             if (conversations == null || conversations.size() < mConversations.size()) {
@@ -683,16 +682,8 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
      * 刷新，并跳转到最新一条
      */
     private void notifyAndScrollBottom() {
-//        mAdapter.notifyDataSetChanged();
-        //本应该是mAdapter.getCount-1的，但是发送图片时有bug，显示的不是最底下的图片。
-        mConversationList.post(new Runnable() {
-            @Override
-            public void run() {
-                //setSelection后立刻再notifyDataSetChanged会导致setSelection无效，改为再setAdapter
-                mConversationList.setAdapter(mAdapter);
-//                mConversationList.setSelection(mAdapter.getCount());
-            }
-        });
+        //setSelection后立刻再notifyDataSetChanged会导致setSelection无效，改为再setAdapter
+        mConversationList.setAdapter(mAdapter);
     }
 
     public static final int SEND_MESSAGE_SUCCESS = 0x11;

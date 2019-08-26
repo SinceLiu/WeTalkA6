@@ -2,6 +2,7 @@ package com.readboy.adapter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -14,6 +15,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
@@ -42,7 +44,6 @@ import com.readboy.view.ConversationView;
 import com.readboy.wetalk.DisplayImageActivity;
 import com.readboy.wetalk.R;
 import com.readboy.wetalk.TextDialog;
-import com.tencent.bugly.crashreport.CrashReport;
 
 /**
  * @author hwj
@@ -188,7 +189,6 @@ public class ConversationListAdapterSimple extends BaseAdapter {
                         break;
                     default:
                         Log.e(TAG, "getView: unknown message type, " + conversation.content);
-                        CrashReport.postCatchedException(new IllegalAccessException("message send type = " + type));
                         view = LayoutInflater.from(mContext).inflate(R.layout.item_conversation_text_left, viewGroup, false);
                         commonHolder = new UnknownItemHolder(view);
                         view.setTag(commonHolder);

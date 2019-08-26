@@ -48,7 +48,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.0.pr4'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.0.pr4'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.0.pr4'
-    implementation project(':readboywearmanager')
     implementation project(':baseadapter-recyclerview')
     implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation project(':wetalk_support')

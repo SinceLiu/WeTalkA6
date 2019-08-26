@@ -7,7 +7,6 @@ import android.util.Log;
 import com.readboy.bean.Constant;
 import com.readboy.utils.LogInfo;
 import com.readboy.utils.NetWorkUtils;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,7 +60,6 @@ public class AudioRecorder implements RecordStrategy {
             } catch (IllegalStateException | IOException e) {
                 e.printStackTrace();
                 Log.w(TAG, "start: 开始录音识别出错。", e);
-                CrashReport.postCatchedException(e);
                 recorder.setOnErrorListener(null);
                 recorder.setOnInfoListener(null);
                 recorder.setPreviewDisplay(null);

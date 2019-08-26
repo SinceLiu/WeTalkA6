@@ -251,6 +251,7 @@ public class NotificationUtils {
         return intent;
     }
 
+
     /**
      * 不用判断是否在上课禁用期间，SystemUI统一处理，
      * 期间，不主动亮屏，无振动，有弹窗，更新通知栏信息。
