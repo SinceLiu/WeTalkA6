@@ -9,6 +9,7 @@ import com.readboy.wetalk.view.WetalkFrameLayout;
 
 /**
  * @author hwj
+ * @deprecated
  */
 public class FriendActivity extends BaseRequestPermissionActivity {
     private static final String TAG = "hwj_FriendActivity";

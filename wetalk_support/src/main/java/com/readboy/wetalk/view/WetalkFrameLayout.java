@@ -518,7 +518,7 @@ public class WetalkFrameLayout extends FrameLayout {
             } else {
                 //根据未读数设置显示数量
                 int count = friend.unreadCount;
-                if (count > MAX_MESSAGE_COUNT) {
+                if (count >= MAX_MESSAGE_COUNT) {
                     holder.item.setUnreadCount("99+", true);
                 } else {
                     holder.item.setUnreadCount(String.valueOf(friend.unreadCount), false);

@@ -337,8 +337,6 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
             if (mCurrentFriend.uuid != null && mCurrentFriend.uuid.trim().startsWith(Model.UUID_BEGINNING_CHARACTER)) {
                 mLoading.setVisibility(View.VISIBLE);
                 initModel();
-            } else {
-//                mLoading.setVisibility(View.GONE);
             }
         } else {
             showMsg(getResources().getString(R.string.wrong_data));
@@ -354,8 +352,10 @@ public class ConversationView extends RelativeLayout implements OnClickListener,
                     @Override
                     public void run() {
                         mLoading.setVisibility(View.GONE);
-                        if (!profile.getImei().startsWith("86422704") && !profile.getImei().startsWith("86172404") &&
-                                !profile.getImei().startsWith("86626104")) {
+                        if (!profile.getImei().startsWith("86422704")
+                                && !profile.getImei().startsWith("86172404")
+                                && !profile.getImei().startsWith("86626104")
+                                && !profile.getImei().startsWith("86132004")) {
                             isVideoSupported = false;
                         }
                         mCurrentFriend.model = Model.getModel(profile.getImei());
