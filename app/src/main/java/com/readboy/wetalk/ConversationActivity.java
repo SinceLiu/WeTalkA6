@@ -138,7 +138,6 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
     }
 
     private void updateGroupInfoFromNet(String uuid) {
-        hadUpdateGroupInfo = true;
         GroupInfoManager.getGroupInfoFromNet(ConversationActivity.this,
                 uuid, ConversationActivity.this);
     }
@@ -295,6 +294,7 @@ public class ConversationActivity extends BaseRequestPermissionActivity implemen
     @Override
     public void onSuccess(GroupInfo info) {
         if (info != null) {
+            hadUpdateGroupInfo = true;
             updateMembersMap(info);
             mMembersView.updateGroupInfo(info);
         }
